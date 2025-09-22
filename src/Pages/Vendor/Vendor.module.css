@@ -1,0 +1,88 @@
+@import '../../styles/global.css';
+
+.vendorContainer {
+  max-width: 1200px;
+  padding: 0 1rem;
+}
+
+.vendorContainer h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  font-family: "Story Script", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+  color: var(--primary-color);
+}
+
+.shopSelector {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.shopSelector label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+  font-family: "Story Script", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1.5rem;
+}
+
+.selectDropdown {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background-color: white;
+  color: var(--color-text);
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.selectDropdown:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2);
+}
+
+.productsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1rem 0;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.noResults {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .productsGrid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .vendorContainer h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .productsGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .selectDropdown {
+    width: 100%;
+  }
+}

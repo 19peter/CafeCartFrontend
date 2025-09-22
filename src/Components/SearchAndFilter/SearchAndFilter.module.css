@@ -1,0 +1,78 @@
+@import '../../styles/global.css';
+
+.searchFilterContainer {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+}
+
+.searchForm {
+  width: 100%;
+}
+
+.searchInputGroup {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.searchInput {
+  flex: 2;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2);
+}
+
+.categorySelect {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  background-color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.categorySelect:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2);
+}
+
+.searchButton {
+  padding: 0.75rem 2rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.searchButton:hover {
+  background-color: var(--color-primary-light);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .searchInputGroup {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  /* .searchInput,
+  .categorySelect,
+  .searchButton {
+    width: 100%;
+  } */
+}

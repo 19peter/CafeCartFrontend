@@ -1,0 +1,9 @@
+.custom_btn {
+    width: 150px;
+    margin: 0 5px;
+    
+}
+
+.custom_btn:hover {
+    border: 1px solid #9C6644;
+}

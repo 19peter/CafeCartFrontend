@@ -1,0 +1,144 @@
+@import '../../styles/global.css';
+
+.container {
+  width: 100%;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: var(--color-bg);
+}
+
+.image_sec {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  margin-right: 20px;
+  max-height: 70vh;
+  background-color: var(--color-bg-secondary);
+}
+
+.text_sec {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: var(--color-primary);
+  padding: 20px;
+  text-align: center;
+}
+
+.text_sec h1 {
+  font-size: 2.5rem;
+  color: var(--color-text);
+  font-family: "Story Script", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  margin-bottom: 1rem;
+}
+
+.highlight {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.cafe_img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  transition: transform 0.3s ease;
+}
+
+.cafe_img:hover {
+  transform: scale(1.02);
+}
+
+.browse_btn {
+  background-color: var(--color-primary);
+  width: 50%;
+  cursor: pointer;
+  border-radius: 8px;
+  height: fit-content;
+  padding: 12px 24px;
+  color: var(--color-button-text);
+  margin-top: 20px;
+  border: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.browse_btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.subtitle {
+  font-family: "Story Script", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+  font-size: 1.4rem;
+  color: var(--color-text-light);
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Tablet and Mobile Responsive Styles */
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    padding: 40px 20px;
+    min-height: auto;
+  }
+
+  .image_sec {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto 40px;
+    max-height: 50vh;
+  }
+
+  .text_sec {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .text_sec h1 {
+    font-size: 2rem;
+  }
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 480px) {
+  .container {
+    padding: 20px 15px;
+  }
+
+  .image_sec {
+    margin-bottom: 30px;
+    max-height: 40vh;
+    padding: 15px;
+  }
+
+  .text_sec h1 {
+    font-size: 1.75rem;
+  }
+
+  .browse_btn {
+    width: 70%;
+    padding: 10px 20px;
+  }
+
+  .subtitle {
+    font-size: 1.2rem;
+  }
+}

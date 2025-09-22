@@ -1,0 +1,72 @@
+@import '../../styles/global.css';
+
+.vendorCard {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  aspect-ratio: 16/9;
+}
+
+.vendorCard:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.vendorImage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.1) 100%);
+}
+
+.vendorName {
+  position: relative;
+  color: var(--color-bg);
+  font-size: 1.5rem;
+  font-weight: 600;
+  /* margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 1; */
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  /* .vendorCard {
+    aspect-ratio: 4/3;
+  } */
+  
+  .vendorName {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vendorCard {
+    aspect-ratio: 1;
+    border-radius: 8px;
+  }
+  
+  .vendorName {
+    font-size: 1.1rem;
+  }
+}

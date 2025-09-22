@@ -1,0 +1,254 @@
+@import '../../styles/global.css';
+
+.container {
+  width: 100%;
+  background-color: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.navWrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  position: relative;
+}
+
+.logo {
+  font-family: "Libertinus Keyboard", system-ui;
+  color: var(--color-primary);
+  font-size: 1.5rem;
+  font-weight: bold;
+  z-index: 10;
+}
+
+.registeration_btns {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  z-index: 2;
+}
+
+.cartLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+  margin-left: 8px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.cartLink:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.cartIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.cartBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.registeration_btns button,
+.registeration_btns a {
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  text-decoration: none;
+  text-align: center;
+}
+
+.signin_btn {
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary) !important;
+}
+
+.signin_btn:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.register_btn {
+  background-color: var(--color-primary);
+  color: white;
+  border: 1px solid var(--color-primary) !important;
+}
+
+.register_btn:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark) !important;
+}
+
+/* User Menu Styles */
+.userMenu {
+  position: relative;
+  display: inline-block;
+}
+
+.userButton {
+  background: none;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text);
+  padding: 8px 16px !important;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.userButton:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 200px;
+  z-index: 1000;
+  padding: 8px 0;
+  min-width: 160px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 16px;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.9rem;
+  text-decoration: none;
+  gap: 8px;
+}
+
+.dropdownItem svg {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.dropdownItem:hover {
+  background-color: var(--color-bg-hover);
+}
+
+/* Mobile Menu Button */
+.menuButton {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.menuButton span {
+  width: 100%;
+  height: 2px;
+  background: var(--color-text);
+  transition: all 0.3s ease;
+}
+
+.menuButton.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menuButton.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.menuButton.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* Mobile styles */
+@media (max-width: 768px) {
+  .menuButton {
+    display: flex;
+  }
+
+  .registeration_btns {
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    background: var(--color-bg);
+    flex-direction: column;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .registeration_btns.menuOpen {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .registeration_btns.menuClosed {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  .menuButton.open span:last-child {
+    transform: rotate(-45deg);
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+  .registeration_btns {
+    flex-direction: row;
+  }
+  
+  .registeration_btns button {
+    width: auto;
+    min-width: 100px;
+  }
+}
