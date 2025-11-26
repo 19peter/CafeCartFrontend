@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import styles from './ProductCard.module.css';
 
 interface ProductCardProps {
-  id: string;
+  id: number;
   name: string;
   price: number;
   imageUrl: string;
   description: string;
   rating: number;
+  vendorShopId: number;
+  productId: number;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -17,20 +19,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   price,
   imageUrl,
   description,
-  rating,
+  productId,
+  vendorShopId
 }) => {
   const navigate = useNavigate();
 
   const handleViewProduct = () => {
     // Navigate to product detail page with product data
-    navigate(`/product/${id}`, {
+    navigate(`/product/${productId}`, {
       state: {
-        id,
-        name,
-        price,
-        description,
-        imageUrl,
-        rating,
+        vendorShopId
       }
     });
   };
@@ -39,7 +37,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     <div className={styles.productCard}>
       <div className={styles.productImage}>
         <img 
-          src={imageUrl} 
+          src={'https://images.unsplash.com/photo-1445116572660-236099ec97a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'} 
           alt={name}
           className={styles.productImg}
           onError={(e) => {

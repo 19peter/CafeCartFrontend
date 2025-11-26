@@ -7,14 +7,14 @@ import { useCart } from '../../contexts/CartContext';
 export const NavigationBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { items } = useCart();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleLogout = async () => {
     try {
-      await logout();
+      logout();
       setShowUserMenu(false);
       navigate('/');
     } catch (error) {
@@ -75,7 +75,7 @@ export const NavigationBar = () => {
                 aria-expanded={showUserMenu}
                 aria-haspopup="true"
               >
-                {user?.email || 'My Account'}
+                My Account
               </button>
               {showUserMenu && (
                 <div className={styles.dropdownMenu}>

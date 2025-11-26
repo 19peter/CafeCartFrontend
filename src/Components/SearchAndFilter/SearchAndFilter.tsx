@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import styles from './SearchAndFilter.module.css';
 
 interface SearchAndFilterProps {
-  onSearch: (searchTerm: string, category: string) => void;
-  categories: string[];
+  onSearch: (searchTerm: string, category: { id: number; name: string }) => void;
+  categories: { id: number; name: string }[];
 }
 
 export const SearchAndFilter: React.FC<SearchAndFilterProps> = ({ onSearch, categories }) => {
@@ -31,10 +31,9 @@ export const SearchAndFilter: React.FC<SearchAndFilterProps> = ({ onSearch, cate
             onChange={(e) => setSelectedCategory(e.target.value)}
             className={styles.categorySelect}
           >
-            <option value="">All Categories</option>
             {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
+              <option key={category.id} value={category.name}>
+                {category.name}
               </option>
             ))}
           </select>

@@ -114,7 +114,8 @@
 .userButton {
   background: none;
   border: 1px solid var(--color-border) !important;
-  color: var(--color-text);
+  color: var(--color-primary);
+  font-family: "Story Script", sans-serif;
   padding: 8px 16px !important;
   border-radius: 20px;
   cursor: pointer;

@@ -13,13 +13,9 @@ export const SignIn = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-      // Only navigate if login was successful (no error was thrown)
-      navigate(from, { replace: true });
-    } catch (error) {
-      // Error is already handled in the AuthContext
-    }
+    const res = await login(email, password);
+    if (res) navigate(from, { replace: true });
+    
   };
 
   return (
@@ -27,9 +23,9 @@ export const SignIn = () => {
       <div className={styles.authCard}>
         <h2>Welcome Back</h2>
         <p className={styles.subtitle}>Sign in to continue to CafeCart</p>
-        
+
         {error && <div className={styles.error}>{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className={styles.authForm}>
           <div className={styles.formGroup}>
             <label htmlFor="email">Email</label>
@@ -42,7 +38,7 @@ export const SignIn = () => {
               disabled={loading}
             />
           </div>
-          
+
           <div className={styles.formGroup}>
             <label htmlFor="password">Password</label>
             <input
@@ -54,12 +50,12 @@ export const SignIn = () => {
               disabled={loading}
             />
           </div>
-          
+
           <button type="submit" className={styles.submitButton} disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
         </form>
-        
+
         <div className={styles.authFooter}>
           Don't have an account?{' '}
           <Link to="/register" className={styles.authLink}>

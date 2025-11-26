@@ -4,6 +4,7 @@
   align-items: flex-start;
   min-height: 100vh;
   padding: 1rem;
+  width: 50%;
 }
 
 .authCard {

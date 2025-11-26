@@ -3,13 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import './Cart.css';
+import { addOneToCart, getCart, removeItemFromCart, removeOneFromCart } from '../../services/cartService';
+import type { OrderSummary, CartSummary, OrderType, PaymentMethod } from '../../shared/types/cart/CartTypes';
+import { useNotification } from '../../contexts/NotificationContext';
+import { createOrder } from '../../services/ordersService';
 
-type OrderType = 'in-house' | 'take-away' | 'delivery';
-type PaymentMethod = 'cash' | 'online';
 
 interface CartItemProps {
   children: React.ReactNode;
 }
+
 
 const CartItem: React.FC<CartItemProps> = ({ children }) => (
   <div className="cart-item">
@@ -22,85 +25,113 @@ const Cart = () => {
   const { isAuthenticated } = useAuth();
   const {
     items,
+    deliveryLocation,
     orderType,
     paymentMethod,
-    removeFromCart,
-    updateQuantity,
-    setOrderType,
-    setPaymentMethod,
-    getCartTotal,
-    getDeliveryFee,
+    removeFromCartContext,
+    addQuantityContext,
+    removeQuantityContext,
+    setOrderTypeContext,
+    setPaymentMethodContext,
+    clearCartContext,
+    saveItemsToContext,
   } = useCart();
 
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [orderSummary, setOrderSummary] = useState<OrderSummary>();
+  const [cartSummary, setCartSummary] = useState<CartSummary>();
+  const { showError, showSuccess } = useNotification();
 
-  // Redirect to login if not authenticated
+  const fetchCart = async () => {
+    const res = await getCart({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng });
+    if (res.status !== 200) {
+      showError(res.message);
+      return;
+    }
+    setCartSummary(res.data.cartSummary);
+    setOrderSummary(res.data.orderSummary);
+    saveItemsToContext(res.data.orderSummary?.items || []);
+
+  };
+
+  const currencyFormatter = new Intl.NumberFormat('en-EG', {
+    style: 'currency',
+    currency: 'EGP',
+  });
+
+  function formatCurrency(value: number) {
+    if (value == null || Number.isNaN(value)) return currencyFormatter.format(0);
+    return currencyFormatter.format(value);
+  }
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login', { state: { from: '/cart' } });
     }
-  }, [isAuthenticated, navigate]);
+
+    fetchCart();
+  }, [orderType, paymentMethod]);
 
   const handleOrderTypeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newOrderType = event.target.value as OrderType;
-    try {
-      await setOrderType(newOrderType);
-      setLocationError(null);
-    } catch (error) {
-      setLocationError(error instanceof Error ? error.message : 'Failed to set location');
-    }
+    await setOrderTypeContext(newOrderType);
+    setLocationError(null);
   };
 
-  const handleQuantityChange = (id: string, currentQuantity: number, delta: number) => {
-    const newQuantity = currentQuantity + delta;
-    if (newQuantity > 0) {
-      updateQuantity(id, newQuantity);
-    } else {
-      removeFromCart(id);
-    }
+  const handlePaymentMethodChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPaymentMethod = event.target.value as PaymentMethod;
+    setPaymentMethodContext(newPaymentMethod);
+    setLocationError(null);
   };
 
-  const handleSubmitOrder = () => {
-    setIsLoading(true);
-    // Here you would typically send the order to your backend
-    console.log('Submitting order', {
-      items,
-      orderType,
-      paymentMethod,
-      subtotal: getCartTotal(),
-      deliveryFee: getDeliveryFee(),
-      total: getCartTotal() + getDeliveryFee(),
-    });
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Navigate to order confirmation or payment page
-      if (paymentMethod === 'online') {
-        // Redirect to payment gateway
-        console.log('Redirecting to payment gateway...');
-      } else {
-        // Show order confirmation
-        console.log('Order placed successfully!');
-        // Clear cart and navigate to order confirmation
-        // clearCart();
-        // navigate('/order-confirmation');
-      }
-    }, 1000);
+  const handleAddOneToCart = async (id: number, shopId: number, cartItemId: number) => {
+    const res = await addOneToCart({ productId: id, shopId });
+    if (res.status !== 200) {
+      showError(res.message);
+      return;
+    }
+    addQuantityContext(cartItemId);
+    fetchCart();
+  };
+
+  const handleRemoveOneFromCart = async (id: number) => {
+    const res = await removeOneFromCart({ cartItemId: id });
+    if (res.status !== 200) {
+      showError(res.message);
+      return;
+    }
+    removeQuantityContext(id);
+    fetchCart();
+  };
+
+  const handleRemoveItemFromCart = async (id: number) => {
+    const res = await removeItemFromCart({ cartItemId: id });
+    if (res.status !== 200) {
+      showError(res.message);
+      return;
+    }
+    removeFromCartContext(id);
+    fetchCart();
+  };
+
+  const handleCreateOrder = async () => {
+    const res = await createOrder({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng });
+    if (res.status !== 200) {
+      showError(res.message);
+      return;
+    }
+    clearCartContext();
+    showSuccess('Order created successfully');
   };
 
   if (!isAuthenticated) {
     return <div>Redirecting to login...</div>;
   }
 
-  const subtotal = getCartTotal();
-  const deliveryFee = getDeliveryFee();
-  const total = subtotal + deliveryFee;
-
   return (
     <div className="cart-container">
-      <h1 className="cart-title">Your Order</h1>
+      <h1 className="cart-title">Your <span className="cart-shop-name">{orderSummary?.shopName}</span> Order</h1>
 
       {/* Order Type Selection */}
       {items.length > 0 && (
@@ -112,9 +143,9 @@ const Cart = () => {
             onChange={(e) => handleOrderTypeChange(e as any)}
             className="form-control"
           >
-            <option value="in-house">In House</option>
-            <option value="take-away">Take Away</option>
-            <option value="delivery">Delivery</option>
+            <option value="IN_HOUSE">In House</option>
+            <option value="PICKUP">Pickup</option>
+            <option value="DELIVERY">Delivery</option>
           </select>
           {locationError && (
             <div className="error-message">
@@ -131,40 +162,41 @@ const Cart = () => {
         ) : (
           items.map((item) => (
             <>
-            
-            <CartItem key={item.id}>
-              <div className="item-details">
-                <h3 className="item-name">{item.name}</h3>
-                <p className="item-price">${item.price.toFixed(2)} each</p>
-              </div>
-              <div className="item-actions">
-                <button 
-                  onClick={() => handleQuantityChange(item.id, item.quantity, -1)}
-                  className="quantity-btn"
-                  aria-label="Decrease quantity"
-                >
-                  -
-                </button>
-                <span className="quantity">{item.quantity}</span>
-                <button 
-                  onClick={() => handleQuantityChange(item.id, item.quantity, 1)}
-                  className="quantity-btn"
-                  aria-label="Increase quantity"
-                >
-                  +
-                </button>
-                <span className="item-total">
-                  ${(item.price * item.quantity).toFixed(2)}
-                </span>
-                <button 
-                  onClick={() => removeFromCart(item.id)}
-                  className="remove-btn"
-                  aria-label="Remove item"
-                >
-                  ×
-                </button>
-              </div>
-            </CartItem>
+
+              <CartItem key={item.id}>
+                <div className="item-details">
+                  <h3 className="item-name">{item.productName}</h3>
+                  <p className="item-price">${item.unitPrice.toFixed(2)} each</p>
+                </div>
+                <div className="item-actions">
+                  <button
+                    onClick={() => handleRemoveOneFromCart(item.id)}
+                    className="quantity-btn"
+                    aria-label="Decrease quantity"
+                  >
+                    -
+                  </button>
+                  <span className="quantity">{item.quantity}</span>
+                  <button
+                    onClick={() => handleAddOneToCart(item.productId, cartSummary!.shopId, item.id)}
+                    className="quantity-btn"
+                    aria-label="Increase quantity"
+                  >
+                    +
+                  </button>
+                  <span className="item-total">
+                    ${(item.unitPrice * item.quantity).toFixed(2)}
+                  </span>
+
+                  <button
+                    onClick={() => handleRemoveItemFromCart(item.id)}
+                    className="remove-btn"
+                    aria-label="Remove item"
+                  >
+                    ×
+                  </button>
+                </div>
+              </CartItem>
             </>
           ))
         )}
@@ -178,42 +210,62 @@ const Cart = () => {
             <select
               id="payment-method"
               value={paymentMethod}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setPaymentMethod(e.target.value as PaymentMethod)}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePaymentMethodChange(e)}
               className="form-control"
             >
-              <option value="cash">Cash on Delivery</option>
-              <option value="online">Online Payment</option>
+              <option value="CASH">Cash on Delivery</option>
+              <option value="CREDIT_CARD">Online Payment</option>
             </select>
           </div>
 
           {/* Order Summary */}
           <div className="order-summary">
             <h2 className="summary-title">Order Summary</h2>
-            <div className="summary-row">
-              <span>Subtotal</span>
-              <span>${subtotal.toFixed(2)}</span>
-            </div>
-            <div className="summary-row">
-              <span>Delivery Fee</span>
-              <span>${deliveryFee.toFixed(2)}</span>
-            </div>
-            <div className="divider"></div>
-            <div className="summary-total">
-              <span>Total</span>
-              <span>${total.toFixed(2)}</span>
-            </div>
-            
-            <button
-              className={`submit-btn ${isLoading || items.length === 0 ? 'disabled' : ''}`}
-              onClick={handleSubmitOrder}
-              disabled={isLoading || items.length === 0}
-            >
-              {isLoading 
-                ? 'Processing...' 
-                : paymentMethod === 'online' 
-                  ? 'Proceed to Payment' 
-                  : 'Place Order'}
-            </button>
+
+            {orderSummary ? (
+              <>
+
+                <div className="summary-row">
+                  <span>Subtotal</span>
+                  <span>{formatCurrency(orderSummary.subTotal)}</span>
+                </div>
+
+                {orderSummary.deliveryFee != null && orderSummary.deliveryFee != 0  && (
+                  <div className="summary-row">
+                    <span>Delivery Fee</span>
+                    <span>{formatCurrency(orderSummary.deliveryFee)}</span>
+                  </div>
+                )}
+
+                {orderSummary.transactionFee != null && orderSummary.transactionFee != 0 && (
+                  <div className="summary-row">
+                    <span>Transaction Fee</span>
+                    <span>{formatCurrency(orderSummary.transactionFee)}</span>
+                  </div>
+                )}
+
+                <div className="divider" />
+                <div className="summary-total">
+                  <span>Total</span>
+                  <span>{formatCurrency(orderSummary.total)}</span>
+                </div>
+
+                <button
+                  className={`submit-btn ${isLoading || items.length === 0 ? 'disabled' : ''}`}
+                  onClick={() => handleCreateOrder()}
+                  disabled={isLoading || items.length === 0}
+                >
+                  {isLoading 
+                    ? 'Processing...' 
+                    : paymentMethod === 'CREDIT_CARD' 
+                      ? 'Proceed to Payment' 
+                      : 'Place Order'}
+                </button>
+                
+              </>
+            ) : (
+              <p className="empty-summary">No items in cart</p>
+            )}
           </div>
         </>
       )}

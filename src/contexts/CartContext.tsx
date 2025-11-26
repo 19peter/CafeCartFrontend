@@ -1,30 +1,23 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import type { OrderItem, OrderType, PaymentMethod } from '../shared/types/cart/CartTypes';
 
-type CartItem = {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image?: string;
-};
-
-type OrderType = 'in-house' | 'take-away' | 'delivery';
-type PaymentMethod = 'cash' | 'online';
 
 interface CartContextType {
-  items: CartItem[];
+  items: OrderItem[];
   orderType: OrderType;
   paymentMethod: PaymentMethod;
-  deliveryLocation: { lat: number; lng: number } | null;
-  addToCart: (item: Omit<CartItem, 'quantity'>) => void;
-  removeFromCart: (itemId: string) => void;
-  updateQuantity: (itemId: string, quantity: number) => void;
-  setOrderType: (type: OrderType) => Promise<void>;
-  setPaymentMethod: (method: PaymentMethod) => void;
-  clearCart: () => void;
-  getCartTotal: () => number;
-  getDeliveryFee: () => number;
+  deliveryLocation: { lat: number; lng: number };
+  addToCartContext: (item: Omit<OrderItem, 'quantity'>) => void;
+  removeFromCartContext: (itemId: number) => void;
+  addQuantityContext: (itemId: number) => void;
+  removeQuantityContext: (itemId: number) => void;
+  setOrderTypeContext: (type: OrderType) => Promise<void>;
+  setPaymentMethodContext: (method: PaymentMethod) => void;
+  clearCartContext: () => void;
+  getCartTotalContext: () => number;
+  getDeliveryFeeContext: () => number;
+  saveItemsToContext: (items: OrderItem[]) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -32,10 +25,10 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 const DELIVERY_FEE = 5; // Example delivery fee
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const [orderType, setOrderTypeState] = useState<OrderType>('take-away');
-  const [paymentMethod, setPaymentMethodState] = useState<PaymentMethod>('cash');
-  const [deliveryLocation, setDeliveryLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [items, setItems] = useState<OrderItem[]>([]);
+  const [orderType, setOrderTypeState] = useState<OrderType>('PICKUP');
+  const [paymentMethod, setPaymentMethodState] = useState<PaymentMethod>('CASH');
+  const [deliveryLocation, setDeliveryLocation] = useState<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
   // We don't need isAuthenticated here as we'll handle auth in the Cart component
 
   // Load cart from database on mount
@@ -52,7 +45,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [items]);
 
-  const addToCart = (item: Omit<CartItem, 'quantity'>) => {
+  const saveItemsToContext = (items: OrderItem[]) => {
+    setItems(items);
+  };
+
+  const addToCartContext = (item: Omit<OrderItem, 'quantity'>) => {
     setItems(prevItems => {
       const existingItem = prevItems.find(i => i.id === item.id);
       if (existingItem) {
@@ -64,55 +61,64 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  const removeFromCart = (itemId: string) => {
+  const removeFromCartContext = (itemId: number) => {
     setItems(prevItems => prevItems.filter(item => item.id !== itemId));
   };
 
-  const updateQuantity = (itemId: string, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(itemId);
-      return;
-    }
+  const addQuantityContext = (itemId: number) => {
     setItems(prevItems =>
       prevItems.map(item =>
-        item.id === itemId ? { ...item, quantity } : item
+        item.id === Number(itemId) ? { ...item, quantity: item.quantity + 1 } : item
       )
     );
   };
 
-  const setOrderType = async (type: OrderType) => {
-    if (type === 'delivery' && !deliveryLocation) {
+  const removeQuantityContext = (itemId: number) => {
+    setItems(prevItems =>
+      prevItems.map(item =>
+        item.id === Number(itemId) ? { ...item, quantity: item.quantity - 1 } : item
+      )
+    );
+  };
+
+  const setOrderTypeContext = async (type: OrderType) => {
+    if (type === 'DELIVERY') {
       try {
-        const position = await getCurrentPosition();
-        setDeliveryLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
+        const position = await getCurrentPositionContext();
+        if (!position) {
+          throw new Error('Could not get your location. Please enable location services or choose another order type.');
+        }
+        if (position.coords.latitude != deliveryLocation.lat || position.coords.longitude != deliveryLocation.lng) {
+          setDeliveryLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        }
       } catch (error) {
         console.error('Error getting location:', error);
         throw new Error('Could not get your location. Please enable location services or choose another order type.');
       }
-    }
+    } 
     setOrderTypeState(type);
   };
 
-  const setPaymentMethod = (method: PaymentMethod) => {
+  const setPaymentMethodContext = (method: PaymentMethod) => {
     setPaymentMethodState(method);
   };
 
-  const clearCart = () => {
+  const clearCartContext = () => {
     setItems([]);
   };
 
-  const getCartTotal = () => {
-    return items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const getCartTotalContext = () => {
+    return items.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
   };
 
-  const getDeliveryFee = () => {
-    return orderType === 'delivery' ? DELIVERY_FEE : 0;
+  const getDeliveryFeeContext = () => {
+    return orderType === 'DELIVERY' ? DELIVERY_FEE : 0;
   };
 
-  const getCurrentPosition = (): Promise<GeolocationPosition> => {
+  const getCurrentPositionContext = (): Promise<GeolocationPosition> => {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by your browser'));
@@ -129,14 +135,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         orderType,
         paymentMethod,
         deliveryLocation,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        setOrderType,
-        setPaymentMethod,
-        clearCart,
-        getCartTotal,
-        getDeliveryFee,
+        addToCartContext,
+        removeFromCartContext,
+        addQuantityContext,
+        removeQuantityContext,
+        setOrderTypeContext,
+        setPaymentMethodContext,
+        clearCartContext,
+        getCartTotalContext,
+        getDeliveryFeeContext,
+        saveItemsToContext,
       }}
     >
       {children}
