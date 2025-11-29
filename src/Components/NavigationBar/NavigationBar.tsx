@@ -82,6 +82,9 @@ export const NavigationBar = () => {
                   <Link to="/cart" className={styles.dropdownItem}>
                     My Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
                   </Link>
+                  <Link to="/orders" className={styles.dropdownItem}>
+                    My Orders
+                  </Link>
                   <button
                     className={styles.dropdownItem}
                     onClick={handleLogout}

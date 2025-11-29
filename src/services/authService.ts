@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1/auth';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const handleRequest = async (endpoint: string, data: any) => {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -15,35 +15,133 @@ const handleRequest = async (endpoint: string, data: any) => {
     throw new Error(result.message || 'Request failed');
   }
 
-  setAuthToken(result.token);
-  setRefreshToken(result.refreshToken);
   return result;
 };
 
-export const loginVendor = (email: string, password: string) =>
-  handleRequest('/login/vendor', { email, password });
 
-export const loginVendorShop = (email: string, password: string) =>
-  handleRequest('/login/vendor-shop', { email, password });
+export const refreshToken = async () => {
+  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
 
-export const loginCustomer = (email: string, password: string) =>
-  handleRequest('/login/customer', { email, password });
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Request failed');
+  }
+
+  setAuthToken(result.accessToken);
+  return result.accessToken;
+};
+
+export const isTokenValid = async () => {
+  const response = await fetch(`${API_BASE_URL}/is-token-valid`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token: getAuthToken() }),
+    credentials: 'include',
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Request failed');
+  }
+
+  return result;
+};
+
+export const authFetch = async (endpoint: string, method: string, data: any, retry = true) => {
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${getAuthToken()}`,
+    };
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method,
+      headers,
+      ...(method == 'GET' ? null : { body: JSON.stringify(data) }),
+    });
+
+    const res = await handleJson(response);
+    console.log(res);
+
+    if (res.status === 401 && retry) {
+      const newToken = await refreshToken();
+      
+      if (!newToken) {
+        logout();
+        return res;
+      }
+
+      // Retry original request with new token
+      const retryHeaders = {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${newToken}`,
+      };
+
+      const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
+        method, 
+        headers: retryHeaders,
+        ...(method == 'GET' ? null : { body: JSON.stringify(data) }),
+      });
+
+      const retryResult = await handleJson(retryResponse);
+      return retryResult;
+    }
+
+    return res;
+  } catch (error) {
+    // Handle network errors or other exceptions
+    console.error('authFetch error:', error);
+    return {
+      data: null,
+      message: error instanceof Error ? error.message : 'Network error',
+      status: 0
+    };
+  }
+};
+
+const handleJson = async (response: { json: () => Promise<any>, ok: boolean, status: number }) => {
+  let result;
+  try {
+    result = await response.json();
+  } catch (_) {
+    result = null;
+  }
+
+  if (!response.ok) {
+    const message = (result && (result.message || result.error)) || 'Request failed';
+    return { data: result, message, status: response.status };
+  }
+
+  return { data: result, message: "success", status: response.status };
+};
+
+export const isAuthenticated = () => Boolean(getAuthToken());
+export const getAuthToken = () => localStorage.getItem('token');
 
 export const setAuthToken = (token: string) => {
   token ? localStorage.setItem('token', token) : localStorage.removeItem('token');
 };
 
-export const setRefreshToken = (token: string) => {
-  token ? localStorage.setItem('refreshToken', token) : localStorage.removeItem('refreshToken');
-};
-
-export const getAuthToken = () => localStorage.getItem('token');
-
-export const getRefreshToken = () => localStorage.getItem('refreshToken');
-
-export const isAuthenticated = () => Boolean(getAuthToken());
-
 export const logout = () => {
   localStorage.removeItem('token');
-  localStorage.removeItem('refreshToken');
 };
+
+
+export const loginVendor = (email: string, password: string) =>
+  handleRequest('/auth/login/vendor', { email, password });
+
+export const loginVendorShop = (email: string, password: string) =>
+  handleRequest('/auth/login/vendor-shop', { email, password });
+
+export const loginCustomer = (email: string, password: string) =>
+  handleRequest('/auth/login/customer', { email, password });

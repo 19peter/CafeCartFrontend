@@ -6,7 +6,7 @@ import styles from './Vendor.module.css';
 import cappuccinoImg from '../../assets/cafe-1.jpg';
 import { getVendorShopsByVendorId } from '../../services/vendorShopsService';
 import { getShopCategories, getVendorShopInventoryByCategory } from '../../services/inventoryService';
-import { CategoriesDisplay } from '../../Components/CategoryCard/CategoriesDisplay';
+import { CategoriesDisplay } from '../../Components/CategoryDisplay/CategoriesDisplay';
 
 
 interface Shop {

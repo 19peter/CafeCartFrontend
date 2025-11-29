@@ -12,6 +12,7 @@ import { CartProvider } from './contexts/CartContext';
 import Cart from './Pages/Cart/Cart';
 import './App.css';
 import type { ReactNode } from 'react';
+import { Orders } from './Pages/Orders/Orders';
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/vendors" element={<Vendors />} />
                 <Route path="/vendor/:vendorId" element={<Vendor />} />
                 <Route path="/product/:productId" element={<ProductDetail />} />
+                <Route path="/orders" element={<Orders />} />
                 <Route 
                   path="/cart" 
                   element={

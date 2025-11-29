@@ -1,0 +1,281 @@
+.orderCard {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  border: 1px solid #eaeaea;
+  overflow: hidden;
+}
+
+.orderCard.expanded {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.orderHeader {
+  padding: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.orderHeader:hover {
+  background-color: #f9f9f9;
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.expandIcon {
+  color: #666;
+  transition: transform 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-top: 8px;
+}
+
+.orderNumber {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.orderDate {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.statusBadge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+.statusDelivered {
+  background-color: #e6f7e6;
+  color: #28a745;
+}
+
+.statusPending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.statusCancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.statusDefault {
+  background-color: #e2e3e5;
+  color: #383d41;
+}
+
+.orderInfo {
+  padding: 0 20px;
+  margin: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 16px;
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.infoLabel {
+  color: #666;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.infoValue {
+  color: #333;
+  font-weight: 400;
+  text-align: right;
+  margin-left: 12px;
+}
+
+.paymentStatus {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.paid {
+  background-color: #e6f7e6;
+  color: #28a745;
+}
+
+.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.failed {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.orderItems {
+  padding: 0 20px;
+  margin: 16px 0;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
+}
+
+.itemsTitle {
+  font-size: 1rem;
+  color: #444;
+  margin: 0 0 12px 0;
+  font-weight: 600;
+}
+
+.orderItem {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.orderItem:last-child {
+  border-bottom: none;
+}
+
+.itemImage {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  margin-right: 12px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.itemImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.itemImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background-color: #eaeaea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.itemDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.itemName {
+  display: block;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.itemPriceRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.itemQuantity {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+.itemPrice {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.orderTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.orderTotal:hover {
+  background-color: #f0f0f0;
+}
+
+.totalAmountContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.totalAmount {
+  color: #2c3e50;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.expandButton {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.expandButton:hover {
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+/* Animation for expanding/collapsing */
+@keyframes slideDown {
+  from { max-height: 0; opacity: 0; }
+  to { max-height: 1000px; opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { max-height: 1000px; opacity: 1; }
+  to { max-height: 0; opacity: 0; }
+}
+
+.orderItems {
+  animation: slideDown 0.3s ease-out forwards;
+}
+
+.orderCard:not(.expanded) .orderItems {
+  animation: slideUp 0.3s ease-in forwards;
+  overflow: hidden;
+}

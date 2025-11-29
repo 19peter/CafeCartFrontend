@@ -1,0 +1,99 @@
+.ordersContainer {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  color: #2c3e50;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.ordersList {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+
+.loadingSpinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+  text-align: center;
+}
+
+.errorText {
+  color: #e74c3c;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.retryButton {
+  padding: 0.6rem 1.5rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.retryButton:hover {
+  background-color: #2980b9;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.emptyState p {
+  font-size: 1.1rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ordersContainer {
+    padding: 1rem 0.5rem;
+  }
+  
+  .pageTitle {
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
+}
