@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
-import type { RegisterCustomerPayload } from '../../services/registerService';
+import type { RegisterCustomerPayload } from '../../services/authService';
 
 export const Register = () => {
   const [firstName, setFirstName] = useState('');
@@ -16,7 +16,7 @@ export const Register = () => {
   const [dobError, setDobError] = useState('');
   const [firstNameError, setFirstNameError] = useState('');
   const [lastNameError, setLastNameError] = useState('');
-  const { register, loading, error } = useAuth();
+  const { registerCustomer, loading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/';
@@ -76,7 +76,7 @@ export const Register = () => {
         dob,
         phoneNumber: phone
       };
-      const success = await register(payload);
+      const success = await registerCustomer(payload);
       if (!success) throw new Error('Registration failed');
       // Only navigate if registration was successful (no error was thrown)
       navigate('/login', { replace: true });

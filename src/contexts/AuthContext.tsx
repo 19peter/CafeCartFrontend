@@ -1,42 +1,64 @@
 import { createContext, useContext, useState, type ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginCustomer, logout as authLogout } from '../services/authService';
-import { registerCustomer } from '../services/registerService';
-import type { RegisterCustomerPayload } from '../services/registerService';
+import {
+  loginCustomer as authLoginCustomer,
+  logout as authLogout,
+  registerCustomer as authRegisterCustomer,
+  isAuthenticated as authIsAuthenticated,
+  getAuthToken
+} from '../services/authService';
+import type { RegisterCustomerPayload } from '../services/authService';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (payload: RegisterCustomerPayload) => Promise<boolean>;
+  loginCustomer: (email: string, password: string) => Promise<boolean>;
+  registerCustomer: (payload: RegisterCustomerPayload) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   error: string | null;
   token: string | null;
-  refreshToken: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
-  const [refreshToken, setRefreshToken] = useState<string | null>(() => localStorage.getItem('refreshToken'));
+  const [token, setToken] = useState<string | null>(getAuthToken());
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const initAuth = async () => {
+      console.log("herer");
+      if (!token) {
+        setLoading(false);
+        return;
+      }
 
-  const login = async (email: string, _password: string) => {
+      console.log(token);
+
+      const { valid, accessToken } = await authIsAuthenticated();
+      console.log(valid, accessToken);
+      if (!valid) {
+        logout();
+        return;
+      }
+      setToken(accessToken);
+      setLoading(false);
+    };
+
+    initAuth();
+  }, []);
+
+  const loginCustomer = async (email: string, _password: string) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await loginCustomer(email, _password);
+      const res = await authLoginCustomer(email, _password);
       const access = res?.token ?? res?.accessToken ?? res?.jwt ?? null;
-      const refresh = res?.refreshToken ?? res?.refresh_token ?? null;
       if (!access) throw new Error('Missing token in response');
       setToken(access);
-      if (refresh) setRefreshToken(refresh);
-      localStorage.setItem('token', access);
-      if (refresh) localStorage.setItem('refreshToken', refresh); else localStorage.removeItem('refreshToken');
       return true;
     } catch (err: any) {
       setError(err?.message || 'Failed to login. Please check your credentials.');
@@ -46,11 +68,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const register = async (payload: RegisterCustomerPayload) => {
+  const registerCustomer = async (payload: RegisterCustomerPayload) => {
     setLoading(true);
     setError(null);
     try {
-      await registerCustomer(payload);
+      await authRegisterCustomer(payload);
 
       return true;
     } catch (err: any) {
@@ -66,9 +88,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       authLogout();
     } finally {
       setToken(null);
-      setRefreshToken(null);
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
       navigate('/login');
     }
   };
@@ -78,9 +97,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         isAuthenticated: !!token,
         token,
-        refreshToken,
-        login,
-        register,
+        loginCustomer,
+        registerCustomer,
         logout,
         loading,
         error

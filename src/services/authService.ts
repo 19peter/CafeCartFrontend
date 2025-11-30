@@ -1,3 +1,12 @@
+export type RegisterCustomerPayload = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  dob: string; // YYYY-MM-DD
+  phoneNumber: string; // e.g. 01012345678
+};
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const handleRequest = async (endpoint: string, data: any) => {
@@ -39,7 +48,7 @@ export const refreshToken = async () => {
 };
 
 export const isTokenValid = async () => {
-  const response = await fetch(`${API_BASE_URL}/is-token-valid`, {
+  const response = await fetch(`${API_BASE_URL}/auth/is-token-valid`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -71,7 +80,6 @@ export const authFetch = async (endpoint: string, method: string, data: any, ret
     });
 
     const res = await handleJson(response);
-    console.log(res);
 
     if (res.status === 401 && retry) {
       const newToken = await refreshToken();
@@ -125,7 +133,25 @@ const handleJson = async (response: { json: () => Promise<any>, ok: boolean, sta
   return { data: result, message: "success", status: response.status };
 };
 
-export const isAuthenticated = () => Boolean(getAuthToken());
+export const isAuthenticated = async () => {
+  const token = getAuthToken();
+  if (!token) return {valid: false, accessToken: null};
+  try {
+    const res = await isTokenValid();
+    if (!res) {
+      try {
+        await refreshToken();
+        return {valid: true, accessToken: getAuthToken()};
+      } catch (_) {
+        return {valid: false, accessToken: null};
+      }
+    }
+    return {valid: true, accessToken: getAuthToken()};
+  } catch (_) {
+    return {valid: false, accessToken: null};
+  }
+};
+
 export const getAuthToken = () => localStorage.getItem('token');
 
 export const setAuthToken = (token: string) => {
@@ -143,5 +169,14 @@ export const loginVendor = (email: string, password: string) =>
 export const loginVendorShop = (email: string, password: string) =>
   handleRequest('/auth/login/vendor-shop', { email, password });
 
-export const loginCustomer = (email: string, password: string) =>
-  handleRequest('/auth/login/customer', { email, password });
+export const loginCustomer = async (email: string, password: string) => {
+  const res = await handleRequest('/auth/login/customer', { email, password });
+  if (res) {
+    setAuthToken(res.accessToken);
+    return res;
+  }
+  return null;
+}
+
+export const registerCustomer = (payload: RegisterCustomerPayload) =>
+  handleRequest('/auth/register/customer', payload);
