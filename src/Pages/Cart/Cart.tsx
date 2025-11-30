@@ -133,7 +133,7 @@ const Cart = () => {
 
   return (
     <div className="cart-container">
-      {!cartSummary?.online && <h3 className="cart-shop-closed">Shop Is Closed</h3>}
+      {cartSummary && !cartSummary.online && <h3 className="cart-shop-closed">Shop Is Closed</h3>}
       <h1 className="cart-title">Your <span className="cart-shop-name">{orderSummary?.shopName}</span> Order</h1>
 
       {/* Order Type Selection */}

@@ -7,6 +7,11 @@ export const getCart = async ({ orderType, paymentMethod, latitude, longitude }:
   return res;
 };
 
+export const getShopName = async (): Promise<{ status: number, message: string, data: any }> => {
+  const res = await authFetch(`/cart/get-cart-shop`, 'GET', {}, true);
+  return res;
+};
+
 // POST /cart/add-to-cart
 export const addToCart = async ({ productId, shopId, quantity }: { productId: number; shopId: number; quantity: number }): Promise<{ status: number, message: string, data: any }> => {
   const res = await authFetch(`/cart/add-to-cart`, 'POST', { productId, shopId, quantity }, true);

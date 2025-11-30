@@ -29,7 +29,6 @@ export const NavigationBar = () => {
         setIsMenuOpen(false);
       }
     };
-
     // Set initial value
     handleResize();
 
@@ -81,6 +80,7 @@ export const NavigationBar = () => {
               {showUserMenu && (
                 <div className={styles.dropdownMenu}>
                   <span className={styles.shopName}>{shopName}</span>
+                  
                   <Link to="/cart" className={styles.dropdownItem}>
                     My Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
                   </Link>

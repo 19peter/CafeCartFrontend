@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import type { OrderItem, OrderType, PaymentMethod } from '../shared/types/cart/CartTypes';
+import { getShopName } from '../services/cartService';
 
 
 interface CartContextType {
@@ -38,13 +39,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       // Implement your logic to fetch cart from database here
+      getShopName().then(res => {
+        if (res.status === 200) {
+          setShopName(res.data.shop);
+        } else {
+          setShopName('Empty Cart');
+        }
+      });
     }
   }, []);
 
   // Save cart to database when it changes
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      // Implement your logic to save cart to database here
+      // getShopName().then(res => {
+      //   if (res.status === 200) {
+      //     setShopName(res.data.shop);
+      //   } else {
+      //     setShopName('Empty Cart');
+      //   }
+      // });
     }
   }, [items]);
 
