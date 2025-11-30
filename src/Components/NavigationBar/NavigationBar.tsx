@@ -87,12 +87,15 @@ export const NavigationBar = () => {
                   <Link to="/orders" className={styles.dropdownItem}>
                     My Orders
                   </Link>
-                  <button
-                    className={styles.dropdownItem}
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </button>
+                  <div className={styles.logoutDiv}>
+
+                    <button
+                      className={` ${styles.logoutBtn}`}
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
