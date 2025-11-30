@@ -147,7 +147,7 @@ const Cart = () => {
           >
             <option value="IN_HOUSE">In House</option>
             <option value="PICKUP">Pickup</option>
-            <option value="DELIVERY">Delivery</option>
+            {cartSummary?.deliveryAvailable && <option value="DELIVERY">Delivery</option>}
           </select>
           {locationError && (
             <div className="error-message">
@@ -216,7 +216,7 @@ const Cart = () => {
               className="form-control"
             >
               <option value="CASH">Cash on Delivery</option>
-              <option value="CREDIT_CARD">Online Payment</option>
+              {cartSummary?.onlinePaymentAvailable && <option value="CREDIT_CARD">Online Payment</option>}
             </select>
           </div>
 
@@ -253,9 +253,12 @@ const Cart = () => {
                 </div>
 
                 <button
-                  className={`submit-btn ${isLoading || items.length === 0 ? 'disabled' : ''}`}
+                  className={`submit-btn 
+                    ${isLoading || items.length === 0 ? 'disabled' : ''}
+                    ${!cartSummary?.online ? 'offline' : ''}`}
                   onClick={() => handleCreateOrder()}
-                  disabled={isLoading || items.length === 0}
+                  disabled={!cartSummary?.online || isLoading || items.length === 0}
+                  title={!cartSummary?.online ? 'Shop Is Closed' : ''}
                 >
                   {isLoading 
                     ? 'Processing...' 

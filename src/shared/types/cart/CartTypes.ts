@@ -25,6 +25,9 @@ export interface CartSummary {
   customerId: number;
   vendorId: number;
   shopId: number;
+  online: boolean;
+  onlinePaymentAvailable: boolean;
+  deliveryAvailable: boolean;
 }
 
 
