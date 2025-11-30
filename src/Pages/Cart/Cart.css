@@ -13,6 +13,14 @@
   text-align: center;
 }
 
+.cart-shop-closed {
+  /* color: var(--color-text); */
+  color: rgba(119, 20, 20, 0.473);
+  display: flex;
+  /* justify-content: center; */
+  /* align-items: center; */
+}
+
 .cart-shop-name {
   color: var(--color-primary);
 }
