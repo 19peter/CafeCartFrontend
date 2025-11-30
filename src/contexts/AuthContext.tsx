@@ -30,16 +30,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const initAuth = async () => {
-      console.log("herer");
       if (!token) {
         setLoading(false);
         return;
       }
 
-      console.log(token);
-
       const { valid, accessToken } = await authIsAuthenticated();
-      console.log(valid, accessToken);
       if (!valid) {
         logout();
         return;
