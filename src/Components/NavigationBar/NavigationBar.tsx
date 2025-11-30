@@ -8,7 +8,7 @@ export const NavigationBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const { isAuthenticated, logout } = useAuth();
-  const { items } = useCart();
+  const { items, shopName } = useCart();
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -43,6 +43,7 @@ export const NavigationBar = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
 
   return (
 
@@ -79,6 +80,7 @@ export const NavigationBar = () => {
               </button>
               {showUserMenu && (
                 <div className={styles.dropdownMenu}>
+                  <span className={styles.shopName}>{shopName}</span>
                   <Link to="/cart" className={styles.dropdownItem}>
                     My Cart ({items.length} {items.length === 1 ? 'item' : 'items'})
                   </Link>

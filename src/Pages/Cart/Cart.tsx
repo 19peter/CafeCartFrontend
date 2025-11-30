@@ -35,6 +35,7 @@ const Cart = () => {
     setPaymentMethodContext,
     clearCartContext,
     saveItemsToContext,
+    setShopName
   } = useCart();
 
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -52,6 +53,7 @@ const Cart = () => {
     setCartSummary(res.data.cartSummary);
     setOrderSummary(res.data.orderSummary);
     saveItemsToContext(res.data.orderSummary?.items || []);
+    setShopName(res.data.orderSummary?.shopName || '');
 
   };
 

@@ -18,6 +18,8 @@ interface CartContextType {
   getCartTotalContext: () => number;
   getDeliveryFeeContext: () => number;
   saveItemsToContext: (items: OrderItem[]) => void;
+  shopName: string;
+  setShopName: (name: string) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -29,6 +31,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [orderType, setOrderTypeState] = useState<OrderType>('PICKUP');
   const [paymentMethod, setPaymentMethodState] = useState<PaymentMethod>('CASH');
   const [deliveryLocation, setDeliveryLocation] = useState<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
+  const [shopName, setShopName] = useState<string>('');
   // We don't need isAuthenticated here as we'll handle auth in the Cart component
 
   // Load cart from database on mount
@@ -128,6 +131,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+
   return (
     <CartContext.Provider
       value={{
@@ -145,6 +149,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         getCartTotalContext,
         getDeliveryFeeContext,
         saveItemsToContext,
+        shopName,
+        setShopName,
       }}
     >
       {children}

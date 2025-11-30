@@ -171,6 +171,22 @@
   background-color: var(--color-bg-hover);
 }
 
+.shopName {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 19px;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  transition: background-color 0.2s ease;
+  font-size: 0.7rem;
+  font-weight: 900;
+  text-decoration: none;
+  gap: 8px;
+}
+
 /* Mobile Menu Button */
 .menuButton {
   display: none;
@@ -203,6 +219,7 @@
 .menuButton.open span:nth-child(3) {
   transform: rotate(-45deg) translate(7px, -6px);
 }
+
 
 /* Mobile styles */
 @media (max-width: 768px) {
