@@ -47,7 +47,6 @@ export const ProductDetail = () => {
     fetchLatestStock();
   }, [productId, vendorShopId]);
 
-  console.log(productDetails);
   const handleAddToCart = async () => {
     isAuthenticated ? null : navigate('/login');
     if (!productDetails || productDetails.quantity === 0) return;

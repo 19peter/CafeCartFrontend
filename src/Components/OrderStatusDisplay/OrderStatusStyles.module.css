@@ -1,0 +1,66 @@
+.statusDisplay {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding: 8px 0;
+    scrollbar-width: none; /* For Firefox */
+}
+
+.statusDisplay::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari and Opera */
+}
+
+.statusDiv {
+    min-width: 120px;
+    height: 40px;
+    background-color: transparent;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 16px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.statusDiv:hover {
+    background-color: var(--color-primary-light);
+    color: white;
+    border-color: var(--color-primary-light);
+}
+
+.selectedStatusDiv {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .statusDiv {
+        min-width: 100px;
+        height: 36px;
+        font-size: 0.8em;
+        padding: 0 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .statusDisplay {
+        gap: 6px;
+    }
+    
+    .statusDiv {
+        min-width: 90px;
+        height: 32px;
+        font-size: 0.75em;
+        padding: 0 10px;
+    }
+}
