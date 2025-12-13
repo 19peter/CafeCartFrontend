@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_INVENTORY_BASE_URL || 'http://localhost:8080/api/v1/inventory';
+const BASE_URL = import.meta.env.VITE_INVENTORY_BASE_URL || 'http://localhost:8080/api/v1/shop-products';
 
 const handleJson = async (response: any) => {
   let result;
@@ -17,27 +17,16 @@ const handleJson = async (response: any) => {
   return result;
 };
 
-const toQuery = (params = {}) => {
-  const q = new URLSearchParams();
-  Object.entries(params).forEach(([k, v]) => {
-    if (v !== undefined && v !== null && v !== '') q.append(k, String(v));
-  });
-  const s = q.toString();
-  return s ? `?${s}` : '';
-};
-
-// GET /inventory/vendor/{vendorId}
-export const getVendorShopInventoryByCategory = async ({ shopId, quantity, page, size, category }: { shopId: number; quantity?: number; page?: number; size?: number; category: string }) => {
-  const qs = toQuery({ quantity, page, size, category });
-  const res = await fetch(`${BASE_URL}/vendor/${shopId}${qs}`, {
+// GET /shop-product/vendor/{vendorId}
+export const getVendorShopProducts = async ({ shopId }: { shopId: number }) => {
+  const res = await fetch(`${BASE_URL}/vendor/${shopId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
-  console.log('Inventory:', res);
   return handleJson(res);
 };
 
-// GET /inventory/vendor/{vendorId}/product/{productId}
+// GET /shop-product/vendor/{vendorId}/product/{productId}
 export const getVendorProduct = async ({ vendorShopId, productId }: { vendorShopId: number; productId: number }) => {
   const res = await fetch(`${BASE_URL}/vendor/${vendorShopId}/product/${productId}`, {
     method: 'GET',
@@ -45,6 +34,5 @@ export const getVendorProduct = async ({ vendorShopId, productId }: { vendorShop
   });
   return handleJson(res);
 };
-
 
 

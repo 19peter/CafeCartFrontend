@@ -6,16 +6,22 @@ import styles from './Auth.module.css';
 export const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { loginCustomer, loading, error } = useAuth();
+  const { loginCustomer, loginShop, loading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from || '/';
+  const hostname = window.location.hostname;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await loginCustomer(email, password);
+    const from = location.state?.from || '/';
+    let res;
+    if (hostname.includes("shop")) {
+      res = await loginShop(email, password);
+    } else {
+      res = await loginCustomer(email, password);
+    }
     if (res) navigate(from, { replace: true });
-    
+
   };
 
   return (

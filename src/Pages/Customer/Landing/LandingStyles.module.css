@@ -1,19 +1,18 @@
-@import '../../styles/global.css';
+@import '../../../styles/global.css';
 
 .container {
-  width: 100%;
+  width: 90%;
   min-height: calc(100vh - 80px);
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 20px;
+  padding: 20px 0;
   box-sizing: border-box;
   background-color: var(--color-bg);
 }
 
 .image_sec {
   flex: 1;
-  padding: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -32,7 +31,6 @@
   justify-content: center;
   align-items: center;
   color: var(--color-primary);
-  padding: 20px;
   text-align: center;
 }
 
@@ -119,14 +117,10 @@
 
 /* Mobile Responsive Styles */
 @media (max-width: 480px) {
-  .container {
-    padding: 20px 15px;
-  }
-
+ 
   .image_sec {
     margin-bottom: 30px;
     max-height: 40vh;
-    padding: 15px;
   }
 
   .text_sec h1 {

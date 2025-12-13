@@ -1,7 +1,7 @@
 // import { format } from 'date-fns';
 // import { format } from 'date-fns';
 import { useState } from 'react';
-import type { Order, OrderItem } from '../../Pages/Orders/OrderType';
+import type { Order, OrderItem } from '../../Pages/Customer/Orders/OrderType';
 import styles from './OrderDetails.module.css';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -43,7 +43,7 @@ export const OrderDetails = ({ order }: OrderDetailsProps) => {
           <div>
             <h3 className={styles.orderNumber}>Order #{order.orderNumber}</h3>
             <p className={styles.orderDate}>
-              {new Date(order.createdAt).toLocaleString()}
+              {new Date(order.createdAt).toLocaleString('en-GB')}
             </p>
           </div>
           <div className={`${styles.statusBadge} ${getStatusBadgeClass(order.status)}`}>
@@ -83,7 +83,7 @@ export const OrderDetails = ({ order }: OrderDetailsProps) => {
       {isExpanded && order.items && order.items.length > 0 && (
         <div className={styles.orderItems}>
           <h4 className={styles.itemsTitle}>Order Items</h4>
-          {order.items.map((item) => (
+          {order.items.map((item: OrderItem) => (
             <div key={item.id} className={styles.orderItem}>
               <div className={styles.itemImage}>
                 {item.image ? (
@@ -108,9 +108,9 @@ export const OrderDetails = ({ order }: OrderDetailsProps) => {
         <span>Total Amount:</span>
         <div className={styles.totalAmountContainer}>
           <span className={styles.totalAmount}>{formatCurrency(order.totalPrice)}</span>
-          <button className={styles.expandButton}>
+          {/* <button className={styles.expandButton}>
             {isExpanded ? 'Show less' : 'Show details'}
-          </button>
+          </button> */}
         </div>
       </div>
     </div>

@@ -2,9 +2,12 @@ import type { OrderType, PaymentMethod } from '../shared/types/cart/CartTypes';
 import { authFetch } from './authService';
 
 // GET /orders/shop
-export const getShopOrders = async () => {
-  const res = await authFetch(`/orders/shop`, 'GET', {}, true);
-  return res;
+export const getShopOrders = async (date?: string) => {
+  const params = date
+    ? `?date=${encodeURIComponent(date)}`
+    : "";
+
+  return authFetch(`/orders/shop/${params}`, "GET", {}, true);
 };
 
 // GET /orders/customer
@@ -20,8 +23,13 @@ export const getOrderItems = async () => {
 };
 
 // POST /orders/update-order
-export const updateOrder = async ({ orderId }: { orderId: number }) => {
-  const res = await authFetch(`/orders/update-order`, 'POST', { orderId }, true);
+export const updateOrderStatus = async ({ orderId }: { orderId: number }) => {
+  const res = await authFetch(`/orders/shop/update-order`, 'POST', { orderId }, true);
+  return res;
+};
+
+export const cancelOrder = async ({ orderId }: { orderId: number }) => {
+  const res = await authFetch(`/orders/shop/cancel-order`, 'POST', { orderId }, true);
   return res;
 };
 

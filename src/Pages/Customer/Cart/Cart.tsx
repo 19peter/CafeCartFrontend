@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
+import { useCart } from '../../../contexts/CartContext';
+import { useAuth } from '../../../contexts/AuthContext';
 import './Cart.css';
-import { addOneToCart, getCart, removeItemFromCart, removeOneFromCart } from '../../services/cartService';
-import type { OrderSummary, CartSummary, OrderType, PaymentMethod } from '../../shared/types/cart/CartTypes';
-import { useNotification } from '../../contexts/NotificationContext';
-import { createOrder } from '../../services/ordersService';
+import { addOneToCart, getCart, removeItemFromCart, removeOneFromCart } from '../../../services/cartService';
+import type { OrderSummary, CartSummary, OrderType, PaymentMethod } from '../../../shared/types/cart/CartTypes';
+import { useNotification } from '../../../contexts/NotificationContext';
+import { createOrder } from '../../../services/ordersService';
 
 
 interface CartItemProps {

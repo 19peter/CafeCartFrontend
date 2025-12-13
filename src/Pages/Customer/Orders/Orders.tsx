@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { getCustomerOrders } from "../../services/ordersService";
+import { getCustomerOrders } from "../../../services/ordersService";
 import type { Order } from "./OrderType";
-import { OrderDetails } from "../../Components/OrderDetails/OrderDetails";
-import { OrderStatusDisplay } from "../../Components/OrderStatusDisplay/OrderStatusDisplay";
+import { OrderDetails } from "../../../Components/OrderDetails/OrderDetails";
+import { OrderStatusDisplay } from "../../../Components/OrderStatusDisplay/OrderStatusDisplay";
 import styles from "./Orders.module.css";
 
 export const Orders = () => {
@@ -19,8 +19,8 @@ export const Orders = () => {
         { value: 'CANCELLED', label: 'Cancelled' },
     ];
 
-    const [selectedStatus, setSelectedStatus] = useState(orderStatuses[0].value);
-    const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
+    // const [selectedStatus, setSelectedStatus] = useState(orderStatuses[0].value);
+    // const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -28,8 +28,9 @@ export const Orders = () => {
                 setIsLoading(true);
                 const res = await getCustomerOrders();
                 if (res.status === 200) {
+                    console.log(res.data);
                     setOrders(Array.isArray(res.data) ? res.data : []);
-                    setFilteredOrders(Array.isArray(res.data) ? res.data.filter((order) => order.status === selectedStatus.value) : []);
+                    // setFilteredOrders(Array.isArray(res.data) ? res.data.filter((order) => order.status === selectedStatus.value) : []);
                 } else {
                     setError(res.message || 'Failed to load orders');
                 }
@@ -44,12 +45,12 @@ export const Orders = () => {
         fetchOrders();
     }, []);
 
-    useEffect(() => {
-        const filtered = selectedStatus === 'all' 
-            ? orders 
-            : orders.filter((order) => order.status === selectedStatus);
-        setFilteredOrders(filtered);
-    }, [selectedStatus, orders]);
+    // useEffect(() => {
+    //     const filtered = selectedStatus === 'all' 
+    //         ? orders 
+    //         : orders.filter((order) => order.status === selectedStatus);
+    //     setFilteredOrders(filtered);
+    // }, [selectedStatus, orders]);
 
     if (isLoading) {
         return (
@@ -78,24 +79,13 @@ export const Orders = () => {
         <div className={styles.ordersContainer}>
             <h1 className={styles.pageTitle}>My Orders</h1>
             
-            {orders.length > 0 && (
-                <OrderStatusDisplay 
-                    statuses={orderStatuses} 
-                    onStatusChange={(status) => setSelectedStatus(status)}
-                />
-            )}
-            
             {orders.length === 0 ? (
                 <div className={styles.emptyState}>
                     <p>You haven't placed any orders yet.</p>
                 </div>
-            ) : filteredOrders.length === 0 ? (
-                <div className={styles.emptyState}>
-                    <p>No orders found with the selected status.</p>
-                </div>
-            ) : (
+            ) :  (
                 <div className={styles.ordersList}>
-                    {filteredOrders.map((order) => (
+                    {orders.map((order) => (
                         <OrderDetails key={order.id} order={order} />
                     ))}
                 </div>

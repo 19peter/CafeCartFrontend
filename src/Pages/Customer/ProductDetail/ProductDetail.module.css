@@ -1,4 +1,4 @@
-@import '../../styles/global.css';
+@import '../../../styles/global.css';
 
 .container {
   max-width: 1200px;
@@ -67,7 +67,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .productName {
@@ -111,8 +111,9 @@
 }
 
 .description {
-  color: var(--color-text-secondary);
+  color: var(--color-primary);
   line-height: 1.6;
+  font-weight: 600;
   margin: 0.5rem 0;
 }
 
@@ -121,12 +122,13 @@
 }
 
 .inStock {
-  color: #4caf50;
+  /* color: #4caf50; */
+  color: var(--color-text);
   font-weight: 500;
 }
 
 .outOfStock {
-  color: #f44336;
+  color: var(--color-text-red);
   font-weight: 500;
 }
 

@@ -262,13 +262,27 @@
 
 /* Animation for expanding/collapsing */
 @keyframes slideDown {
-  from { max-height: 0; opacity: 0; }
-  to { max-height: 1000px; opacity: 1; }
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { max-height: 1000px; opacity: 1; }
-  to { max-height: 0; opacity: 0; }
+  from {
+    max-height: 1000px;
+    opacity: 1;
+  }
+
+  to {
+    max-height: 0;
+    opacity: 0;
+  }
 }
 
 .orderItems {
@@ -278,4 +292,37 @@
 .orderCard:not(.expanded) .orderItems {
   animation: slideUp 0.3s ease-in forwards;
   overflow: hidden;
+}
+
+
+@media (max-width: 425px) {
+  .headerContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .orderNumber {
+    font-size: 0.9rem;
+  }
+
+  .orderDate {
+    font-size: 0.8rem;
+    margin: 10px 0;
+  }
+
+  .statusBadge {
+    text-align: center;
+    width: 80%;
+  }
+
+  /* .orderInfo {
+    font-size: 0.8rem;
+  } */
+
+  .infoRow {
+    display: block;
+    font-size: 0.8rem;
+  }
 }

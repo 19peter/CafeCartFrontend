@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import styles from './LandingStyles.module.css';
-import img from '../../assets/cafe-1.jpg';
+import img from '../../../assets/cafe-1.jpg';
 
 const containerVariants = {
   hidden: { opacity: 0 },

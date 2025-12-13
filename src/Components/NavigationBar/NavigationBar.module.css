@@ -4,6 +4,7 @@
   width: 100%;
   background-color: var(--color-bg);
   box-shadow: var(--shadow-sm);
+  position: relative;
 }
 
 .navWrapper {
@@ -20,11 +21,12 @@
 .logo {
   font-family: "Libertinus Keyboard", system-ui;
   color: var(--color-primary);
-  font-size: 1.5rem;
+  font-size: 2rem;
   font-weight: bold;
   z-index: 10;
 }
 
+/* Desktop Navigation */
 .registeration_btns {
   display: flex;
   align-items: center;
@@ -82,6 +84,7 @@
   font-size: 0.9rem;
   text-decoration: none;
   text-align: center;
+  white-space: nowrap;
 }
 
 .signin_btn {
@@ -123,6 +126,7 @@
   align-items: center;
   gap: 8px;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .userButton:hover {
@@ -141,8 +145,6 @@
   min-width: 200px;
   z-index: 1000;
   padding: 8px 0;
-  min-width: 160px;
-  z-index: 1000;
   overflow: hidden;
 }
 
@@ -206,6 +208,8 @@
   font-weight: 900;
   text-decoration: none;
   gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* Mobile Menu Button */
@@ -214,7 +218,7 @@
   flex-direction: column;
   justify-content: space-around;
   width: 30px;
-  height: 24px;
+  height: 20px;
   background: transparent;
   border: none;
   cursor: pointer;
@@ -241,53 +245,201 @@
   transform: rotate(-45deg) translate(7px, -6px);
 }
 
+/* Mobile Menu Overlay */
+.mobileMenuOverlay {
+  display: none;
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 998;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
 
-/* Mobile styles */
+.mobileMenuOverlay.open {
+  opacity: 1;
+}
+
+.mobileMenuOverlay.close {
+  display: none;
+}
+
+.mobileMenu {
+  display: none;
+  position: fixed;
+  top: 80px;
+  right: -100%;
+  width: 280px;
+  max-width: 85%;
+  height: calc(100vh - 80px);
+  background-color: var(--color-bg);
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  overflow-y: auto;
+  transition: right 0.3s ease;
+  padding: 20px 0;
+}
+
+.mobileMenu.open {
+  right: 0;
+}
+
+.mobileMenuContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.mobileMenuItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 20px;
+  text-align: left;
+  border: none;
+  background: none;
+  color: var(--color-text);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1rem;
+  text-decoration: none;
+  gap: 12px;
+}
+
+.mobileMenuItem svg {
+  font-size: 1.2rem;
+  opacity: 0.8;
+}
+
+.mobileMenuItem:hover,
+.mobileMenuItem:active {
+  background-color: var(--color-bg-hover);
+}
+
+.mobileDivider {
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 12px 20px;
+}
+
+.mobileShopName {
+  padding: 12px 20px;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+}
+
+.mobileCartBadge {
+  margin-left: auto;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 12px;
+  padding: 2px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+.mobileAuthButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  margin-top: 8px;
+}
+
+.mobileAuthButtons button,
+.mobileAuthButtons a {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+  font-size: 1rem;
+  text-decoration: none;
+  text-align: center;
+}
+
+/* Responsive Breakpoints */
 @media (max-width: 768px) {
+  .navWrapper {
+    height: 70px;
+    padding: 0 16px;
+  }
+
+  .logo {
+    font-size: 2rem;
+  }
+
+  .registeration_btns {
+    display: none;
+  }
+
   .menuButton {
     display: flex;
   }
 
-  /* .registeration_btns {
-    position: fixed;
-    top: 80px;
-    left: 0;
-    right: 0;
-    background: var(--color-bg);
-    flex-direction: column;
-    padding: 20px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transform: translateY(-100%);
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    z-index: 1;
-  } */
-
-  .registeration_btns.menuOpen {
-    transform: translateY(0);
-    opacity: 1;
-    pointer-events: all;
+  .mobileMenuOverlay.close,
+  .mobileMenu.close {
+    display: none;
   }
 
-  .registeration_btns.menuClosed {
-    transform: translateY(-100%);
-    opacity: 0;
+  .mobileMenu.open,
+  .mobileMenuOverlay.open {
+    display: flex;
   }
 
-  .menuButton.open span:last-child {
-    transform: rotate(-45deg);
+  .mobileMenu {
+    top: 70px;
+    height: calc(100vh - 70px);
+  }
+
+  .mobileMenuOverlay {
+    top: 70px;
   }
 }
 
-/* Desktop styles */
-@media (min-width: 769px) {
-  .registeration_btns {
-    flex-direction: row;
+@media (max-width: 480px) {
+  .navWrapper {
+    height: 60px;
+    padding: 0 12px;
   }
-  
-  /* .registeration_btns button {
-    width: auto;
-    min-width: 100px;
-  } */
+
+  .logo {
+    font-size: 1.5rem;
+  }
+
+  .mobileMenu {
+    top: 60px;
+    height: calc(100vh - 60px);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .mobileMenuOverlay {
+    top: 60px;
+  }
 }
+
+@media (max-width: 360px) {
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .navWrapper {
+    padding: 0 10px;
+  }
+
+  .menuButton {
+    height: 18px;
+  }
+} 

@@ -1,55 +1,53 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './ProductCard.module.css';
+import type { Product } from '../../shared/types/product/ProductTypes';
+
 
 interface ProductCardProps {
-  id: number;
-  name: string;
-  price: number;
-  imageUrl: string;
-  description: string;
-  rating: number;
+  product: Product;
   vendorShopId: number;
-  productId: number;
+
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
-  id,
-  name,
-  price,
-  imageUrl,
-  description,
-  productId,
-  vendorShopId
+  product,
+  vendorShopId,
 }) => {
   const navigate = useNavigate();
 
   const handleViewProduct = () => {
     // Navigate to product detail page with product data
-    navigate(`/product/${productId}`, {
+    navigate(`/product/${product.productId}`, {
       state: {
         vendorShopId
       }
     });
   };
-
+  
   return (
     <div className={styles.productCard}>
       <div className={styles.productImage}>
         <img 
-          src={'https://images.unsplash.com/photo-1445116572660-236099ec97a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'} 
-          alt={name}
+          src={product.imageUrl} 
+          alt={product.name}
           className={styles.productImg}
           onError={(e) => {
-            (e.target as HTMLImageElement).src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(name)}`;
+            (e.target as HTMLImageElement).src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(product.name)}`;
           }}
         />
         <div className={styles.productOverlay}></div>
       </div>
       <div className={styles.productInfo}>
-        <h3>{name}</h3>
-        <p className={styles.productDescription}>{description}</p>
-        <p className={styles.productPrice}>${price.toFixed(2)}</p>
+        <h3>{product.name}</h3>
+        {product.isStockTracked &&  product.isAvailable && (
+          <p className={styles.productInStock}>Available in stock</p>
+        )}
+        {product.isStockTracked && !product.isAvailable && (
+          <p className={styles.productOutOfStock}>Not available in stock</p>
+        )}
+        {/* <p className={styles.productDescription}>{product.description}</p> */}
+        <p className={styles.productPrice}>${product.price.toFixed(2)}</p>
         <button 
           className={styles.viewButton}
           onClick={handleViewProduct}

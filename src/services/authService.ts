@@ -47,6 +47,26 @@ export const refreshToken = async () => {
   return result.accessToken;
 };
 
+export const refreshTokenShop = async () => {
+  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Request failed');
+  }
+
+  setShopToken(result.accessToken);
+  return result.accessToken;
+};
+
+
 export const isTokenValid = async () => {
   const response = await fetch(`${API_BASE_URL}/auth/is-token-valid`, {
     method: 'POST',
@@ -83,7 +103,7 @@ export const authFetch = async (endpoint: string, method: string, data: any, ret
 
     if (res.status === 401 && retry) {
       const newToken = await refreshToken();
-      
+
       if (!newToken) {
         logout();
         return res;
@@ -96,7 +116,7 @@ export const authFetch = async (endpoint: string, method: string, data: any, ret
       };
 
       const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
-        method, 
+        method,
         headers: retryHeaders,
         ...(method == 'GET' ? null : { body: JSON.stringify(data) }),
       });
@@ -135,39 +155,70 @@ const handleJson = async (response: { json: () => Promise<any>, ok: boolean, sta
 
 export const isAuthenticated = async () => {
   const token = getAuthToken();
-  if (!token) return {valid: false, accessToken: null};
+  if (!token) return { valid: false, accessToken: null };
   try {
     const res = await isTokenValid();
     if (!res) {
       try {
         await refreshToken();
-        return {valid: true, accessToken: getAuthToken()};
+        return { valid: true, accessToken: getAuthToken() };
       } catch (_) {
-        return {valid: false, accessToken: null};
+        return { valid: false, accessToken: null };
       }
     }
-    return {valid: true, accessToken: getAuthToken()};
+    return { valid: true, accessToken: getAuthToken() };
   } catch (_) {
-    return {valid: false, accessToken: null};
+    return { valid: false, accessToken: null };
   }
 };
 
+export const isShopAuthenticated = async () => {
+  const token = getShopToken();
+  if (!token) return { valid: false, accessToken: null };
+  try {
+    const res = await isTokenValid();
+    if (!res) {
+      try {
+        await refreshTokenShop();
+        return { valid: true, accessToken: getShopToken() };
+      } catch (_) {
+        return { valid: false, accessToken: null };
+      }
+    }
+    return { valid: true, accessToken: getShopToken() };
+  } catch (_) {
+    return { valid: false, accessToken: null };
+  }
+}; 
+
 export const getAuthToken = () => localStorage.getItem('token');
+export const getShopToken = () => localStorage.getItem('shopToken');
 
 export const setAuthToken = (token: string) => {
   token ? localStorage.setItem('token', token) : localStorage.removeItem('token');
 };
 
+export const setShopToken = (token: string) => {
+  token ? localStorage.setItem('shopToken', token) : localStorage.removeItem('shopToken');
+};
+
 export const logout = () => {
   localStorage.removeItem('token');
+  localStorage.removeItem('shopToken');
 };
 
 
 export const loginVendor = (email: string, password: string) =>
   handleRequest('/auth/login/vendor', { email, password });
 
-export const loginVendorShop = (email: string, password: string) =>
-  handleRequest('/auth/login/vendor-shop', { email, password });
+export const loginVendorShop = async (email: string, password: string) => {
+  const res = await handleRequest('/auth/login/vendor-shop', { email, password });
+  if (res) {
+    setShopToken(res.accessToken);
+    return res;
+  }
+  return null;
+}
 
 export const loginCustomer = async (email: string, password: string) => {
   const res = await handleRequest('/auth/login/customer', { email, password });
