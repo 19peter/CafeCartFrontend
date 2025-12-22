@@ -20,7 +20,7 @@ const handleJson = async (response: any) => {
 };
 
 // GET /vendor-shops/{vendorId}
-export const getVendorShopsByVendorId = async (vendorId: number) => {
+export const getVendorShopsByVendorId = async (vendorId: number | string) => {
   const res = await fetch(`${BASE_URL}/vendor-shops/${vendorId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },

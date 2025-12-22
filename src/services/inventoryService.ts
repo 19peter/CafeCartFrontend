@@ -1,3 +1,5 @@
+import { authFetch } from "./authService";
+
 const BASE_URL = import.meta.env.VITE_INVENTORY_BASE_URL || 'http://localhost:8080/api/v1/inventory';
 
 const handleJson = async (response: any) => {
@@ -44,6 +46,12 @@ export const getVendorProduct = async ({ vendorShopId, productId }: { vendorShop
     headers: { 'Content-Type': 'application/json' },
   });
   return handleJson(res);
+};
+
+
+export const updateInventory = async ({ vendorShopId, productId, quantity }: { vendorShopId: number; productId: number; quantity: number }) => {
+  const res = await authFetch(`/inventory/shop/update/${vendorShopId}/${productId}/${quantity}`, 'POST', {}, true);
+  return res;
 };
 
 

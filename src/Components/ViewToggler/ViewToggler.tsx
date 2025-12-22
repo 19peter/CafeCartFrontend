@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-export const ViewToggler = ({ onChange }: { onChange: (view: string) => void }) => {
-  const [active, setActive] = useState("orders");
+export const ViewToggler = ({ onChange, options }: { onChange: (view: string) => void, options: string[] }) => {
+  const [active, setActive] = useState(options[0]);
 
   const handleToggle = (val: string) => {
     setActive(val);
@@ -12,24 +12,26 @@ export const ViewToggler = ({ onChange }: { onChange: (view: string) => void }) 
     <div style={styles.wrapper}>
       <div style={styles.container}>
         <button
-          onClick={() => handleToggle("orders")}
+          onClick={() => handleToggle(options[0])}
           style={{
             ...styles.btn,
-            ...(active === "orders" ? styles.active : {}),
+            ...(active === options[0] ? styles.active : {}),
           }}
         >
-          Orders
+          {options[0]}
         </button>
 
         <button
-          onClick={() => handleToggle("inventory")}
+          onClick={() => handleToggle(options[1])}
           style={{
             ...styles.btn,
-            ...(active === "inventory" ? styles.active : {}),
+            ...(active === options[1] ? styles.active : {}),
           }}
         >
-          Inventory
+          {options[1]}
         </button>
+
+  
       </div>
     </div>
   );

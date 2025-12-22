@@ -17,7 +17,6 @@ export const Vendors = () => {
     fetchVendors();
   }, []);
 
-  console.log(vendors);
   
   return (
     <div className={styles.vendorsContainer}>

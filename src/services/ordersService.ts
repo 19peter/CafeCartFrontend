@@ -16,9 +16,17 @@ export const getCustomerOrders = async () => {
   return res;
 };
 
-// GET /orders/order/items
+// GET /orders/customer/items
 export const getOrderItems = async () => {
-  const res = await authFetch(`/orders/order/items`, 'GET', {}, true);
+  const res = await authFetch(`/orders/customer/items`, 'GET', {}, true);
+  return res;
+};
+
+// POST /orders/customer
+export const createOrder = async (
+  { orderType, paymentMethod, latitude, longitude, address, pickupTime }: { orderType: OrderType; paymentMethod: PaymentMethod; latitude: number; longitude: number; address: string; pickupTime: string },
+) => {
+  const res = await authFetch(`/orders/customer`, 'POST', { orderType, paymentMethod, latitude, longitude, address, pickupTime }, true);
   return res;
 };
 
@@ -33,10 +41,4 @@ export const cancelOrder = async ({ orderId }: { orderId: number }) => {
   return res;
 };
 
-// POST /orders
-export const createOrder = async (
-  { orderType, paymentMethod, latitude, longitude }: { orderType: OrderType; paymentMethod: PaymentMethod; latitude: number; longitude: number },
-) => {
-  const res = await authFetch(`/orders`, 'POST', { orderType, paymentMethod, latitude, longitude }, true);
-  return res;
-};
+

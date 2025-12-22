@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import ToggleButton from "../../../Components/Toggle/ToggleButton";
+import ToggleButton from "../../Components/Toggle/ToggleButton";
 import styles from "./ShopPage.module.css";
-import { ViewToggler } from "../../../Components/ViewToggler/ViewToggler";
-import { OrdersPage } from "../Orders/OrdersPage";
-import { InventoryPage } from "../Inventory/InventoryPage";
-import { useAuth } from "../../../contexts/AuthContext";
-import { setIsOnline, setIsDeliveryAvailable, getShopSettings } from "../../../services/vendorShopsService";
+import { ViewToggler } from "../../Components/ViewToggler/ViewToggler";
+import { OrdersPage } from "./Orders/OrdersPage";
+import { InventoryPage } from "./Inventory/InventoryPage";
+import { useAuth } from "../../contexts/AuthContext";
+import { setIsOnline, setIsDeliveryAvailable, getShopSettings } from "../../services/vendorShopsService";
 
 
 
@@ -71,11 +71,10 @@ export const ShopPage = () => {
 
             </nav>
 
-            <ViewToggler onChange={(value) => setSelected(value)} />
+            <ViewToggler onChange={(value) => setSelected(value)} options={["Orders", "Inventory"]} />
 
-            {selected === "orders" && <OrdersPage />}
-            {selected === "inventory" && <InventoryPage />}
-
+            {selected === "Orders" && <OrdersPage />}
+            {selected === "Inventory" && <InventoryPage />}
 
         </>
     );

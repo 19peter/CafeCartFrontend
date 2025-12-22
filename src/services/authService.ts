@@ -66,6 +66,25 @@ export const refreshTokenShop = async () => {
   return result.accessToken;
 };
 
+export const refreshTokenVendor = async () => {
+  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.message || 'Request failed');
+  }
+
+  setVendorToken(result.accessToken);
+  return result.accessToken;
+};
+
 
 export const isTokenValid = async () => {
   const response = await fetch(`${API_BASE_URL}/auth/is-token-valid`, {
@@ -191,8 +210,28 @@ export const isShopAuthenticated = async () => {
   }
 }; 
 
+export const isVendorAuthenticated = async () => {
+  const token = getVendorToken();
+  if (!token) return { valid: false, accessToken: null };
+  try {
+    const res = await isTokenValid();
+    if (!res) {
+      try {
+        await refreshTokenVendor();
+        return { valid: true, accessToken: getVendorToken() };
+      } catch (_) {
+        return { valid: false, accessToken: null };
+      }
+    }
+    return { valid: true, accessToken: getVendorToken() };
+  } catch (_) {
+    return { valid: false, accessToken: null };
+  }
+}; 
+
 export const getAuthToken = () => localStorage.getItem('token');
 export const getShopToken = () => localStorage.getItem('shopToken');
+export const getVendorToken = () => localStorage.getItem('vendorToken');
 
 export const setAuthToken = (token: string) => {
   token ? localStorage.setItem('token', token) : localStorage.removeItem('token');
@@ -202,14 +241,25 @@ export const setShopToken = (token: string) => {
   token ? localStorage.setItem('shopToken', token) : localStorage.removeItem('shopToken');
 };
 
+export const setVendorToken = (token: string) => {
+  token ? localStorage.setItem('vendorToken', token) : localStorage.removeItem('vendorToken');
+};
+
 export const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('shopToken');
+  localStorage.removeItem('vendorToken');
 };
 
 
-export const loginVendor = (email: string, password: string) =>
-  handleRequest('/auth/login/vendor', { email, password });
+export const loginVendor = async (email: string, password: string) => {
+  const res = await handleRequest('/auth/login/vendor', { email, password });
+  if (res) {
+    setVendorToken(res.accessToken);
+    return res;
+  }
+  return null;
+}
 
 export const loginVendorShop = async (email: string, password: string) => {
   const res = await handleRequest('/auth/login/vendor-shop', { email, password });

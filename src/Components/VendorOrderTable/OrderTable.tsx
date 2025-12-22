@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "./OrderTable.module.css";
 import type { OrderItem, ShopOrder } from "../../shared/types/orders/ShopOrder";
 import { updateOrderStatus, cancelOrder } from "../../services/ordersService";
+import { useNotification } from "../../contexts/NotificationContext";
 
 const ORDER_STATUSES = [
     "PENDING",
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export const OrdersTable = ({ order }: Props) => {
+    const { showError, showSuccess } = useNotification();
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const [tableOrder, setTableOrder] = useState<ShopOrder>(order);
 
@@ -45,6 +47,9 @@ export const OrdersTable = ({ order }: Props) => {
         const res = await updateOrderStatus({ orderId });
         if (res.status === 200 && res.data) {
             setTableOrder({ ...tableOrder, status: res.data });
+            showSuccess("Order status updated successfully");
+        } else {
+            showError("Failed to update order status");
         }
     };
 
@@ -52,6 +57,9 @@ export const OrdersTable = ({ order }: Props) => {
         const res = await cancelOrder({ orderId });
         if (res.status === 200 && res.data) {
             setTableOrder({ ...tableOrder, status: "CANCELLED" });
+            showSuccess("Order cancelled successfully");
+        } else {
+            showError("Failed to cancel order");
         }
     };
 

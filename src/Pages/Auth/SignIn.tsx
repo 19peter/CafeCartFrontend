@@ -6,7 +6,7 @@ import styles from './Auth.module.css';
 export const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { loginCustomer, loginShop, loading, error } = useAuth();
+  const { loginCustomer, loginShop, loginVendor, loading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const hostname = window.location.hostname;
@@ -17,6 +17,8 @@ export const SignIn = () => {
     let res;
     if (hostname.includes("shop")) {
       res = await loginShop(email, password);
+    } else if (hostname.includes("vendor")) {
+      res = await loginVendor(email, password);
     } else {
       res = await loginCustomer(email, password);
     }

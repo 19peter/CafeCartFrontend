@@ -14,11 +14,8 @@
 }
 
 .cart-shop-closed {
-  /* color: var(--color-text); */
   color: rgba(119, 20, 20, 0.473);
   display: flex;
-  /* justify-content: center; */
-  /* align-items: center; */
 }
 
 .cart-shop-name {
@@ -36,9 +33,19 @@
   font-weight: 600;
 }
 
+.pickup-time-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.pickup-time-row select {
+  width: 30%;
+}
+
 .form-control {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.75rem 0;
   font-size: 1rem;
   border: 1px solid #ddd;
   border-radius: 4px;

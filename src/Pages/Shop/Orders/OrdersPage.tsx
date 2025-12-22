@@ -5,6 +5,7 @@ import type { ShopOrder } from "../../../shared/types/orders/ShopOrder";
 import styles from "./OrdersPage.module.css";
 
 export const OrdersPage = () => {
+
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [orders, setOrders] = useState<ShopOrder[]>([]);
 

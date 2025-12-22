@@ -44,6 +44,11 @@ const Cart = () => {
   const [cartSummary, setCartSummary] = useState<CartSummary>();
   const { showError, showSuccess } = useNotification();
 
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [pickupHour, setPickupHour] = useState('');   // 1–12
+  const [pickupMinute, setPickupMinute] = useState('00');
+  const [pickupPeriod, setPickupPeriod] = useState<'AM' | 'PM'>('AM');
+
   const fetchCart = async () => {
     const res = await getCart({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng });
     if (res.status !== 200) {
@@ -117,8 +122,37 @@ const Cart = () => {
     fetchCart();
   };
 
+  const to24HourTime = () => {
+    if (!pickupHour) return null;
+
+    let hour = Number(pickupHour);
+
+    if (pickupPeriod === 'PM' && hour !== 12) hour += 12;
+    if (pickupPeriod === 'AM' && hour === 12) hour = 0;
+
+    return `${hour.toString().padStart(2, '0')}:${pickupMinute}`;
+  };
+
   const handleCreateOrder = async () => {
-    const res = await createOrder({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng });
+    if (!deliveryAddress && orderType === 'DELIVERY') {
+      showError('Please enter a delivery address');
+      return;
+    }
+
+    if (!pickupHour && orderType === 'PICKUP') {
+      showError('Please select a pickup time');
+      return;
+    }
+    const res = await createOrder(
+      {
+        orderType,
+        paymentMethod,
+        latitude: deliveryLocation.lat,
+        longitude: deliveryLocation.lng,
+        address: deliveryAddress,
+        pickupTime: to24HourTime() || '',
+      }
+    );
     if (res.status !== 200) {
       showError(res.message);
       return;
@@ -155,6 +189,67 @@ const Cart = () => {
               {locationError}
             </div>
           )}
+        </div>
+      )}
+
+      {/* DELIVERY ADDRESS */}
+      {items.length > 0 && orderType === 'DELIVERY' && (
+        <div className="form-group">
+          <label htmlFor="delivery-address">Delivery Address</label>
+          <textarea
+            id="delivery-address"
+            className="form-control"
+            placeholder="Enter delivery address"
+            value={deliveryAddress}
+            onChange={(e) => setDeliveryAddress(e.target.value)}
+            rows={3}
+            style={{ "resize": "none" }}
+          />
+        </div>
+      )}
+
+      {items.length > 0 && orderType === 'PICKUP' && (
+        <div className="form-group">
+          <label>Pickup Time</label>
+
+          <div className="pickup-time-row">
+            {/* HOUR */}
+            <select
+              className="form-control"
+              value={pickupHour}
+              onChange={(e) => setPickupHour(e.target.value)}
+            >
+              <option value="">HH</option>
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                <option key={h} value={h}>
+                  {h}
+                </option>
+              ))}
+            </select>
+
+            {/* MINUTE */}
+            <select
+              className="form-control"
+              value={pickupMinute}
+              onChange={(e) => setPickupMinute(e.target.value)}
+            >
+              {['00', '15', '30', '45'].map((m) => (
+                <option key={m} value={m}>
+                  {m}
+                </option>
+              ))}
+            </select>
+
+            {/* AM / PM */}
+            <select
+              className="form-control"
+              value={pickupPeriod}
+              onChange={(e) => setPickupPeriod(e.target.value as 'AM' | 'PM')}
+            >
+              <option value="AM">AM</option>
+              <option value="PM">PM</option>
+            </select>
+          </div>
         </div>
       )}
 
@@ -233,7 +328,7 @@ const Cart = () => {
                   <span>{formatCurrency(orderSummary.subTotal)}</span>
                 </div>
 
-                {orderSummary.deliveryFee != null && orderSummary.deliveryFee != 0  && (
+                {orderSummary.deliveryFee != null && orderSummary.deliveryFee != 0 && (
                   <div className="summary-row">
                     <span>Delivery Fee</span>
                     <span>{formatCurrency(orderSummary.deliveryFee)}</span>
@@ -261,13 +356,13 @@ const Cart = () => {
                   disabled={!cartSummary?.online || isLoading || items.length === 0}
                   title={!cartSummary?.online ? 'Shop Is Closed' : ''}
                 >
-                  {isLoading 
-                    ? 'Processing...' 
-                    : paymentMethod === 'CREDIT_CARD' 
-                      ? 'Proceed to Payment' 
+                  {isLoading
+                    ? 'Processing...'
+                    : paymentMethod === 'CREDIT_CARD'
+                      ? 'Proceed to Payment'
                       : 'Place Order'}
                 </button>
-                
+
               </>
             ) : (
               <p className="empty-summary">No items in cart</p>

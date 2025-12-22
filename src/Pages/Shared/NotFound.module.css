@@ -1,0 +1,80 @@
+/* * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+} */
+
+/* body {
+  height: 100vh;
+  background: linear-gradient(135deg, #f6efe8, #f2e2d2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3e2c1c;
+} */
+
+.container {
+  padding: 20px;
+}
+
+.card {
+  background: #ffffff;
+  padding: 40px 30px;
+  max-width: 420px;
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.card h1 {
+  font-size: 96px;
+  color: #c47a3a;
+  margin-bottom: 10px;
+}
+
+.card h2 {
+  font-size: 22px;
+  margin-bottom: 15px;
+}
+
+.card p {
+  font-size: 15px;
+  color: #6b4b2f;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn {
+  padding: 12px 22px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn.primary {
+  background: #c47a3a;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #a8632f;
+}
+
+.btn.secondary {
+  border: 2px solid #c47a3a;
+  color: #c47a3a;
+}
+
+.btn.secondary:hover {
+  background: #f7e6d5;
+}

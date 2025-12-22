@@ -2,12 +2,15 @@ import { createContext, useContext, useState, type ReactNode, useEffect } from '
 import { useNavigate } from 'react-router-dom';
 import {
   loginCustomer as authLoginCustomer,
+  loginVendor as authLoginVendor,
   logout as authLogout,
   registerCustomer as authRegisterCustomer,
   isAuthenticated as authIsAuthenticated,
   isShopAuthenticated as authIsShopAuthenticated,
+  isVendorAuthenticated as authIsVendorAuthenticated,
   getAuthToken,
   getShopToken,
+  getVendorToken,
   loginVendorShop as authLoginVendorShop,
 } from '../services/authService';
 import type { RegisterCustomerPayload } from '../services/authService';
@@ -15,14 +18,17 @@ import type { RegisterCustomerPayload } from '../services/authService';
 interface AuthContextType {
   isAuthenticated: boolean;
   isShopAuthenticated: boolean;
+  isVendorAuthenticated: boolean;
   loginCustomer: (email: string, password: string) => Promise<boolean>;
   registerCustomer: (payload: RegisterCustomerPayload) => Promise<boolean>;
   loginShop: (email: string, password: string) => Promise<boolean>;
+  loginVendor: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   error: string | null;
   token: string | null;
   shopToken: string | null;
+  vendorToken: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -33,6 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [error, setError] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(getAuthToken());
   const [shopToken, setShopToken] = useState<string | null>(getShopToken());
+  const [vendorToken, setVendorToken] = useState<string | null>(getVendorToken());
   const navigate = useNavigate();
   const hostname = window.location.hostname;
 
@@ -42,6 +49,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await authenticateShop();
         setLoading(false);
 
+      } else if (hostname.includes("vendor")) {
+        await authenticateVendor();
+        setLoading(false);
       } else {
         await authenticateCustomer();
         setLoading(false);
@@ -78,6 +88,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
     setToken(accessToken);
+    setLoading(false);
+  };
+
+  const authenticateVendor = async () => {
+    if (!vendorToken) {
+      setLoading(false);
+      return;
+    }
+
+    const { valid, accessToken } = await authIsVendorAuthenticated();
+    if (!valid) {
+      logout();
+      return;
+    }
+    setVendorToken(accessToken);
     setLoading(false);
   };
 
@@ -130,6 +155,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const loginVendor = async (email: string, _password: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await authLoginVendor(email, _password);
+      const access = res?.token ?? res?.accessToken ?? res?.jwt ?? null;
+      if (!access) throw new Error('Missing token in response');
+      setToken(access);
+      return true;
+    } catch (err: any) {
+      setError(err?.message || 'Failed to login. Please check your credentials.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     try {
       authLogout();
@@ -144,11 +186,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       value={{
         isAuthenticated: !!token,
         isShopAuthenticated: !!shopToken,
+        isVendorAuthenticated: !!vendorToken,
         token,
         shopToken,
+        vendorToken,
         loginCustomer,
         registerCustomer,
         loginShop,
+        loginVendor,
         logout,
         loading,
         error

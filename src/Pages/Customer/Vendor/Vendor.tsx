@@ -8,6 +8,7 @@ import { getShopCategories } from '../../../services/productService';
 import { CategoriesDisplay } from '../../../Components/CategoryDisplay/CategoriesDisplay';
 import { getVendorShopProducts } from '../../../services/shopProductService';
 import type { Product } from '../../../shared/types/product/ProductTypes';
+import NotFound from '../../Shared/NotFound';
 
 
 interface Shop {
@@ -26,58 +27,65 @@ export const Vendor = () => {
   const [inventory, setInventory] = useState<Product[]>([]);
   const [filteredInventory, setFilteredInventory] = useState<Product[]>([]);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
-
+  const [notFoundError, setNotFoundError] = useState(false);
 
   // 1️⃣ Load shops on vendorId change
-useEffect(() => {
-  const loadShops = async () => {
-    try {
-      const data = await getVendorShopsByVendorId(Number(vendorId));
-      setShops(data);
+  useEffect(() => {
+    const loadShops = async () => {
+      try {
+        if (!vendorId) return;
+        const parsedId = Number(vendorId);
 
-      if (data.length > 0) {
-        setSelectedShop(data[0].id); // auto-select first shop
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  if (vendorId) loadShops();
-}, [vendorId]);
-
-// 2️⃣ Load categories & inventory whenever selectedShop changes
-useEffect(() => {
-  if (!selectedShop) return;
-
-  const loadShopData = async () => {
-    try {
-      // Load categories
-      const categoriesData = await getShopCategories({ shopId: selectedShop });
-      setCategories(categoriesData);
-
-      const firstCategory = categoriesData.length > 0 ? categoriesData[0].name : '';
-      setSelectedCategory(firstCategory);
-
-      // Load inventory
-      const res = await getVendorShopProducts({ shopId: Number(selectedShop) });
-      const inventoryData = res.content ?? res;
-      console.log(inventoryData);
-      setInventory(inventoryData);
-
-      // Filter inventory by selectedCategory
-      if (firstCategory) {
-        setFilteredInventory(
-          inventoryData.filter((p: Product) => p.categoryName === firstCategory)
+        const data = await getVendorShopsByVendorId(
+          Number.isNaN(parsedId) ? vendorId : parsedId
         );
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+        setShops(data);
 
-  loadShopData();
-}, [selectedShop]);
+        if (data.length > 0) {
+          setSelectedShop(data[0].id); // auto-select first shop
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name == '404') {
+          setNotFoundError(true);
+        }
+      }
+    };
+
+    if (vendorId) loadShops();
+  }, [vendorId]);
+
+  // 2️⃣ Load categories & inventory whenever selectedShop changes
+  useEffect(() => {
+    if (!selectedShop) return;
+
+    const loadShopData = async () => {
+      try {
+        // Load categories
+        const categoriesData = await getShopCategories({ shopId: selectedShop });
+        setCategories(categoriesData);
+
+        const firstCategory = categoriesData.length > 0 ? categoriesData[0].name : '';
+        setSelectedCategory(firstCategory);
+
+        // Load inventory
+        const res = await getVendorShopProducts({ shopId: Number(selectedShop) });
+        const inventoryData = res.content ?? res;
+        console.log(inventoryData);
+        setInventory(inventoryData);
+
+        // Filter inventory by selectedCategory
+        if (firstCategory) {
+          setFilteredInventory(
+            inventoryData.filter((p: Product) => p.categoryName === firstCategory)
+          );
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    loadShopData();
+  }, [selectedShop]);
 
   // Optional: only handle category changes for filtering
   useEffect(() => {
@@ -93,9 +101,10 @@ useEffect(() => {
     setSelectedShop(Number(e.target.value));
   };
 
-  console.log(inventory);
 
   return (
+    <>
+    {notFoundError ? <NotFound /> : (
     <div className={styles.vendorContainer}>
       <h1>{vendorName}</h1>
 
@@ -140,5 +149,7 @@ useEffect(() => {
         )}
       </div>
     </div>
+    )}
+    </>
   );
 };

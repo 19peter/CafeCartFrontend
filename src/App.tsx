@@ -13,7 +13,9 @@ import Cart from './Pages/Customer/Cart/Cart';
 import './App.css';
 import type { ReactNode } from 'react';
 import { Orders } from './Pages/Customer/Orders/Orders';
-import { ShopPage } from './Pages/Shop/Shop Page/ShopPage';
+import { ShopPage } from './Pages/Shop/ShopPage';
+import { VendorAccessPage } from './Pages/VendorAccess/VendorAccessPage';
+import NotFound from './Pages/Shared/NotFound';
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -46,6 +48,16 @@ function App() {
     return children;
   };
 
+  const VendorProtectedRoute = ({ children }: ProtectedRouteProps) => {
+    const { isVendorAuthenticated } = useAuth();
+
+    if (!isVendorAuthenticated) {
+      return <Navigate to="/login" />;
+    }
+
+    return children;
+  };
+
   const CustomerApp = () => {
     return (
 
@@ -53,6 +65,7 @@ function App() {
         <div className='layout'>
           <NavigationBar />
           <Routes>
+            <Route path="*" element={<NotFound />} />
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<SignIn />} />
             <Route path="/register" element={<Register />} />
@@ -81,9 +94,22 @@ function App() {
             <ShopProtectedRoute>
               <ShopPage />
             </ShopProtectedRoute>
-          }>
-            
-          </Route>
+          } />
+        </Routes>
+      </div>
+    )
+  }
+
+  const VendorApp = () => {
+    return (
+      <div className='layout'>
+        <Routes>
+          <Route path="/login" element={<SignIn />} />
+          <Route path="/" element={
+            <VendorProtectedRoute>
+              <VendorAccessPage />
+            </VendorProtectedRoute>
+          } />
         </Routes>
       </div>
     )
@@ -92,6 +118,8 @@ function App() {
   const ActiveApp = () => {
     if (hostname.includes("shop")) {
       return <ShopApp />
+    } else if (hostname.includes("vendor")) {
+      return <VendorApp />
     } else {
       return <CustomerApp />
     }
