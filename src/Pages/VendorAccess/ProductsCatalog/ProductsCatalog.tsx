@@ -8,7 +8,6 @@ import { uploadToS3 } from "../../../services/S3Service";
 const EMPTY_FORM = {
   name: "",
   price: 0,
-  quantity: 0,
   image: "",
   description: "",
   categoryId: 0,
@@ -112,7 +111,6 @@ export const ProductsCatalog = () => {
       const payload = {
         name: form.name,
         price: +form.price,
-        quantity: +form.quantity,
         imageUrl: selectedImage?.name || " ",
         description: form.description,
         categoryId: +form.categoryId,
@@ -153,7 +151,6 @@ export const ProductsCatalog = () => {
     setForm({
       name: product.name,
       price: product.price,
-      quantity: product.isStockTracked ? product.quantity : 0,
       image: product.imageUrl,
       description: product.description,
       categoryId: product.categoryId,
@@ -271,16 +268,6 @@ export const ProductsCatalog = () => {
               />
               Track Stock
             </label>
-
-            {form.isStockTracked && (
-              <>
-                <label htmlFor="price">Quantity</label>
-                <input name="quantity" type="number" placeholder="Quantity" value={form.quantity} onChange={handleChange} />
-              </>
-            )}
-
-
-
           </div>
 
           <textarea

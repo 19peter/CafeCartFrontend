@@ -16,7 +16,6 @@ export interface Product {
 export interface CreateProductDTO {
   name: string;
   price: number;
-  quantity: number;
   imageUrl?: string;
   description: string;
   categoryId: number;
@@ -29,7 +28,6 @@ export interface UpdateProductDTO {
   id: number;
   name: string;
   price: number;
-  quantity: number;
   imageUrl?: string;
   description: string;
   categoryId: number;

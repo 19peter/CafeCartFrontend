@@ -41,7 +41,10 @@ export const ProductDetail = () => {
   }, [productId, vendorShopId]);
 
   const handleAddToCart = async () => {
-    isAuthenticated ? null : navigate('/login');
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
     if (!productDetails || productDetails.quantity === 0) return;
     let res: { status: number, message: string } = await addToCart({ productId: Number(productId), shopId: Number(vendorShopId), quantity });
     if (res.status !== 200) {

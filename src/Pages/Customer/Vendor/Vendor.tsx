@@ -9,13 +9,9 @@ import { CategoriesDisplay } from '../../../Components/CategoryDisplay/Categorie
 import { getVendorShopProducts } from '../../../services/shopProductService';
 import type { Product } from '../../../shared/types/product/ProductTypes';
 import NotFound from '../../Shared/NotFound';
+import type { Shop } from '../../../shared/types/Shop/Shop';
 
 
-interface Shop {
-  id: number;
-  name: string;
-  address: string;
-}
 
 
 export const Vendor = () => {

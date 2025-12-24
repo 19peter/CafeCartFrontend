@@ -16,6 +16,11 @@ export const getCustomerOrders = async () => {
   return res;
 };
 
+export const getVendorOrders = async (year: number, month: number, page: number, size: number, shopId: number) => {
+  const res = await authFetch(`/orders/vendor?year=${year}&month=${month}&page=${page}&size=${size}&shopId=${shopId}`, 'GET', {}, true);
+  return res;
+};
+
 // GET /orders/customer/items
 export const getOrderItems = async () => {
   const res = await authFetch(`/orders/customer/items`, 'GET', {}, true);

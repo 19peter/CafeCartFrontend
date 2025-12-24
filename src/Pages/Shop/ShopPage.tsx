@@ -10,7 +10,7 @@ import { setIsOnline, setIsDeliveryAvailable, getShopSettings } from "../../serv
 
 
 export const ShopPage = () => {
-    const [selected, setSelected] = useState("orders");
+    const [selected, setSelected] = useState("Orders");
     const [open, setOpen] = useState(false);
     const [delivery, setDelivery] = useState(false);
     const { logout } = useAuth();
