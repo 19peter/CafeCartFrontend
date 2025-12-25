@@ -1,102 +1,111 @@
+/* NAVBAR SHELL */
 .navbar {
-  display: flex;
-  justify-content: space-around;
   width: 100%;
-
-  background: linear-gradient(135deg,
-      var(--color-primary),
-      var(--color-primary-dark));
-  padding: 10px 0;
-  color: var(--color-bg-dark);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
   margin-bottom: 28px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
-.newOrderContainer {
-    background: var(--color-text);
-    color: var(--color-bg-dark);
-    padding: 12px 30px;
-    margin-bottom: 10px;
-    border-radius: 12px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.newOrderText {
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.navbarLeft {
-  width: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.navbarLeft h1 {
-    font-size: 1.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.navbarRight {
-  width: 50%;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.toggleContainer {
-  width: 40%;
-  height: 50px;
+/* CENTER CONTENT */
+.navbarInner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-direction: row;
 }
 
-.btnContainer {
-  width: 40%;
-  height: 50px;
+/* LEFT */
+.navbarLeft {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex-direction: row;
 }
 
-/* Logout button */
-.btnContainer button {
-  background: var(--color-bg-dark);
-  color: var(--color-text);
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 10px 18px;
-  width: 70%;
-  font-size: 14px;
+.shopName {
+  color: white;
+  font-size: 1.6rem;
   font-weight: 700;
-  cursor: pointer;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
 
+/* RIGHT CONTROL PANEL */
+.navbarRight {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 240px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+/* CONTROL ROW */
+.controlRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* LABEL */
+.controlLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* DIVIDER */
+.divider {
+  height: 1px;
+  background: #e5e7eb;
+  margin: 4px 0;
+}
+
+/* LOGOUT */
+.logoutBtn {
+  width: 100%;
+  background: #ffffff;
+  color: var(--color-primary-dark);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
-/* Hover */
-.btnContainer button:hover {
-  background: var(--color-primary-light);
-  border-color: white;
+.logoutBtn:hover {
+  background: var(--color-bg-dark);
 }
 
-/* Active click */
-.btnContainer button:active {
+.logoutBtn:active {
   transform: scale(0.97);
 }
 
-/* Focus (keyboard accessibility) */
-.btnContainer button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(white, 0.25);
+/* STATUS PILL */
+.status {
+  align-self: center;
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+/* STATUS COLORS */
+.connected {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.disconnected {
+  background: #fee2e2;
+  color: #991b1b;
 }

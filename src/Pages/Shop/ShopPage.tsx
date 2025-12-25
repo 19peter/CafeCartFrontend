@@ -107,32 +107,46 @@ export const ShopPage = () => {
     return (
         <>
             <nav className={styles.navbar}>
-                <div className={styles.navbarLeft}>
-                    <h1>{settings.shopName}</h1>
+                <div className={styles.navbarInner}>
+
+                    {/* LEFT */}
+                    <div className={styles.navbarLeft}>
+                        <h1 className={styles.shopName}>{settings.shopName}</h1>
+                    </div>
+
+                    {/* RIGHT */}
+                    <div className={styles.navbarRight}>
+
+                        <div className={styles.controlRow}>
+                            <span className={styles.controlLabel}>
+                                {settings.online ? "Online" : "Offline"}
+                            </span>
+                            <ToggleButton onToggle={handleModeChange} value={settings.online} />
+                        </div>
+
+                        <div className={styles.controlRow}>
+                            <span className={styles.controlLabel}>Delivery</span>
+                            <ToggleButton onToggle={handleDeliveryChange} value={settings.deliveryAllowed} />
+                        </div>
+
+                        <div className={styles.divider} />
+
+                        <button className={styles.logoutBtn} onClick={handleLogout}>
+                            Log out
+                        </button>
+
+                        <span
+                            className={`${styles.status} ${connected ? styles.connected : styles.disconnected
+                                }`}
+                        >
+                            {connected ? "Live" : "Disconnected"}
+                        </span>
+
+                    </div>
 
                 </div>
-
-                <div className={styles.navbarRight}>
-                    <div className={styles.toggleContainer}>
-                        <h4>{settings.online ? "Online" : "Offline"}</h4>
-                        <ToggleButton onToggle={handleModeChange} value={settings.online} />
-                    </div>
-
-                    <div className={styles.toggleContainer}>
-                        <h4>Delivery</h4>
-                        <ToggleButton onToggle={handleDeliveryChange} value={settings.deliveryAllowed} />
-                    </div>
-
-                    <div className={styles.btnContainer}>
-                        <button onClick={handleLogout}>Log out</button>
-                    </div>
-
-                    {/* <span className={`status ${connected ? 'connected' : 'disconnected'}`}>
-                        {connected ? '🟢 Live' : '🔴 Disconnected'}
-                    </span> */}
-                </div>
-
             </nav>
+
 
             <ViewToggler onChange={(value) => setSelected(value)} options={["Orders", "Inventory"]} />
             {newOrder &&
