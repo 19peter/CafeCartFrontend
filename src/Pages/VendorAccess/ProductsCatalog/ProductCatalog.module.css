@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: row;
   width: 100%;
-  justify-content: space-between  ;
+  justify-content: space-between;
 }
 
 .productFormContainer {
@@ -12,6 +12,11 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
   border-radius: 16px;
   border: 1px solid #d1d5db;
+  position: sticky;
+  top: 24px;
+  height: fit-content;
+   background: #ffffff;
+     box-shadow: -6px 0 24px rgba(0,0,0,0.06);
 }
 
 .inventoryPage {
@@ -50,6 +55,13 @@
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
 }
 
+.emptyState {
+  text-align: center;
+  padding: 60px 0;
+  color: #6b7280;
+  width: 100%;
+}
+
 .productsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -74,6 +86,16 @@
   width: 100%;
   height: 160px;
   object-fit: cover;
+}
+
+.productName {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.productCategory {
+  font-size: 12px;
+  color: #9ca3af;
 }
 
 .productBody {
@@ -193,3 +215,25 @@
   background: var(--color-primary-dark);
 }
 
+
+.imagePlaceholder {
+  height: 160px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #9ca3af;
+}
+
+
+@media (max-width: 1024px) {
+  .inventoryContainer {
+    flex-direction: column;
+  }
+
+  .productFormContainer,
+  .inventoryPage {
+    width: 100%;
+  }
+}

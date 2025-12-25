@@ -3,25 +3,26 @@
   --color-primary: #9C6644;
   --color-primary-dark: #8a5a3c;
   --color-primary-light: #b37a52;
-  
+
   /* Text Colors */
   --color-text: #5D4037;
   --color-text-light: #8D6E63;
   --color-text-red: rgb(156, 20, 20);
 
-  
+  --color-bg-dark: #ece6e0;   
+
   /* Background Colors */
   --color-bg: #FFFFFF;
   --color-bg-secondary: #F5F5F5;
-  
+
   /* Border Colors */
   --color-border: #8a5a3c;
-  
+
   /* Button Colors */
   --color-button-primary: var(--color-primary);
   --color-button-hover: var(--color-primary-dark);
   --color-button-text: #FFFFFF;
-  
+
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);

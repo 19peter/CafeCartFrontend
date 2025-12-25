@@ -24,31 +24,47 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       }
     });
   };
-  
+
+
   return (
     <div className={styles.productCard}>
       <div className={styles.productImage}>
-        <img 
-          src={product.imageUrl} 
-          alt={product.name}
-          className={styles.productImg}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = `https://via.placeholder.com/300x200?text=${encodeURIComponent(product.name)}`;
-          }}
-        />
+
+        {product.imageUrl ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            className={styles.productImg}
+          />
+        ) : (
+          <div className={styles.imagePlaceholder}>No Image</div>
+        )}
+
         <div className={styles.productOverlay}></div>
       </div>
       <div className={styles.productInfo}>
         <h3>{product.name}</h3>
-        {product.isStockTracked &&  product.isAvailable && (
+
+        <p className={styles.productDescription}>{product.description}</p>
+
+        {!product.isStockTracked && product.isAvailable && (
+          <p className={styles.productInStock}>Available</p>
+        )}
+
+        {product.isStockTracked && product.quantity > 0 && product.isAvailable && (
           <p className={styles.productInStock}>Available in stock</p>
         )}
-        {product.isStockTracked && !product.isAvailable && (
+
+        {product.isStockTracked && product.quantity === 0 && product.isAvailable && (
           <p className={styles.productOutOfStock}>Not available in stock</p>
         )}
-        {/* <p className={styles.productDescription}>{product.description}</p> */}
+        {product.isStockTracked && !product.isAvailable && (
+          <p className={styles.productOutOfStock}>Not available</p>
+        )}
+
+
         <p className={styles.productPrice}>${product.price.toFixed(2)}</p>
-        <button 
+        <button
           className={styles.viewButton}
           onClick={handleViewProduct}
         >

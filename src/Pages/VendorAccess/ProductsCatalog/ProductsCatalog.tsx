@@ -190,14 +190,28 @@ export const ProductsCatalog = () => {
           />
         </div>
         {/* PRODUCTS GRID */}
+
+        {filteredProducts.length === 0 && (
+          <div className={styles.emptyState}>
+            <p>No products found</p>
+            <span>Try adjusting your search</span>
+          </div>
+        )}
+
         <div className={styles.productsGrid}>
           {filteredProducts?.map((p: Product) => (
+
             <div key={p.id} className={styles.productCard}>
-              <img src={p.imageUrl} alt={p.name} className={styles.productImage} />
+              {p.imageUrl ? (
+                <img src={p.imageUrl} alt={p.name} className={styles.productImage} />
+              ) : (
+                <div className={styles.imagePlaceholder}>No Image</div>
+              )}
 
               <div className={styles.productBody}>
                 <div className={styles.productHeader}>
-                  <h3>{p.name} - <span className={styles.productDesc}>{p.categoryName}</span></h3>
+                  <h3 className={styles.productName}>{p.name}</h3>
+                  <span className={styles.productCategory}>{p.categoryName}</span>
                 </div>
 
                 <p className={styles.productDesc}>{p.description}</p>

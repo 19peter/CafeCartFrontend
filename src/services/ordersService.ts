@@ -17,7 +17,12 @@ export const getCustomerOrders = async () => {
 };
 
 export const getVendorOrders = async (year: number, month: number, page: number, size: number, shopId: number) => {
-  const res = await authFetch(`/orders/vendor?year=${year}&month=${month}&page=${page}&size=${size}&shopId=${shopId}`, 'GET', {}, true);
+  const res = await authFetch(`/orders/vendor/month?year=${year}&month=${month}&page=${page}&size=${size}&shopId=${shopId}`, 'GET', {}, true);
+  return res;
+};
+
+export const getSaleSummaryByMonth = async (year: number, month: number, shopId: number) => {
+  const res = await authFetch(`/orders/vendor/month/total?year=${year}&month=${month}&shopId=${shopId}`, 'GET', {}, true);
   return res;
 };
 

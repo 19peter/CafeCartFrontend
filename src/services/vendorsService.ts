@@ -1,3 +1,5 @@
+import { authFetch } from "./authService";
+
 const BASE_URL = import.meta.env.VITE_VENDORS_BASE_URL || 'http://localhost:8080/api/v1/vendors';
 
 const handleJson = async (response: any) => {
@@ -43,4 +45,9 @@ export const getVendorById = async (vendorId: number) => {
     headers: { 'Content-Type': 'application/json' },
   });
   return await handleJson(res);
+};
+
+export const getVendorInfo = async () => {
+  const res = await authFetch(`/vendors/vendor`, 'GET', {}, true);
+  return res;
 };

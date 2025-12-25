@@ -3,8 +3,12 @@ import { getVendorOrders } from "../../../services/ordersService";
 import type { ShopOrder } from "../../../shared/types/orders/ShopOrder";
 import { getVendorShopsByVendorId } from "../../../services/vendorShopsService";
 import type { Shop } from "../../../shared/types/Shop/Shop";
+import styles from "./OrderHistory.module.css";
+import type { SalesSummary } from "../../../shared/types/orders/SalesSummary";
+import { getSaleSummaryByMonth } from "../../../services/ordersService";
 
 export const OrderHistory = () => {
+
     const [orders, setOrders] = useState<ShopOrder[]>([]);
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(10);
@@ -13,7 +17,27 @@ export const OrderHistory = () => {
     const [month, setMonth] = useState(new Date().getMonth() + 1); // 1-12
     const [shops, setShops] = useState<Shop[]>([]);
     const [shopId, setShopId] = useState<number>(0);
+    const [monthSaleSummary, setMonthSaleSummary] = useState<SalesSummary>({
+        totalSales: 0,
+        totalOrders: 0
+    });
 
+    const fetchMonthSaleSummary = async () => {
+        try {
+            const res = await getSaleSummaryByMonth(year, month, shopId);
+            let salesSummary: SalesSummary = {
+                totalSales: 0,
+                totalOrders: 0
+            };
+            if (res.data) {
+                salesSummary.totalOrders = res.data.ordersNumber;
+                salesSummary.totalSales = res.data.totalPrice;
+            }
+            setMonthSaleSummary(salesSummary);
+        } catch (error) {
+            console.error("Error fetching month sale summary:", error);
+        }
+    };
     const fetchOrders = async () => {
         try {
             const res = await getVendorOrders(year, month, page, size, shopId);
@@ -39,86 +63,105 @@ export const OrderHistory = () => {
     }, []);
 
     useEffect(() => {
+        if (shopId === 0) return;
         fetchOrders();
+        fetchMonthSaleSummary();
     }, [page, size, year, month, shopId]);
 
     const handlePrevPage = () => setPage(prev => Math.max(prev - 1, 0));
     const handleNextPage = () => setPage(prev => Math.min(prev + 1, totalPages - 1));
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h1>Orders for {month}/{year}</h1>
+        <div className={styles.page}>
+            <h1 className={styles.title}>
+                Orders — {month}/{year}
+            </h1>
 
-            {/* Month & Year selectors */}
-            <div style={{ marginBottom: "20px" }}>
-                <input
-                    type="number"
-                    value={month}
-                    min="1"
-                    max="12"
-                    onChange={e => setMonth(Number(e.target.value))}
-                />
-                <input
-                    type="number"
-                    value={year}
-                    onChange={e => setYear(Number(e.target.value))}
-                />
-                <button onClick={() => setPage(0)}>Load</button>
+            {/* Summary Cards */}
+            <div className={styles.summaryGrid}>
+                <div className={styles.summaryCard}>
+                    <span>Total Sales</span>
+                    <strong>${monthSaleSummary.totalSales}</strong>
+                </div>
+                <div className={styles.summaryCard}>
+                    <span>Total Orders</span>
+                    <strong>{monthSaleSummary.totalOrders}</strong>
+                </div>
             </div>
 
-            {/* Shop Selector */}
-            <select value={shopId} onChange={e => setShopId(Number(e.target.value))}>
-                {shops?.map(shop => (
-                    <option key={shop.id} value={shop.id}>
-                        {shop.name}
-                    </option>
-                ))}
-            </select>
+            {/* Filters */}
+            <div className={styles.filtersCard}>
+                <div className={styles.filterGroup}>
+                    <label>Month</label>
+                    <input type="number" min="1" max="12" value={month} onChange={e => setMonth(+e.target.value)} />
+                </div>
+
+                <div className={styles.filterGroup}>
+                    <label>Year</label>
+                    <input type="number" value={year} onChange={e => setYear(+e.target.value)} />
+                </div>
+
+                <div className={styles.filterGroup}>
+                    <label>Shop</label>
+                    <select value={shopId} onChange={e => setShopId(+e.target.value)}>
+                        {shops?.map(shop => (
+                            <option key={shop.id} value={shop.id}>{shop.name}</option>
+                        ))}
+                    </select>
+                </div>
+            </div>
 
             {/* Orders Table */}
-            <table cellPadding="10" style={{ width: "100%", borderCollapse: "collapse" }}>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Order Number</th>
-                        <th>Type</th>
-                        <th>Payment Method</th>
-                        <th>Status</th>
-                        <th>Total Price</th>
-                        <th>Created At</th>
-                        <th>Items</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {orders.map(order => (
-                        <tr key={order.id}>
-                            <td>{order.id}</td>
-                            <td>{order.orderNumber}</td>
-                            <td>{order.orderType}</td>
-                            <td>{order.paymentMethod}</td>
-                            <td>{order.status}</td>
-                            <td>{order.totalPrice}</td>
-                            <td>{new Date(order.createdAt).toLocaleString()}</td>
-                            <td>
-                                <ul>
-                                    {order.items.map(item => (
-                                        <li key={item.id}>
-                                            {item.name} x {item.quantity} (${item.price})
-                                        </li>
-                                    ))}
-                                </ul>
-                            </td>
+            <div className={styles.tableCard}>
+                <table className={styles.table}>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Order</th>
+                            <th>Type</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                            <th>Date</th>
+                            <th>Items</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {orders.map(order => (
+                            <tr key={order.id}>
+                                <td>{order.id}</td>
+                                <td className={styles.orderNumber}>{order.orderNumber}</td>
+                                <td>{order.orderType}</td>
+                                <td>{order.paymentMethod}</td>
+                                <td>
+                                    <span className={`${styles.status} ${styles[order.status]}`}>
+                                        {order.status}
+                                    </span>
+                                </td>
+                                <td>${order.totalPrice}</td>
+                                <td>{new Date(order.createdAt).toLocaleDateString()}</td>
+                                <td>
+                                    <ul className={styles.itemsList}>
+                                        {order.items.map(item => (
+                                            <li key={item.id}>
+                                                {item.name} × {item.quantity}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* Pagination */}
-            <div style={{ marginTop: "20px" }}>
-                <button onClick={handlePrevPage} disabled={page === 0}>Prev</button>
-                <span style={{ margin: "0 10px" }}>Page {page + 1} of {totalPages}</span>
-                <button onClick={handleNextPage} disabled={page + 1 >= totalPages}>Next</button>
+            <div className={styles.pagination}>
+                <button disabled={page === 0} onClick={handlePrevPage}>Prev</button>
+                <span>Page {page + 1} of {totalPages}</span>
+                <button disabled={page + 1 >= totalPages} onClick={handleNextPage}>Next</button>
             </div>
         </div>
+
     );
 };

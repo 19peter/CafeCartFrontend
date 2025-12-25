@@ -1,0 +1,24 @@
+.dashboardHeader {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-dark)
+  );
+  padding: 28px 32px;
+  color: white;
+  margin-bottom: 28px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.dashboardTitle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboardSubtitle {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  margin-top: 6px;
+}

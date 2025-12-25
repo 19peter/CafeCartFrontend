@@ -124,11 +124,15 @@ export const InventoryPage = () => {
           <div className={styles.productsGrid}>
             {filteredProducts?.map((p) => (
               <div key={p.id} className={styles.productCard}>
-                <img
-                  src={p.imageUrl}
-                  alt={p.name}
-                  className={styles.productImage}
-                />
+                {p.imageUrl ? (
+                  <img
+                    src={p.imageUrl}
+                    alt={p.name}
+                    className={styles.productImage}
+                  />
+                ) : (
+                  <div className={styles.imagePlaceholder}>No Image</div>
+                )}
 
                 <div className={styles.productBody}>
                   <div className={styles.productHeader}>

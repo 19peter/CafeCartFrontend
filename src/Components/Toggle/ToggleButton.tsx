@@ -19,7 +19,7 @@ export default function ToggleButton({ onToggle, value }: ToggleButtonProps) {
 
   useEffect(() => {
     if (value) {
-      setBackground("#4ade80");
+      setBackground("var(--color-bg-dark)");
       setPos("26px");
     } else {
       setBackground("#ccc");
