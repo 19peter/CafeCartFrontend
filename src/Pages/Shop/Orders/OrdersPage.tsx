@@ -4,7 +4,7 @@ import { getShopOrders } from "../../../services/ordersService";
 import type { ShopOrder } from "../../../shared/types/orders/ShopOrder";
 import styles from "./OrdersPage.module.css";
 
-export const OrdersPage = () => {
+export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNewOrder: (value: boolean) => void }) => {
 
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [orders, setOrders] = useState<ShopOrder[]>([]);
@@ -26,29 +26,21 @@ export const OrdersPage = () => {
     });
   };
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      const dateParam = selectedDate.toISOString().split("T")[0]; // yyyy-mm-dd
-      const res = await getShopOrders(dateParam);
-      if (res.status === 200) {
-        setOrders(res.data);
-      }
-    };
+  const fetchOrders = async () => {
+    const dateParam = selectedDate.toISOString().split("T")[0]; // yyyy-mm-dd
+    const res = await getShopOrders(dateParam);
+    if (res.status === 200) {
+      setOrders(res.data);
+      setNewOrder(false);
+    }
+  };
 
-    
+  useEffect(() => {
+
     fetchOrders();
   }, []);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      const dateParam = selectedDate.toISOString().split("T")[0]; // yyyy-mm-dd
-      const res = await getShopOrders(dateParam);
-
-      if (res.status === 200) {
-        setOrders(res.data);
-      }
-    };
-
     fetchOrders();
   }, [selectedDate]);
 
@@ -90,14 +82,21 @@ export const OrdersPage = () => {
         </div>
       </div>
 
+    {newOrder && (
+      <button
+        className={styles.newOrderBtn}
+       
+        onClick={() => fetchOrders()}>Get New Orders</button>
+      )}
+
       {filtered.length > 0 ? (
         filtered.map((order: ShopOrder) => (
           <OrdersTable order={order} />
         ))
       ) : (
-        <div style={{ textAlign: "center"}}>
+        <div style={{ textAlign: "center" }}>
           No orders found
-          </div>
+        </div>
       )}
     </div>
   );

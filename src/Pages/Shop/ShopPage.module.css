@@ -12,6 +12,23 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
+.newOrderContainer {
+    background: var(--color-text);
+    color: var(--color-bg-dark);
+    padding: 12px 30px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.newOrderText {
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 .navbarLeft {
   width: 50%;
   display: flex;
