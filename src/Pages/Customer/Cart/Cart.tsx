@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../../contexts/CartContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -7,6 +7,7 @@ import { addOneToCart, getCart, removeItemFromCart, removeOneFromCart } from '..
 import type { OrderSummary, CartSummary, OrderType, PaymentMethod } from '../../../shared/types/cart/CartTypes';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { createOrder } from '../../../services/ordersService';
+import { generateIdempotencyKey } from '../../../utils/utils';
 
 
 interface CartItemProps {
@@ -19,6 +20,7 @@ const CartItem: React.FC<CartItemProps> = ({ children }) => (
     {children}
   </div>
 );
+
 
 const Cart = () => {
   const navigate = useNavigate();
@@ -48,6 +50,7 @@ const Cart = () => {
   const [pickupHour, setPickupHour] = useState('');   // 1–12
   const [pickupMinute, setPickupMinute] = useState('00');
   const [pickupPeriod, setPickupPeriod] = useState<'AM' | 'PM'>('AM');
+  const idempotencyKey = useRef(generateIdempotencyKey());
 
   const fetchCart = async () => {
     const res = await getCart({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng });
@@ -151,6 +154,7 @@ const Cart = () => {
         longitude: deliveryLocation.lng,
         address: deliveryAddress,
         pickupTime: to24HourTime() || '',
+        idempotencyKey: idempotencyKey.current,
       }
     );
     if (res.status !== 200) {

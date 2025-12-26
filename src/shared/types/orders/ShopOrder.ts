@@ -4,6 +4,7 @@ export type ShopOrder = {
     orderType: orderType;
     paymentMethod: paymentMethod;
     status: orderStatus;
+    customerId: number;
     customerName: string;
     phone: string;
     address: string;

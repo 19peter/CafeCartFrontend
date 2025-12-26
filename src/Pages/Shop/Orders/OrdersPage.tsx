@@ -3,11 +3,18 @@ import { OrdersTable } from "../../../Components/VendorOrderTable/OrderTable";
 import { getShopOrders } from "../../../services/ordersService";
 import type { ShopOrder } from "../../../shared/types/orders/ShopOrder";
 import styles from "./OrdersPage.module.css";
+import type { BasicCustomerInfo } from "../../../shared/types/customer/CustomerTypes";
+import { blockUser, getBlockedCustomers, unblockUser } from "../../../services/vendorShopsService";
+import { useNotification } from "../../../hooks/useNotification";
+import BlockedCustomersModal from "../../../Components/BlockedUserModal/BlockedUserModal";
 
 export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNewOrder: (value: boolean) => void }) => {
 
+  const { showError, showSuccess } = useNotification();
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [orders, setOrders] = useState<ShopOrder[]>([]);
+  const [blockedCustomers, setBlockedCustomers] = useState<BasicCustomerInfo[]>([]);
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const today = new Date();
@@ -35,8 +42,39 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
     }
   };
 
-  useEffect(() => {
+  const fetchBlockedCustomers = async () => {
+    const res = await getBlockedCustomers();
+    if (res.status === 200) {
+      setBlockedCustomers(res.data);
+    }
+  };
 
+  const handleBlockUser = async (userId: number, name: string, phone: string) => {
+    const res = await blockUser(userId);
+    console.log(res);
+    if (res.status === 200) {
+      showSuccess("User blocked successfully");
+      setBlockedCustomers([...blockedCustomers, { id: userId, firstName: name, lastName: "", phone: phone }]);
+    } else {
+      showError("Failed to block user");
+    }
+  };
+
+  const handleUnblockUser = async (userId: number) => {
+    const res = await unblockUser(userId);
+    console.log(res);
+    if (res.status === 200) {
+      showSuccess("User unblocked successfully");
+      setBlockedCustomers(blockedCustomers.filter((customer) => customer.id !== userId));
+    } else {
+      showError("Failed to unblock user");
+    }
+  };
+
+
+
+  useEffect(() => {
+    fetchBlockedCustomers();
     fetchOrders();
   }, []);
 
@@ -82,22 +120,35 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
         </div>
       </div>
 
-    {newOrder && (
-      <button
-        className={styles.newOrderBtn}
-       
-        onClick={() => fetchOrders()}>Get New Orders</button>
+      {newOrder && (
+        <button
+          className={styles.newOrderBtn}
+
+          onClick={() => fetchOrders()}>Get New Orders</button>
       )}
 
       {filtered.length > 0 ? (
         filtered.map((order: ShopOrder) => (
-          <OrdersTable order={order} />
+          <OrdersTable
+            order={order}
+            isCustomerBlocked={blockedCustomers.some((customer) => customer.id === order.customerId)}
+            handleBlockUser={handleBlockUser}
+            handleUnblockUser={handleUnblockUser}
+            openBlockedCustomersModal={() => setShowBlockedModal(true)}
+          />
         ))
       ) : (
         <div style={{ textAlign: "center" }}>
           No orders found
         </div>
       )}
+
+      <BlockedCustomersModal
+        open={showBlockedModal}
+        onClose={() => setShowBlockedModal(false)}
+        blockedCustomers={blockedCustomers}
+        onUnblock={handleUnblockUser}
+      />
     </div>
   );
 };

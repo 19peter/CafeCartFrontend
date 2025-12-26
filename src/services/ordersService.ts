@@ -34,9 +34,13 @@ export const getOrderItems = async () => {
 
 // POST /orders/customer
 export const createOrder = async (
-  { orderType, paymentMethod, latitude, longitude, address, pickupTime }: { orderType: OrderType; paymentMethod: PaymentMethod; latitude: number; longitude: number; address: string; pickupTime: string },
+  { orderType, paymentMethod, latitude, longitude, address, pickupTime, idempotencyKey }: { orderType: OrderType; paymentMethod: PaymentMethod; latitude: number; longitude: number; address: string; pickupTime: string; idempotencyKey: string },
 ) => {
-  const res = await authFetch(`/orders/customer`, 'POST', { orderType, paymentMethod, latitude, longitude, address, pickupTime }, true);
+  const res = await authFetch(`/orders/customer`,
+    'POST',
+    { orderType, paymentMethod, latitude, longitude, address, pickupTime },
+     true,
+     { 'Idempotency-Key': idempotencyKey });
   return res;
 };
 

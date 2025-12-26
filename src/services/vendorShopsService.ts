@@ -56,6 +56,20 @@ export const setIsOnlinePaymentAvailable = async (isOnlinePaymentAvailable: bool
   return res;
 }
 
+export const blockUser = async (userId: number) => {
+  const res = await authFetch(`/vendor-shops/shop/block/${userId}`, 'POST', { }, true);  
+  return res;
+}
+
+export const unblockUser = async (userId: number) => {
+  const res = await authFetch(`/vendor-shops/shop/unblock/${userId}`, 'POST', { }, true);  
+  return res;
+}
+  
+export const getBlockedCustomers = async () => {
+  const res = await authFetch(`/vendor-shops/shop/blocked-users`, 'GET', {}, true);  
+  return res;
+}
 
   
 

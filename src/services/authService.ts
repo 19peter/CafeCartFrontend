@@ -105,11 +105,12 @@ export const isTokenValid = async () => {
   return result;
 };
 
-export const authFetch = async (endpoint: string, method: string, data: any, retry = true) => {
+export const authFetch = async (endpoint: string, method: string, data: any, retry = true, additionalHeaders: any = {}) => {
   try {
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${getAuthToken()}`,
+      ...additionalHeaders
     };
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {

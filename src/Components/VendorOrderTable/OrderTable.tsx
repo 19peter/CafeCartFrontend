@@ -15,9 +15,13 @@ const ORDER_STATUSES = [
 
 interface Props {
     order: ShopOrder;
+    isCustomerBlocked: boolean;
+    handleBlockUser: (userId: number, customerName: string, customerPhone: string) => void;
+    handleUnblockUser: (userId: number) => void;
+    openBlockedCustomersModal: () => void;
 }
 
-export const OrdersTable = ({ order }: Props) => {
+export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleUnblockUser, openBlockedCustomersModal }: Props) => {
     const { showError, showSuccess } = useNotification();
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const [tableOrder, setTableOrder] = useState<ShopOrder>(order);
@@ -67,107 +71,132 @@ export const OrdersTable = ({ order }: Props) => {
     return (
         <table className={styles.ordersTable}>
             <tbody>
-                <>
-                    <tr
-                        key={tableOrder.id}
-                        className={styles.cardRow}
-                        onClick={() => toggleExpand(tableOrder.id)}
-                    >
-                        <td>{tableOrder.orderNumber}</td>
-                        <td>{tableOrder.customerName}</td>
-                        <td>
-                            <span className={`${styles.statusBadge} ${styles[tableOrder.status]}`}>
-                                {tableOrder?.status?.replace(/_/g, " ")}
-                            </span>
-                        </td>
-                        <td>{formatDate(tableOrder.createdAt)}</td>
-                        <td>{tableOrder.items.length} items</td>
-                        <td>
-                            <button className={styles.expandBtn}>
-                                {isExpanded ? "▲" : "▼"}
-                            </button>
-                        </td>
+                <tr
+                    key={tableOrder.id}
+                    className={styles.cardRow}
+                    onClick={() => toggleExpand(tableOrder.id)}
+                >
+                    <td>{tableOrder.orderNumber}</td>
+                    <td>{tableOrder.customerName}</td>
+                    <td>
+                        <span className={`${styles.statusBadge} ${styles[tableOrder.status]}`}>
+                            {tableOrder?.status?.replace(/_/g, " ")}
+                        </span>
+                    </td>
+                    <td>{formatDate(tableOrder.createdAt)}</td>
+                    <td>{tableOrder.items.length} items</td>
+                    <td>
+                        <button className={styles.expandBtn}>
+                            {isExpanded ? "▲" : "▼"}
+                        </button>
+                    </td>
 
-                    </tr>
+                </tr>
 
-                    {isExpanded && (
-                        <tr className={styles.expandedRow}>
+                {isExpanded && (
+                    <tr className={styles.expandedRow}>
 
-                            <td colSpan={6}>
-                                <div className={styles.detailsBox}>
+                        <td colSpan={6}>
+                            <div className={styles.detailsBox}>
 
-                                    <div className={styles.infoContainer}>
+                                <div className={styles.infoContainer}>
 
-                                        <div className={styles.orderInfo}>
-                                            <p><strong>Order Type:</strong> {tableOrder.orderType}</p>
-                                            <p><strong>Payment Method:</strong> {tableOrder.paymentMethod}</p>
-                                            <h4>Items</h4>
-                                            <ul>
-                                                {tableOrder.items.map((item: OrderItem, i: number) => (
-                                                    <li key={i}>
-                                                        {item.name} — {item.quantity} × {item.price} EGP
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                            <h4>Total Price: {tableOrder.totalPrice} EGP</h4>
+                                    <div className={styles.orderInfo}>
+                                        <p><strong>Order Type:</strong> {tableOrder.orderType}</p>
+                                        <p><strong>Payment Method:</strong> {tableOrder.paymentMethod}</p>
+                                        <h4>Items</h4>
+                                        <ul>
+                                            {tableOrder.items.map((item: OrderItem, i: number) => (
+                                                <li key={i}>
+                                                    {item.name} — {item.quantity} × {item.price} EGP
+                                                </li>
+                                            ))}
+                                        </ul>
+                                        <h4>Total Price: {tableOrder.totalPrice} EGP</h4>
 
-                                        </div>
-                                        <div className={styles.customerInfo}>
-                                            <h4>Customer Info</h4>
-                                            <p><strong>Phone:</strong> {tableOrder.phone}</p>
-                                            {tableOrder.orderType === "DELIVERY" && (
-                                                <>
-                                                    <p><strong>Address:</strong> {tableOrder.address}</p>
-                                                    <p>
-                                                        <strong>Coordinates:</strong> {tableOrder.latitude},{" "}
-                                                        {tableOrder.longitude}
-                                                    </p>
-                                                </>
+                                    </div>
+                                    <div className={styles.customerInfo}>
+                                        <h4>Customer Info</h4>
+                                        <p><strong>Phone:</strong> {tableOrder.phone}</p>
+                                        <div>
+
+                                            {isCustomerBlocked ? (
+                                                <button
+                                                    onClick={() => handleUnblockUser(tableOrder.customerId)}
+                                                    className={styles.blockBtn}
+                                                >
+                                                    Unblock
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => handleBlockUser(tableOrder.customerId, tableOrder.customerName, tableOrder.phone)}
+                                                    className={styles.blockBtn}
+                                                >
+                                                    Block
+                                                </button>
                                             )}
 
-
+                                            <button
+                                                className={styles.blockBtn}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    openBlockedCustomersModal();
+                                                }}
+                                            >
+                                                View Blocked Customers
+                                            </button>
                                         </div>
-                                    </div>
+                                        {tableOrder.orderType === "DELIVERY" && (
+                                            <>
+                                                <p><strong>Address:</strong> {tableOrder.address}</p>
+                                                <p>
+                                                    <strong>Coordinates:</strong> {tableOrder.latitude},{" "}
+                                                    {tableOrder.longitude}
+                                                </p>
+                                            </>
+                                        )}
 
 
-                                    <div className={styles.statusButtons}>
-                                        {ORDER_STATUSES.map((s) => {
-                                            const isCurrent = s === tableOrder?.status;
-
-                                            return (
-                                                <button
-                                                    key={s}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                    }}
-                                                    className={`${styles.statusBtn} ${isCurrent
-                                                        ? styles.currentStatus
-                                                        : ''
-                                                        }`}
-                                                >
-                                                    {s.replace(/_/g, " ")}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                    <div className={styles.updateBtnContainer}>
-                                        <button
-                                            className={styles.updateBtn}
-                                            onClick={() => updateStatus(tableOrder.id)}>Update</button>
-
-                                        <button
-                                            className={styles.updateBtn}
-                                            onClick={() => handleCancelOrder(tableOrder.id)}>Cancel</button>
                                     </div>
                                 </div>
 
-                            </td>
-                        </tr>
+
+                                <div className={styles.statusButtons}>
+                                    {ORDER_STATUSES.map((s) => {
+                                        const isCurrent = s === tableOrder?.status;
+
+                                        return (
+                                            <button
+                                                key={s}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                }}
+                                                className={`${styles.statusBtn} ${isCurrent
+                                                    ? styles.currentStatus
+                                                    : ''
+                                                    }`}
+                                            >
+                                                {s.replace(/_/g, " ")}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                                <div className={styles.updateBtnContainer}>
+                                    <button
+                                        className={styles.updateBtn}
+                                        onClick={() => updateStatus(tableOrder.id)}>Update</button>
+
+                                    <button
+                                        className={styles.updateBtn}
+                                        onClick={() => handleCancelOrder(tableOrder.id)}>Cancel</button>
+                                </div>
+                            </div>
+
+                        </td>
+                    </tr>
 
 
-                    )}
-                </>
-
+                )}
             </tbody>
         </table>
     );
