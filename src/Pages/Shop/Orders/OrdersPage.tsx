@@ -15,26 +15,38 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
   const [orders, setOrders] = useState<ShopOrder[]>([]);
   const [blockedCustomers, setBlockedCustomers] = useState<BasicCustomerInfo[]>([]);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
+  const [pinnedOrders, setPinnedOrders] = useState<Set<string>>(new Set());
+
+
 
   const [selectedDate, setSelectedDate] = useState(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return new Date(`${year}-${month}-${day}`);
+    const cairoDate = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Africa/Cairo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(new Date());
+    
+    return new Date(cairoDate);
   });
 
+  const togglePin = (e: React.MouseEvent<HTMLButtonElement>, orderNumber: string) => {
+    e.stopPropagation();
+    setPinnedOrders(prev => {
+      const next = new Set(prev);
+      next.has(orderNumber) ? next.delete(orderNumber) : next.add(orderNumber);
+      return next;
+    });
+  };
 
   const shiftDay = (days: number) => {
     setSelectedDate((prev) => {
-      const d = new Date(prev);
-      d.setDate(d.getDate() + days);
-      return d;
+      return new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + days);
     });
   };
 
   const fetchOrders = async () => {
-    const dateParam = selectedDate.toISOString().split("T")[0]; // yyyy-mm-dd
+    const dateParam = selectedDate.toISOString().split("T")[0];
     const res = await getShopOrders(dateParam);
     if (res.status === 200) {
       setOrders(res.data);
@@ -51,7 +63,6 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
 
   const handleBlockUser = async (userId: number, name: string, phone: string) => {
     const res = await blockUser(userId);
-    console.log(res);
     if (res.status === 200) {
       showSuccess("User blocked successfully");
       setBlockedCustomers([...blockedCustomers, { id: userId, firstName: name, lastName: "", phone: phone }]);
@@ -62,7 +73,6 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
 
   const handleUnblockUser = async (userId: number) => {
     const res = await unblockUser(userId);
-    console.log(res);
     if (res.status === 200) {
       showSuccess("User unblocked successfully");
       setBlockedCustomers(blockedCustomers.filter((customer) => customer.id !== userId));
@@ -76,16 +86,31 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
   useEffect(() => {
     fetchBlockedCustomers();
     fetchOrders();
+    const saved = localStorage.getItem("pinnedOrders");
+    if (saved) setPinnedOrders(new Set(JSON.parse(saved)));
   }, []);
 
   useEffect(() => {
     fetchOrders();
   }, [selectedDate]);
 
+
+  useEffect(() => {
+    localStorage.setItem(
+      "pinnedOrders",
+      JSON.stringify(Array.from(pinnedOrders))
+    );
+  }, [pinnedOrders]);
+
   const filtered =
     statusFilter === "ALL"
       ? orders
       : orders.filter((o: ShopOrder) => o.status === statusFilter);
+
+  const pinned = filtered.filter(o => pinnedOrders.has(o.orderNumber));
+  const unpinned = filtered.filter(o => !pinnedOrders.has(o.orderNumber));
+
+  const ordered = [...pinned, ...unpinned];
 
   return (
     <div className={styles.container}>
@@ -127,14 +152,17 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
           onClick={() => fetchOrders()}>Get New Orders</button>
       )}
 
-      {filtered.length > 0 ? (
-        filtered.map((order: ShopOrder) => (
+      {ordered.length > 0 ? (
+        ordered.map((order: ShopOrder) => (
           <OrdersTable
+            key={order.orderNumber}
             order={order}
             isCustomerBlocked={blockedCustomers.some((customer) => customer.id === order.customerId)}
             handleBlockUser={handleBlockUser}
             handleUnblockUser={handleUnblockUser}
             openBlockedCustomersModal={() => setShowBlockedModal(true)}
+            isPinned={pinnedOrders.has(order.orderNumber)}
+            onTogglePin={(e) => togglePin(e, order.orderNumber)}
           />
         ))
       ) : (

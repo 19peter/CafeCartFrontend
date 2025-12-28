@@ -29,9 +29,7 @@ export const ProductDetail = () => {
         setIsLoading(false);
         return;
       };
-
       const data = await getVendorProduct({ vendorShopId: Number(vendorShopId), productId: Number(productId) });
-      console.log(data);
       setProductDetails(data);
       setIsLoading(false);
 
@@ -84,22 +82,24 @@ export const ProductDetail = () => {
 
         <div className={styles.productContainer}>
           <div className={styles.imageContainer}>
+            {productDetails?.imageUrl ? (
             <img
-              // src={ productDetails?.imageUrl} 
-              src={'https://images.unsplash.com/photo-1445116572660-236099ec97a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'}
-
+              src={ productDetails?.imageUrl} 
               alt={productDetails?.name}
               className={styles.productImage}
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = '/placeholder-product.jpg';
-              }}
             />
+            ) : (
+              <div className={styles.imagePlaceholder}>
+                <p>No Image</p>
+              </div>
+            )}
           </div>
 
           <div className={styles.detailsContainer}>
             <h1 className={styles.productName}>{productDetails?.name}</h1>
-            <p className={styles.description}>{productDetails?.description}</p>
+            {productDetails?.description && (
+              <p className={styles.description}>{productDetails?.description}</p>
+            )}
             <p className={styles.price}>${productDetails?.price.toFixed(2)}</p>
 
             <div className={styles.stockStatus}>

@@ -13,6 +13,7 @@ export type ShopOrder = {
     items: OrderItem[];
     totalPrice: number;
     createdAt: string;
+    verified: boolean;
 }
 
 export type OrderItem = {

@@ -119,20 +119,24 @@ export const authFetch = async (endpoint: string, method: string, data: any, ret
       ...(method == 'GET' ? null : { body: JSON.stringify(data) }),
     });
 
-    const res = await handleJson(response);
-
-    if (res.status === 401 && retry) {
+    // Check status before parsing to avoid logging error
+    if (response.status === 401 && retry) {
       const newToken = await refreshToken();
 
       if (!newToken) {
         logout();
-        return res;
+        return {
+          data: null,
+          message: 'Unauthorized',
+          status: 401
+        };
       }
 
       // Retry original request with new token
       const retryHeaders = {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${newToken}`,
+        ...additionalHeaders
       };
 
       const retryResponse = await fetch(`${API_BASE_URL}${endpoint}`, {
@@ -145,10 +149,9 @@ export const authFetch = async (endpoint: string, method: string, data: any, ret
       return retryResult;
     }
 
+    const res = await handleJson(response);
     return res;
   } catch (error) {
-    // Handle network errors or other exceptions
-    console.error('authFetch error:', error);
     return {
       data: null,
       message: error instanceof Error ? error.message : 'Network error',

@@ -99,23 +99,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const setOrderTypeContext = async (type: OrderType) => {
-    if (type === 'DELIVERY') {
-      try {
-        const position = await getCurrentPositionContext();
-        if (!position) {
-          throw new Error('Could not get your location. Please enable location services or choose another order type.');
-        }
-        if (position.coords.latitude != deliveryLocation.lat || position.coords.longitude != deliveryLocation.lng) {
-          setDeliveryLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          });
-        }
-      } catch (error) {
-        console.error('Error getting location:', error);
-        throw new Error('Could not get your location. Please enable location services or choose another order type.');
-      }
-    } 
+  
     setOrderTypeState(type);
   };
 
@@ -140,7 +124,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation is not supported by your browser'));
       } else {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
+        navigator.geolocation.getCurrentPosition(
+          resolve,
+          reject,
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
       }
     });
   };

@@ -2,8 +2,8 @@ import { authFetch } from './authService';
 
 
 // GET /cart/get-cart with query params to keep it a true GET
-export const getCart = async ({ orderType, paymentMethod, latitude, longitude }: { orderType: string; paymentMethod: string; latitude: number; longitude: number }): Promise<{ status: number, message: string, data: any }> => {
-  const res = await authFetch(`/cart/get-cart`, 'POST', { orderType, paymentMethod, latitude, longitude }, true);
+export const getCart = async ({ orderType, paymentMethod, latitude, longitude, deliveryAreaId }: { orderType: string; paymentMethod: string; latitude: number; longitude: number; deliveryAreaId: number }): Promise<{ status: number, message: string, data: any }> => {
+  const res = await authFetch(`/cart/get-cart`, 'POST', { orderType, paymentMethod, latitude, longitude, deliveryAreaId }, true);
   return res;
 };
 

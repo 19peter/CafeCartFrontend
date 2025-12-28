@@ -7,15 +7,24 @@ import { InventoryPage } from "./Inventory/InventoryPage";
 import { useAuth } from "../../contexts/AuthContext";
 import { setIsOnline, setIsDeliveryAvailable, getShopSettings } from "../../services/vendorShopsService";
 import { Client } from '@stomp/stompjs';
+import type { Area } from "../../shared/types/Shop/Shop";
+import { addDeliveryArea, deleteDeliveryArea, getDeliveryAreas, updateDeliveryArea } from "../../services/deliverySettingsService";
 
 type ShopSettings = {
     shopId: string;
     shopName: string;
     online: boolean;
     deliveryAllowed: boolean;
+    deliveryAreas: Area[];
 }
 
+
+
+
 export const ShopPage = () => {
+    const [areasModalOpen, setAreasModalOpen] = useState(false);
+    const [editingArea, setEditingArea] = useState<Area | null>(null);
+    
     const [selected, setSelected] = useState("Orders");
     const [settings, setSettings] = useState<ShopSettings>({} as ShopSettings);
     const [stompClient, setStompClient] = useState<Client | null>(null);
@@ -40,12 +49,53 @@ export const ShopPage = () => {
         logout();
     };
 
+    const handleSaveArea = async () => {
+        if (!editingArea) return;
+
+        if (editingArea.id) {
+            const res = await updateDeliveryArea(editingArea);
+            if (res.status === 200) {
+                setSettings((prev) => ({
+                    ...prev,
+                    deliveryAreas: prev.deliveryAreas.map((a) => (a.id === editingArea.id ? editingArea : a))
+                }));
+            }
+        } else {
+            const res = await addDeliveryArea(editingArea);
+            if (res.status === 200) {
+                setSettings((prev) => ({
+                    ...prev,
+                    deliveryAreas: [...prev.deliveryAreas, { ...editingArea, id: Date.now() }]
+                }));
+            }
+        }
+
+        setEditingArea(null);
+    };
+
+
+    const handleDeleteArea = async (area: Area) => {
+        if (!area.id) return;
+        const res = await deleteDeliveryArea(area);
+        if (res.status === 200) {
+            setSettings((prev) => ({
+                ...prev,
+                deliveryAreas: prev.deliveryAreas.filter((a) => a.id !== area.id)
+            }));
+        }
+    };
+
     useEffect(() => {
         const fetchSettings = async () => {
             const res = await getShopSettings();
             if (res.status === 200) {
-                setSettings(res.data);
-                setShopId(res.data.shopId);
+                let deliveryAllowed = res.data.deliverySettingsDto.deliveryAvailable;
+                let online = res.data.online;
+                let shopId = res.data.shopId;
+                let shopName = res.data.shopName;
+                let deliveryAreas = res.data.deliverySettingsDto.deliveryAreasDtoList;
+                setSettings({ shopId, shopName, online, deliveryAllowed, deliveryAreas });
+                setShopId(shopId);
             }
         };
         fetchSettings();
@@ -68,17 +118,8 @@ export const ShopPage = () => {
             console.log('Connected: ' + frame);
             setConnected(true);
 
-            // Subscribe to shop-specific orders
             client.subscribe(`/topic/shop/${shopId}/orders`, (message) => {
-                // const newOrder = JSON.parse(message.body);
-                // console.log('New order received:', newOrder);
                 setNewOrder(true);
-                // // Show notification
-                // if (Notification.permission === 'granted') {
-                //     new Notification('New Order', {
-                //         body: `Order #${newOrder.orderId} - $${newOrder.totalAmount}`
-                //     });
-                // }
             });
         };
 
@@ -127,6 +168,15 @@ export const ShopPage = () => {
                         <div className={styles.controlRow}>
                             <span className={styles.controlLabel}>Delivery</span>
                             <ToggleButton onToggle={handleDeliveryChange} value={settings.deliveryAllowed} />
+
+                            {settings.deliveryAllowed && (
+                                <button
+                                    className={styles.manageBtn}
+                                    onClick={() => setAreasModalOpen(true)}
+                                >
+                                    Delivery Settings
+                                </button>
+                            )}
                         </div>
 
                         <div className={styles.divider} />
@@ -146,6 +196,108 @@ export const ShopPage = () => {
 
                 </div>
             </nav>
+
+            {areasModalOpen && (
+                <div
+                    className={styles.modalOverlay}
+                    onClick={() => setAreasModalOpen(false)}
+                >
+                    <div
+                        className={styles.modal}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* HEADER */}
+                        <div className={styles.modalHeader}>
+                            <h2>Delivery Areas</h2>
+                            <button
+                                className={styles.closeBtn}
+                                onClick={() => setAreasModalOpen(false)}
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* LIST */}
+                        <div className={styles.areaList}>
+                            {settings.deliveryAreas.length === 0 && (
+                                <p className={styles.empty}>No delivery areas</p>
+                            )}
+
+                            {settings.deliveryAreas.map((area) => (
+                                <div key={area.id} className={styles.areaRow}>
+                                    <div>
+                                        <strong>{area.area}</strong>
+                                        <div className={styles.sub}>
+                                            {area.city} • {area.price} EGP
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        className={styles.editBtn}
+                                        onClick={() => setEditingArea(area)}
+                                    >
+                                        Edit
+                                    </button>
+
+                                    <button
+                                        className={styles.deleteBtn}
+                                        onClick={() => handleDeleteArea(area)}
+                                    >
+                                        Delete
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* FORM */}
+                        <div className={styles.form}>
+                            <h3>{editingArea?.id ? "Edit area" : "Add new area"}</h3>
+
+                            <input
+                                placeholder="Area name"
+                                value={editingArea?.area ?? ""}
+                                onChange={(e) =>
+                                    setEditingArea((prev) => ({
+                                        ...(prev ?? { city: "", price: 0 }),
+                                        area: e.target.value
+                                    }))
+                                }
+                            />
+
+                            <input
+                                placeholder="City"
+                                value={editingArea?.city ?? ""}
+                                onChange={(e) =>
+                                    setEditingArea((prev) => ({
+                                        ...(prev ?? { area: "", price: 0 }),
+                                        city: e.target.value
+                                    }))
+                                }
+                            />
+
+                            <input
+                                type="number"
+                                placeholder="Delivery price"
+                                value={editingArea?.price ?? ""}
+                                onChange={(e) =>
+                                    setEditingArea((prev) => ({
+                                        ...(prev ?? { area: "", city: "" }),
+                                        price: Number(e.target.value)
+                                    }))
+                                }
+                            />
+
+                            <button
+                                className={styles.saveBtn}
+                                onClick={handleSaveArea}
+                                disabled={!editingArea}
+                            >
+                                {editingArea?.id ? "Save changes" : "Add area"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
 
             <ViewToggler onChange={(value) => setSelected(value)} options={["Orders", "Inventory"]} />

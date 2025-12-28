@@ -3,6 +3,7 @@ import styles from "./OrderTable.module.css";
 import type { OrderItem, ShopOrder } from "../../shared/types/orders/ShopOrder";
 import { updateOrderStatus, cancelOrder } from "../../services/ordersService";
 import { useNotification } from "../../contexts/NotificationContext";
+import { verifyCustomer } from "../../services/customerService";
 
 const ORDER_STATUSES = [
     "PENDING",
@@ -19,9 +20,11 @@ interface Props {
     handleBlockUser: (userId: number, customerName: string, customerPhone: string) => void;
     handleUnblockUser: (userId: number) => void;
     openBlockedCustomersModal: () => void;
+    isPinned: boolean;
+    onTogglePin: (e: React.MouseEvent<HTMLButtonElement>, orderNumber: string) => void;
 }
 
-export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleUnblockUser, openBlockedCustomersModal }: Props) => {
+export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleUnblockUser, openBlockedCustomersModal, isPinned, onTogglePin }: Props) => {
     const { showError, showSuccess } = useNotification();
     const [expandedRows, setExpandedRows] = useState<number[]>([]);
     const [tableOrder, setTableOrder] = useState<ShopOrder>(order);
@@ -35,14 +38,14 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
     };
 
     function formatDate(dateString: string) {
-        const date = new Date(dateString);
-        return date.toLocaleString(undefined, {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-        });
+        // Just extract and format the string directly - no Date object at all
+        const parts = dateString.split('T');
+        if (parts.length < 2) return dateString;
+
+        const date = parts[0]; // "2025-12-26"
+        const time = parts[1].split('.')[0]; // "01:03:16"
+
+        return `${date} ${time}`;
     }
 
 
@@ -67,15 +70,36 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
         }
     };
 
+    const handleVerifyCustomer = async (customerId: number) => {
+        const res = await verifyCustomer(customerId);
+        if (res.status === 200 && res.data) {
+            setTableOrder({ ...tableOrder, verified: true });
+            showSuccess("Customer verified successfully");
+        } else {
+            showError("Failed to verify customer");
+        }
+    };
+
     const isExpanded = expandedRows.includes(tableOrder.id);
     return (
         <table className={styles.ordersTable}>
+
             <tbody>
+
                 <tr
                     key={tableOrder.id}
                     className={styles.cardRow}
                     onClick={() => toggleExpand(tableOrder.id)}
                 >
+                    <td>
+                        <button
+                            className={styles.pinBtn}
+                            onClick={(e) => onTogglePin(e, tableOrder.orderNumber)}
+                            title={isPinned ? "Unpin order" : "Pin order"}
+                        >
+                            {isPinned ? "📌" : "📍"}
+                        </button>
+                    </td>
                     <td>{tableOrder.orderNumber}</td>
                     <td>{tableOrder.customerName}</td>
                     <td>
@@ -83,7 +107,7 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
                             {tableOrder?.status?.replace(/_/g, " ")}
                         </span>
                     </td>
-                    <td>{formatDate(tableOrder.createdAt)}</td>
+                    <td >{formatDate(tableOrder.createdAt)}</td>
                     <td>{tableOrder.items.length} items</td>
                     <td>
                         <button className={styles.expandBtn}>
@@ -96,7 +120,7 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
                 {isExpanded && (
                     <tr className={styles.expandedRow}>
 
-                        <td colSpan={6}>
+                        <td colSpan={7}>
                             <div className={styles.detailsBox}>
 
                                 <div className={styles.infoContainer}>
@@ -117,8 +141,14 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
                                     </div>
                                     <div className={styles.customerInfo}>
                                         <h4>Customer Info</h4>
-                                        <p><strong>Phone:</strong> {tableOrder.phone}</p>
-                                        <div>
+                                        <p ><strong>Phone:</strong> {tableOrder.phone}</p>
+
+                                        <div className={styles.section}>
+                                            {tableOrder.verified ?
+                                                <span className={styles.verifiedBadge}>Verified</span>
+                                                :
+                                                <button onClick={() => handleVerifyCustomer(tableOrder.customerId)} className={styles.blockBtn}>Verify</button>
+                                            }
 
                                             {isCustomerBlocked ? (
                                                 <button
@@ -146,6 +176,9 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
                                                 View Blocked Customers
                                             </button>
                                         </div>
+
+
+
                                         {tableOrder.orderType === "DELIVERY" && (
                                             <>
                                                 <p><strong>Address:</strong> {tableOrder.address}</p>

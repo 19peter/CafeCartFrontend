@@ -4,7 +4,7 @@ import { useCart } from '../../../contexts/CartContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import './Cart.css';
 import { addOneToCart, getCart, removeItemFromCart, removeOneFromCart } from '../../../services/cartService';
-import type { OrderSummary, CartSummary, OrderType, PaymentMethod } from '../../../shared/types/cart/CartTypes';
+import type { OrderSummary, CartSummary, OrderType, PaymentMethod, DeliveryArea, OrderTypeBase, OrderTypeBaseDelivery, OrderTypeBaseInHouse, OrderTypeBasePickup } from '../../../shared/types/cart/CartTypes';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { createOrder } from '../../../services/ordersService';
 import { generateIdempotencyKey } from '../../../utils/utils';
@@ -42,22 +42,37 @@ const Cart = () => {
 
   const [locationError, setLocationError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
   const [orderSummary, setOrderSummary] = useState<OrderSummary>();
   const [cartSummary, setCartSummary] = useState<CartSummary>();
-  const { showError, showSuccess } = useNotification();
+  const [orderTypeInfo, setOrderTypeInfo] = useState<OrderTypeBase>();
+  const [deliveryAreaId, setDeliveryAreaId] = useState<number>(1);
 
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [pickupHour, setPickupHour] = useState('');   // 1–12
   const [pickupMinute, setPickupMinute] = useState('00');
   const [pickupPeriod, setPickupPeriod] = useState<'AM' | 'PM'>('AM');
+
   const idempotencyKey = useRef(generateIdempotencyKey());
+  const { showError, showSuccess } = useNotification();
 
   const fetchCart = async () => {
-    const res = await getCart({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng });
+    const res = await getCart({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng, deliveryAreaId: deliveryAreaId });
     if (res.status !== 200) {
       showError(res.message);
       return;
     }
+    if (orderType === 'DELIVERY') {
+      let orderTypeInfo = res.data.orderSummary.orderTypeBase as OrderTypeBaseDelivery;
+      setOrderTypeInfo(orderTypeInfo);
+    } else if (orderType === 'PICKUP') {
+      let orderTypeInfo = res.data.orderSummary.orderTypeBase as OrderTypeBasePickup;
+      setOrderTypeInfo(orderTypeInfo);
+    } else {
+      let orderTypeInfo = res.data.orderSummary.orderTypeBase as OrderTypeBaseInHouse;
+      setOrderTypeInfo(orderTypeInfo);
+    }
+
     setCartSummary(res.data.cartSummary);
     setOrderSummary(res.data.orderSummary);
     saveItemsToContext(res.data.orderSummary?.items || []);
@@ -75,13 +90,6 @@ const Cart = () => {
     return currencyFormatter.format(value);
   }
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login', { state: { from: '/cart' } });
-    }
-
-    fetchCart();
-  }, [orderType, paymentMethod]);
 
   const handleOrderTypeChange = async (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newOrderType = event.target.value as OrderType;
@@ -154,6 +162,7 @@ const Cart = () => {
         longitude: deliveryLocation.lng,
         address: deliveryAddress,
         pickupTime: to24HourTime() || '',
+        deliveryAreaId,
         idempotencyKey: idempotencyKey.current,
       }
     );
@@ -168,6 +177,15 @@ const Cart = () => {
   if (!isAuthenticated) {
     return <div>Redirecting to login...</div>;
   }
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/login', { state: { from: '/cart' } });
+    }
+
+    fetchCart();
+  }, [orderType, paymentMethod, deliveryAreaId]);
+
 
   return (
     <div className="cart-container">
@@ -198,22 +216,48 @@ const Cart = () => {
 
       {/* DELIVERY ADDRESS */}
       {items.length > 0 && orderType === 'DELIVERY' && (
-        <div className="form-group">
-          <label htmlFor="delivery-address">Delivery Address</label>
-          <textarea
-            id="delivery-address"
-            className="form-control"
-            placeholder="Enter delivery address"
-            value={deliveryAddress}
-            onChange={(e) => setDeliveryAddress(e.target.value)}
-            rows={3}
-            style={{ "resize": "none" }}
-          />
+        <div className="delivery-section" >
+
+          {/* Delivery Area Selection */}
+          {(orderTypeInfo as OrderTypeBaseDelivery).availableDeliveryAreas?.length > 0 && (
+            <div className="form-group">
+              <label htmlFor="delivery-area">Delivery Area</label>
+              <select
+                id="delivery-area"
+                className="form-control"
+                value={deliveryAreaId}
+                onChange={(e) => setDeliveryAreaId(Number(e.target.value))}
+              >
+                <option value="">Select Delivery Area</option>
+                {(orderTypeInfo as OrderTypeBaseDelivery).availableDeliveryAreas?.map((area) => (
+                  <option key={area.id} value={area.id}>
+                    {area.area} - ${area.price.toFixed(2)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Delivery Address Input */}
+          <div className="form-group">
+            <label htmlFor="delivery-address">Delivery Address</label>
+            <textarea
+              id="delivery-address"
+              className="form-control"
+              placeholder="Enter delivery address"
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+              rows={3}
+              style={{ resize: "none" }}
+            />
+          </div>
+
         </div>
       )}
 
+
       {items.length > 0 && orderType === 'PICKUP' && (
-        <div className="form-group">
+        <div className="form-group" key={orderType} >
           <label>Pickup Time</label>
 
           <div className="pickup-time-row">
@@ -263,7 +307,6 @@ const Cart = () => {
           <p className="empty-cart">Your cart is empty</p>
         ) : (
           items.map((item) => (
-            <>
 
               <CartItem key={item.id}>
                 <div className="item-details">
@@ -299,7 +342,6 @@ const Cart = () => {
                   </button>
                 </div>
               </CartItem>
-            </>
           ))
         )}
       </div>
@@ -328,14 +370,14 @@ const Cart = () => {
               <>
 
                 <div className="summary-row">
-                  <span>Subtotal</span>
+                  <span>Subtotal <span style={{ color: 'gray', fontSize: '10px' }}>Incl VAT</span> </span>
                   <span>{formatCurrency(orderSummary.subTotal)}</span>
                 </div>
 
-                {orderSummary.deliveryFee != null && orderSummary.deliveryFee != 0 && (
+                {orderTypeInfo?.orderType === 'DELIVERY' && (
                   <div className="summary-row">
                     <span>Delivery Fee</span>
-                    <span>{formatCurrency(orderSummary.deliveryFee)}</span>
+                    <span>{formatCurrency((orderTypeInfo as OrderTypeBaseDelivery).price)}</span>
                   </div>
                 )}
 

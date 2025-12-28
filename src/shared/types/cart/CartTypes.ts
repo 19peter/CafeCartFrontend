@@ -30,6 +30,31 @@ export interface CartSummary {
   deliveryAvailable: boolean;
 }
 
+export interface OrderTypeBase {
+  orderType: OrderType;
+}
+
+export interface OrderTypeBaseDelivery extends OrderTypeBase {
+  deliveryAvailable: boolean;
+  availableDeliveryAreas: DeliveryArea[];
+  deliveryAreaId: number;
+  price: number;
+  area: string;
+}
+
+export interface OrderTypeBasePickup extends OrderTypeBase {
+  pickupTime: string;
+}
+
+export interface OrderTypeBaseInHouse extends OrderTypeBase {
+}
+
+export interface DeliveryArea {
+  id: number;
+  area: string;
+  price: number;
+
+}
 
 export type OrderType = 'PICKUP' | 'IN_HOUSE' | 'DELIVERY';
 export type PaymentMethod = 'CASH' | 'CREDIT_CARD';

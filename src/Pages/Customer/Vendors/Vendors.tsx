@@ -2,12 +2,11 @@ import { useEffect, useState } from 'react';
 import { VendorCard } from '../../../Components/VendorCard/VendorCard';
 import styles from './Vendors.module.css';
 import { getVendors } from '../../../services/vendorsService';
-import type { VendorType, VendorResponse } from './VendorType';
+import type { VendorType } from './VendorType';
 
 export const Vendors = () => {
 
   const [vendors, setVendors] = useState<VendorType[]>([]);
-  const url = 'https://images.unsplash.com/photo-1445116572660-236099ec97a0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80'
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -27,7 +26,7 @@ export const Vendors = () => {
             key={vendor.id}
             id={vendor.id}
             name={vendor.name}
-            imageUrl={vendor.imageUrl || url}
+            imageUrl={vendor.imageUrl}
           />
         ))}
       </div>

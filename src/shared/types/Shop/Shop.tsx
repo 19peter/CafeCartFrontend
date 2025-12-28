@@ -3,3 +3,11 @@ export interface Shop {
   name: string;
   address: string;
 }
+
+
+export type Area = {
+    id?: number;
+    area: string;
+    city: string;
+    price: number;
+};

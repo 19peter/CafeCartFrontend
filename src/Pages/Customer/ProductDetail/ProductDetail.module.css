@@ -15,6 +15,7 @@
   display: flex;
   align-items: center;
   padding: 0.5rem 0;
+  margin-bottom: 1rem;
   transition: color 0.2s;
 }
 
@@ -25,15 +26,27 @@
 .productContainer {
   display: flex;
   gap: 2rem;
+  align-items: flex-start;
 }
 
 .imageContainer {
   flex: 1;
+  max-width: 500px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   background-color: #f8f8f8;
-  /* aspect-ratio: 1/1; */
+  aspect-ratio: 1/1;
+}
+
+.imagePlaceholder {
+  height: 100%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  color: #9ca3af;
 }
 
 .productImage {
@@ -75,6 +88,7 @@
   color: var(--color-text);
   margin: 0;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .ratingContainer {
@@ -115,14 +129,15 @@
   line-height: 1.6;
   font-weight: 600;
   margin: 0.5rem 0;
+  font-size: 1rem;
 }
 
 .stockStatus {
   margin: 0.5rem 0;
+  font-size: 1rem;
 }
 
 .inStock {
-  /* color: #4caf50; */
   color: var(--color-text);
   font-weight: 500;
 }
@@ -151,6 +166,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .quantityButton:not(:disabled):hover {
@@ -182,6 +198,7 @@
   cursor: pointer;
   transition: background-color 0.2s;
   margin-top: 1rem;
+  width: 100%;
 }
 
 .addToCartButton:not(:disabled):hover {
@@ -193,31 +210,237 @@
   cursor: not-allowed;
 }
 
-.loading {
-  text-align: center;
-  padding: 2rem;
-  font-size: 1.2rem;
-  color: var(--color-text-secondary);
-}
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
 
-/* Responsive Design */
-@media (max-width: 768px) {
+/* Large Desktop (1200px+) - default styles above */
+
+/* Medium Desktop/Laptop (992px - 1199px) */
+@media (max-width: 1199px) {
+  .container {
+    max-width: 960px;
+    padding: 1rem;
+  }
+
   .productContainer {
-    flex-direction: column;
-    gap: 1rem;
+    gap: 1.5rem;
   }
-  
+
+  .imageContainer {
+    max-width: 450px;
+  }
+
   .productName {
-    font-size: 2.5rem;
-  }
-  
-  .price {
     font-size: 2rem;
   }
 
-  .detailsContainer{
-    display: flex;
+  .price {
+    font-size: 1.6rem;
+  }
+}
+
+/* Tablet Landscape (768px - 991px) */
+@media (max-width: 991px) {
+  .container {
+    max-width: 720px;
+    padding: 1rem;
+  }
+
+  .productContainer {
+    gap: 1.5rem;
+  }
+
+  .imageContainer {
+    max-width: 400px;
+  }
+
+  .productName {
+    font-size: 1.8rem;
+  }
+
+  .price {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.95rem;
+  }
+}
+
+/* Tablet Portrait (768px) */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .productContainer {
     flex-direction: column;
-    gap: 0;
+    gap: 1.5rem;
+  }
+
+  .imageContainer {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .detailsContainer {
+    width: 100%;
+    gap: 0.75rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .productName {
+    font-size: 1.75rem;
+  }
+
+  .price {
+    font-size: 1.5rem;
+    margin: 0.25rem 0;
+  }
+
+  .description {
+    margin: 0.25rem 0;
+  }
+
+  .stockStatus {
+    margin: 0.25rem 0;
+  }
+
+  .quantitySelector {
+    margin: 0.75rem 0;
+  }
+
+  .addToCartButton {
+    margin-top: 0.75rem;
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+/* Mobile Landscape (576px - 767px) */
+@media (max-width: 576px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .backButton {
+    font-size: 0.95rem;
+    padding: 0.375rem 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .productContainer {
+    gap: 1rem;
+  }
+
+  .productName {
+    font-size: 1.5rem;
+  }
+
+  .price {
+    font-size: 1.35rem;
+  }
+
+  .description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .stockStatus {
+    font-size: 0.9rem;
+  }
+
+  .quantitySelector {
+    gap: 0.75rem;
+  }
+
+  .quantityButton {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .quantity {
+    font-size: 1.1rem;
+    min-width: 36px;
+  }
+
+  .addToCartButton {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+  }
+}
+
+/* Mobile Portrait (up to 375px) - Small phones */
+@media (max-width: 375px) {
+  .container {
+    padding: 0.5rem;
+  }
+
+  .backButton {
+    font-size: 0.9rem;
+  }
+
+  .productName {
+    font-size: 1.35rem;
+  }
+
+  .price {
+    font-size: 1.25rem;
+  }
+
+  .description {
+    font-size: 0.85rem;
+  }
+
+  .quantityButton {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .quantity {
+    font-size: 1rem;
+    min-width: 32px;
+  }
+
+  .addToCartButton {
+    padding: 0.675rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Very Small Mobile (up to 320px) */
+@media (max-width: 320px) {
+ 
+
+  .price {
+    font-size: 1.15rem;
+  }
+
+  .description {
+    font-size: 0.8rem;
+  }
+
+  .quantitySelector {
+    gap: 0.5rem;
+  }
+}
+
+/* Landscape orientation specific adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+  .productContainer {
+    flex-direction: row;
+  }
+
+
+  .productName {
+    font-size: 1.5rem;
+  }
+
+  .description {
+    font-size: 0.85rem;
+    line-height: 1.4;
   }
 }
