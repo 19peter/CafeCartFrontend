@@ -2,87 +2,122 @@
 
 .vendorCard {
   text-decoration: none;
+  display: block;
+  width: 300px;
 }
 
-.container {
+.cardContent {
+  background-color: var(--color-bg);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  border: 1px solid rgba(156, 102, 68, 0.08);
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-md);
-  text-decoration: none;
-  color: inherit;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  padding-bottom: 10px;
-  color: var(--color-text);
 }
 
-.imageContainer {
+.cardContent:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  border-color: rgba(156, 102, 68, 0.2);
+}
 
+.imageSection {
   position: relative;
-  border-radius: 12px;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
 }
 
-.imageContainer img {
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  width: 300px;
-  height: 300px;
-  display: block;
+.vendorImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.cardContent:hover .vendorImage {
+  transform: scale(1.08);
 }
 
 .imagePlaceholder {
-  width: 300px;
-  height: 300px;
-  background: #f3f4f6;
+  width: 100%;
+  height: 100%;
+  background: #fdfaf8;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  color: #9ca3af;
+  font-size: 1.2rem;
+  color: #d7ccc8;
 }
 
-.overlay {
+.imageOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top,
-      rgba(0, 0, 0, 0.6),
-      rgba(0, 0, 0, 0.1));
-  pointer-events: none;
-  border-radius: 12px;
+  background: linear-gradient(to top, rgba(44, 26, 18, 0.2), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cardContent:hover .imageOverlay {
+  opacity: 1;
+}
+
+.infoSection {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex-grow: 1;
 }
 
 .vendorName {
-  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
   margin: 0;
+  line-height: 1.2;
+}
+
+.actionRow {
+  margin-top: auto;
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.viewShop {
+  font-size: 0.85rem;
   font-weight: 600;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  position: relative;
+  padding-bottom: 2px;
 }
 
-.container:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+.viewShop::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-primary);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
 }
 
+.cardContent:hover .viewShop::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
 
-/* Responsive styles */
+/* Tablet & Mobile responsive card metrics */
 @media (max-width: 768px) {
-
-  .vendorName {
-    font-size: 1.25rem;
+  .infoSection {
+    padding: 1.25rem;
   }
-
-  .imageContainer img {
-    width: 250px;
-    height: 250px;
-  }
-}
-
-@media (max-width: 480px) {
-
-  .vendorName {
-    font-size: 1.1rem;
-  }
-
-  
 }

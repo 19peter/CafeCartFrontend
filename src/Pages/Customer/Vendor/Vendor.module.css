@@ -3,7 +3,11 @@
 .vendorContainer {
   max-width: 1200px;
   padding: 0 1rem;
-  width: 90%;
+  width: 100%;
+  margin: 40px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .vendorContainer h1 {
@@ -15,40 +19,45 @@
   color: var(--primary-color);
 }
 
-.shopSelector {
-  margin-bottom: 2.5rem;
-  text-align: center;
+.searchSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 3.5rem;
 }
 
-.shopSelector label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--text-color);
-  font-family: "Story Script", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 1.5rem;
+.searchContainer {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  padding: 0 1rem;
 }
 
-.selectDropdown {
-  padding: 0.75rem 1.5rem;
+.searchIcon {
+  position: absolute;
+  left: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-light);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 50vw;
+  max-width: 500px;
+  padding: 0.75rem 1rem 0.75rem 3rem;
   font-size: 1rem;
-  border: 2px solid var(--color-border);
-  border-left: 6px solid var(--color-border);
-  border-right: 6px solid var(--color-border);
-  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
   background-color: white;
   color: var(--color-text);
-  cursor: pointer;
-  width: 50vw;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
-.selectDropdown:focus {
+.searchInput:focus {
   outline: none;
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(127, 85, 57, 0.2);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(156, 102, 68, 0.1), var(--shadow-md);
 }
 
 .productsGrid {
@@ -84,18 +93,28 @@
 
 .categorySelector {
   margin-bottom: 2.5rem;
-  text-align: center;
+  width: 100%;
 }
 
-.categorySelector label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--text-color);
-  font-family: "Story Script", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-  font-size: 1.5rem;
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  color: var(--color-primary-dark);
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.sectionIcon {
+  color: var(--color-primary);
 }
 
 .categorySelect:focus {
@@ -131,25 +150,25 @@
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
+
   .vendorContainer h1 {
     font-size: 2rem;
   }
 
-  .selectDropdown {
-    width: 75vw;
-  }
+
 
   .categorySelect {
     width: 100%;
   }
+
+
 }
 
 @media (max-width: 480px) {
   .productsGrid {
     grid-template-columns: 1fr;
   }
-  
+
   .selectDropdown {
     width: 75vw;
   }

@@ -10,6 +10,8 @@ import { getVendorShopProducts } from '../../../services/shopProductService';
 import type { Product } from '../../../shared/types/product/ProductTypes';
 import NotFound from '../../Shared/NotFound';
 import type { Shop } from '../../../shared/types/Shop/Shop';
+import { LocationSelector } from './LocationSelector';
+import { Search, Layers } from 'lucide-react';
 
 
 
@@ -17,13 +19,13 @@ import type { Shop } from '../../../shared/types/Shop/Shop';
 export const Vendor = () => {
   const { vendorId } = useParams<{ vendorId: string }>();
   const [selectedShop, setSelectedShop] = useState<number>(0);
-  const [vendorName, _] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [shops, setShops] = useState<Shop[]>([]);
   const [inventory, setInventory] = useState<Product[]>([]);
   const [filteredInventory, setFilteredInventory] = useState<Product[]>([]);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
   const [notFoundError, setNotFoundError] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // 1️⃣ Load shops on vendorId change
   useEffect(() => {
@@ -35,6 +37,7 @@ export const Vendor = () => {
         const data = await getVendorShopsByVendorId(
           Number.isNaN(parsedId) ? vendorId : parsedId
         );
+
         setShops(data);
 
         if (data.length > 0) {
@@ -83,69 +86,80 @@ export const Vendor = () => {
     loadShopData();
   }, [selectedShop]);
 
-  // Optional: only handle category changes for filtering
+  // 3️⃣ Filter whenever selectedCategory, inventory, or searchQuery changes
   useEffect(() => {
-    if (!selectedCategory) return;
-    setFilteredInventory(
-      inventory.filter((product: Product) => product.categoryName === selectedCategory)
-    );
-  }, [selectedCategory, inventory]);
+    let filtered = inventory;
+
+    if (selectedCategory) {
+      filtered = filtered.filter((product: Product) => product.categoryName === selectedCategory);
+    }
+
+    if (searchQuery) {
+      filtered = filtered.filter((product: Product) =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    setFilteredInventory(filtered);
+  }, [selectedCategory, inventory, searchQuery]);
 
 
 
-  const handleShopChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedShop(Number(e.target.value));
-  };
+
 
 
   return (
     <>
-    {notFoundError ? <NotFound /> : (
-    <div className={styles.vendorContainer}>
-      <h1>{vendorName}</h1>
+      {notFoundError ? <NotFound /> : (
+        <div className={styles.vendorContainer}>
+          <LocationSelector
+            shops={shops}
+            selectedShopId={selectedShop}
+            onShopChange={setSelectedShop}
+          />
 
-      <div className={styles.shopSelector}>
-        <label htmlFor="shop-select">Select a shop:</label>
-        <select
-          id="shop-select"
-          value={selectedShop}
-          onChange={handleShopChange}
-          className={styles.selectDropdown}
-        >
-          {shops.map((shop) => (
-            <option key={shop.id} value={shop.id}>
-              {shop.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className={styles.categorySelector}>
-        <h3>Browse By Category</h3>
-        <CategoriesDisplay
-          handleCategoryChange={setSelectedCategory}
-          categories={categories} />
-      </div>
-
-
-      <div className={styles.productsGrid}>
-
-        {filteredInventory.length > 0 ? (
-          filteredInventory.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              vendorShopId={Number(selectedShop)}
-            />
-          ))
-        ) : (
-          <div className={styles.noResults}>
-            <p>No products found matching your search criteria.</p>
+          <div className={styles.categorySelector}>
+            <div className={styles.sectionHeader}>
+              <Layers className={styles.sectionIcon} size={20} />
+              <h3 className={styles.sectionTitle}>Browse By Category</h3>
+            </div>
+            <CategoriesDisplay
+              handleCategoryChange={setSelectedCategory}
+              categories={categories} />
           </div>
-        )}
-      </div>
-    </div>
-    )}
+
+          <div className={styles.searchSection}>
+            <div className={styles.searchContainer}>
+              <Search className={styles.searchIcon} size={20} />
+              <input
+                type="text"
+                placeholder="Search products in this shop..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
+          </div>
+
+
+          <div className={styles.productsGrid}>
+
+            {filteredInventory.length > 0 ? (
+              filteredInventory.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  vendorShopId={Number(selectedShop)}
+                />
+              ))
+            ) : (
+              <div className={styles.noResults}>
+                <p>No products found matching your search criteria.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 };

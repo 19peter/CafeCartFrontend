@@ -7,23 +7,27 @@ interface VendorCardProps {
   imageUrl: string | null;
 }
 
-export const VendorCard = ({ name, imageUrl }: VendorCardProps) => {
+export const VendorCard = ({ id, name, imageUrl }: VendorCardProps) => {
   return (
     <Link to={`/vendor/${name}`} className={styles.vendorCard}>
-        
-        <div className={styles.container}>
-          <div className={styles.imageContainer}>
-            {imageUrl ? (
-              <img src={imageUrl} alt={name} />
-            ) : (
-              <div className={styles.imagePlaceholder}>
-                <p>No Image</p>
-              </div>
-            )}
-            <div className={styles.overlay}></div>
-          </div>
-          <h3 className={styles.vendorName}>{name}</h3>
+      <div className={styles.cardContent}>
+        <div className={styles.imageSection}>
+          {imageUrl ? (
+            <img src={imageUrl} alt={name} className={styles.vendorImage} />
+          ) : (
+            <div className={styles.imagePlaceholder}>
+              <p>No Image</p>
+            </div>
+          )}
+          <div className={styles.imageOverlay} />
         </div>
+        <div className={styles.infoSection}>
+          <h3 className={styles.vendorName}>{name.toUpperCase()}</h3>
+          <div className={styles.actionRow}>
+            <span className={styles.viewShop}>View Shop</span>
+          </div>
+        </div>
+      </div>
     </Link>
   );
 };

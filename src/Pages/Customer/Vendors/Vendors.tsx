@@ -10,19 +10,23 @@ export const Vendors = () => {
 
   useEffect(() => {
     const fetchVendors = async () => {
-      const vendors = await getVendors({ page: 0, size: 10 }) ;
+      const vendors = await getVendors({ page: 0, size: 10 });
       setVendors(vendors.content);
     };
     fetchVendors();
   }, []);
 
-  
+
   return (
     <div className={styles.vendorsContainer}>
-      <h1>Our Vendors</h1>
+      <div className={styles.headerSection}>
+        <h1>Our Vendors</h1>
+        <p className={styles.subtitle}>Discover the finest local cafes and artisanal bakeries in our community.</p>
+      </div>
+
       <div className={styles.vendorsGrid}>
         {vendors?.map((vendor) => (
-          <VendorCard 
+          <VendorCard
             key={vendor.id}
             id={vendor.id}
             name={vendor.name}

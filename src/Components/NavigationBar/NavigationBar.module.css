@@ -19,11 +19,59 @@
 }
 
 .logo {
-  font-family: "Libertinus Keyboard", system-ui;
-  color: var(--color-primary);
-  font-size: 2rem;
-  font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* not more */
   z-index: 10;
+  user-select: none;
+  text-decoration: none;
+}
+
+.iconContainer {
+  background-color: var(--color-primary);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-10deg);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 10px rgba(156, 102, 68, 0.2);
+}
+
+.logo:hover .iconContainer {
+  transform: rotate(-2deg) scale(1.05);
+}
+
+.logoText {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.logoPart1 {
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--color-text-light);
+  letter-spacing: 0.04em;
+
+}
+
+.logoPart2 {
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  letter-spacing: 0.04em;
+}
+
+.logoIcon {
+  opacity: 0.8;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 /* Desktop Navigation */
@@ -115,101 +163,129 @@
 }
 
 .userButton {
-  background: none;
-  border: 1px solid var(--color-border) !important;
-  color: var(--color-primary);
-  font-family: "Story Script", sans-serif;
-  padding: 8px 16px !important;
-  border-radius: 20px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 6px 12px 6px 6px !important;
+  border-radius: 30px;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
-  transition: all 0.2s ease;
+  gap: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
 }
 
 .userButton:hover {
-  background-color: var(--color-bg-hover);
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.userIconWrapper {
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chevron {
+  color: var(--color-text-light);
+  transition: transform 0.3s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
 }
 
 .dropdownMenu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 12px);
   right: 0;
-  margin-top: 8px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 200px;
+  background: white;
+  border: 1px solid rgba(138, 90, 60, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
   z-index: 1000;
-  padding: 8px 0;
+  padding: 12px 8px;
   overflow: hidden;
+  animation: dropdownFade 0.2s ease-out;
+}
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .dropdownItem {
   display: flex;
   align-items: center;
   width: 100%;
-  padding: 10px 16px;
+  padding: 12px 16px;
   text-align: left;
   border: none;
   background: none;
   color: var(--color-text);
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-size: 0.9rem;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
   text-decoration: none;
-  gap: 8px;
-}
-
-.dropdownItem svg {
-  font-size: 1.1rem;
-  opacity: 0.8;
+  gap: 12px;
+  margin-bottom: 4px;
 }
 
 .dropdownItem:hover {
-  background-color: var(--color-bg-hover);
+  background-color: #faf7f5;
+  color: var(--color-primary-dark);
 }
 
 .logoutDiv {
   display: flex;
   align-items: center;
-  width: 100%;
-  padding: 10px 16px;
+  width: calc(100% - 16px);
+  margin: 4px 8px 0;
+  padding: 12px 16px;
   text-align: left;
   border: none;
-  background: none;
-  color: var(--color-text);
+  background-color: #fff1f0;
+  color: #e53e3e;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-size: 0.9rem;
-  text-decoration: none;
-  gap: 8px;
+  border-radius: 10px;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+  font-weight: 500;
+  gap: 12px;
 }
 
-.logoutBtn {
-  background-color: var(--color-primary);
-  color: white;
+.logoutDiv:hover {
+  background-color: #fee2e2;
 }
 
 .shopName {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 10px 19px;
-  text-align: left;
-  border: none;
-  background: none;
-  color: var(--color-text);
-  transition: background-color 0.2s ease;
-  font-size: 0.7rem;
-  font-weight: 900;
-  text-decoration: none;
-  gap: 8px;
+  padding: 8px 16px 12px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--color-text-light);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 12px;
 }
 
 /* Mobile Menu Button */
@@ -442,4 +518,4 @@
   .menuButton {
     height: 18px;
   }
-} 
+}

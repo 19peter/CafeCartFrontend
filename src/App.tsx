@@ -16,6 +16,8 @@ import { Orders } from './Pages/Customer/Orders/Orders';
 import { ShopPage } from './Pages/Shop/ShopPage';
 import { VendorAccessPage } from './Pages/VendorAccess/VendorAccessPage';
 import NotFound from './Pages/Shared/NotFound';
+import { Footer } from './Components/Footer/Footer';
+
 
 // Protected route component
 interface ProtectedRouteProps {
@@ -80,6 +82,8 @@ function App() {
             }
             />
           </Routes>
+          <Footer />
+
         </div>
       </CartProvider>
     )

@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { Coffee, User, ChevronDown, LogOut, ShoppingCart, Layout } from 'lucide-react';
 import styles from './NavigationBar.module.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCart } from '../../contexts/CartContext';
@@ -9,11 +9,11 @@ export const NavigationBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  
+
   const { isAuthenticated, logout } = useAuth();
   const { items, shopName } = useCart();
   const navigate = useNavigate();
-  
+
   const userMenuRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -22,7 +22,7 @@ export const NavigationBar = () => {
     const handleResize = () => {
       const mobile = window.innerWidth <= 768;
       setIsMobile(mobile);
-      
+
       if (!mobile) {
         setIsMenuOpen(false);
       }
@@ -30,7 +30,7 @@ export const NavigationBar = () => {
 
     handleResize();
     window.addEventListener('resize', handleResize);
-    
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -89,12 +89,18 @@ export const NavigationBar = () => {
     <nav className={styles.container}>
       <div className={styles.navWrapper}>
         {/* Logo */}
-        <div 
+        <div
           className={styles.logo}
           onClick={() => handleNavigation('/')}
           style={{ cursor: 'pointer' }}
         >
-          CAFECART
+          <div className={styles.iconContainer}>
+            <Coffee size={24} className={styles.logoIcon} strokeWidth={2.5} />
+          </div>
+          <div className={styles.logoText}>
+            <span className={styles.logoPart1}>CAFE</span>
+            <span className={styles.logoPart2}>CART</span>
+          </div>
         </div>
 
         {/* Desktop Navigation */}
@@ -105,12 +111,16 @@ export const NavigationBar = () => {
 
                 <div className={styles.userMenu} ref={userMenuRef}>
                   <button
-                    className={`${styles.userButton} ${styles.register_btn}`}
+                    className={styles.userButton}
                     onClick={() => setShowUserMenu(!showUserMenu)}
                     aria-expanded={showUserMenu}
                     aria-haspopup="true"
                   >
-                    My Account
+                    <div className={styles.userIconWrapper}>
+                      <User size={18} />
+                    </div>
+                    <span>My Account</span>
+                    <ChevronDown size={16} className={`${styles.chevron} ${showUserMenu ? styles.chevronOpen : ''}`} />
                   </button>
 
                   {showUserMenu && (
@@ -120,7 +130,7 @@ export const NavigationBar = () => {
                           {shopName}
                         </div>
                       )}
-                      
+
                       <a
                         href="/cart"
                         className={styles.dropdownItem}
@@ -129,6 +139,7 @@ export const NavigationBar = () => {
                           handleNavigation('/cart');
                         }}
                       >
+                        <ShoppingCart size={18} />
                         My Cart ({totalItems} {totalItems === 1 ? 'item' : 'items'})
                       </a>
 
@@ -140,13 +151,15 @@ export const NavigationBar = () => {
                           handleNavigation('/orders');
                         }}
                       >
+                        <Layout size={18} />
                         My Orders
                       </a>
 
-                      <div 
+                      <div
                         className={styles.logoutDiv}
                         onClick={handleLogout}
                       >
+                        <LogOut size={18} />
                         Logout
                       </div>
                     </div>

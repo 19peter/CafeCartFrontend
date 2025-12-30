@@ -8,12 +8,16 @@ interface CategoryDivProps {
 }
 
 export const CategoryDiv = ({ category, selectedCategory, index, handleCategoryChange }: CategoryDivProps) => {
-    
+    const isSelected = selectedCategory === index;
+
     return (
-        <div
-            className={styles.categoryDiv + " " + (selectedCategory === index ? styles.selectedCategoryDiv : "")}
-            onClick={() => handleCategoryChange(category)}>
+        <button
+            className={`${styles.categoryDiv} ${isSelected ? styles.selectedCategoryDiv : ""}`}
+            onClick={() => handleCategoryChange(category)}
+            type="button"
+        >
             <h4>{category}</h4>
-        </div>
+            {isSelected && <div className={styles.indicator} />}
+        </button>
     );
 };
