@@ -1,7 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import styles from './LandingStyles.module.css';
-import heroImg from '../../../assets/cafe-1.jpg';
+// import heroImg from '../../../assets/cafe-2.png';
+// import heroImg from '../../../assets/cafe-1.jpg';
+import heroImg from '../../../assets/cafe-4.jpg';
+// import heroImg from '../../../assets/cafe-5.jpg';
+
+
+
 import { Button } from '../../../Components/Button/Button';
 import { Coffee, MapPin, ShoppingBag, ArrowRight } from 'lucide-react';
 
@@ -35,37 +41,10 @@ export const Landing = () => {
         viewport={{ once: true }}
         variants={containerVariants}
       >
-        <div className={styles.textSection}>
-          <motion.h1 variants={itemVariants}>
-            Deliciously Simple <br />
-            <span className={styles.highlight}>CafeCart</span>
-          </motion.h1>
-
-          <motion.p className={styles.subtitle} variants={itemVariants}>
-            The best cafes in town, delivered to your doorstep or ready for pickup.
-            Experience the finest roasts with zero hassle.
-          </motion.p>
-
-          <motion.div className={styles.ctaGroup} variants={itemVariants}>
-            <Button
-              size="lg"
-              onClick={() => navigate('/vendors')}
-              rightIcon={<ArrowRight size={20} />}
-            >
-              Start Exploring
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              onClick={() => {
-                const element = document.getElementById('how-it-works');
-                element?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              How it Works
-            </Button>
-          </motion.div>
-        </div>
+        <motion.h1 variants={itemVariants} className={styles.heroTitle}>
+          Deliciously Simple <br />
+          <span className={styles.highlight}>CafeCart</span>
+        </motion.h1>
 
         <motion.div className={styles.imageSection} variants={itemVariants}>
           <div className={styles.imageContainer}>
@@ -76,6 +55,31 @@ export const Landing = () => {
             />
             <div className={styles.imageOverlay} />
           </div>
+        </motion.div>
+
+        <motion.p className={styles.subtitle} variants={itemVariants}>
+          The best cafes in town, delivered to your doorstep or ready for pickup.
+          Experience the finest roasts with zero hassle.
+        </motion.p>
+
+        <motion.div className={styles.ctaGroup} variants={itemVariants}>
+          <Button
+            size="lg"
+            onClick={() => navigate('/vendors')}
+            rightIcon={<ArrowRight size={20} />}
+          >
+            Start Exploring
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            onClick={() => {
+              const element = document.getElementById('how-it-works');
+              element?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            How it Works
+          </Button>
         </motion.div>
       </motion.section>
 

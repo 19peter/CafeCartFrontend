@@ -11,22 +11,21 @@
 /* Hero Section */
 .hero {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.2fr 0.8fr;
+  grid-template-areas:
+    "title image"
+    "subtitle image"
+    "cta image";
   align-items: center;
   min-height: 90vh;
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 4rem;
-  gap: 4rem;
+  gap: 2rem 4rem;
 }
 
-.textSection {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.hero h1 {
+.heroTitle {
+  grid-area: title;
   font-size: 4.5rem;
   line-height: 1.1;
   font-family: "Story Script", sans-serif;
@@ -34,38 +33,26 @@
   margin: 0;
 }
 
-.highlight {
-  color: var(--color-primary);
-  position: relative;
-  display: inline-block;
-}
-
-.highlight::after {
-  content: '';
-  position: absolute;
-  bottom: 0.2rem;
-  left: 0;
-  width: 100%;
-  height: 0.3rem;
-  background-color: rgba(156, 102, 68, 0.2);
-  z-index: -1;
-}
-
 .subtitle {
+  grid-area: subtitle;
   font-size: 1.5rem;
   color: var(--color-text-light);
   line-height: 1.6;
   max-width: 500px;
   margin: 0;
+  align-self: start;
 }
 
 .ctaGroup {
+  grid-area: cta;
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+  align-self: start;
 }
 
 .imageSection {
+  grid-area: image;
   position: relative;
   height: 80vh;
 }
@@ -169,23 +156,36 @@
 /* Responsive */
 @media (max-width: 1100px) {
   .hero {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     text-align: center;
     padding: 6rem 2rem;
-    gap: 3rem;
+    gap: 2rem;
+    min-height: auto;
   }
 
-  .textSection {
-    align-items: center;
-  }
-
-  .subtitle {
-    max-width: 100%;
+  .heroTitle {
+    order: 1;
   }
 
   .imageSection {
-    height: 50vh;
-    width: 100%;
+    order: 2;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    width: 90%;
+    max-width: 600px;
+    margin: 1rem auto;
+  }
+
+  .subtitle {
+    order: 3;
+    max-width: 100%;
+    align-self: center;
+  }
+
+  .ctaGroup {
+    order: 4;
+    align-self: center;
   }
 
   .stepsGrid {
@@ -194,11 +194,62 @@
 }
 
 @media (max-width: 640px) {
-  .hero h1 {
-    font-size: 3rem;
+  .hero {
+    padding: 4rem 1.5rem;
+    gap: 2rem;
+  }
+
+  .heroTitle {
+    font-size: 2.75rem;
+  }
+
+  .subtitle {
+    font-size: 1.15rem;
+  }
+
+  .ctaGroup {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .ctaGroup>button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .imageSection {
+    height: auto;
+    aspect-ratio: 16 / 9;
+    width: 95%;
+    max-width: 450px;
+    margin: 0.5rem auto;
   }
 
   .howItWorks {
-    padding: 4rem 2rem;
+    padding: 4rem 1.5rem;
+  }
+
+  .sectionTitle {
+    font-size: 2.25rem;
+  }
+
+  .sectionHeader {
+    margin-bottom: 3rem;
+  }
+
+  .stepCard {
+    padding: 2rem 1.5rem;
+  }
+}
+
+/* Extra small devices (320px and above) */
+@media (max-width: 380px) {
+  .heroTitle {
+    font-size: 2.25rem;
+  }
+
+  .subtitle {
+    font-size: 1.05rem;
   }
 }

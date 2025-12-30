@@ -29,6 +29,7 @@
 
 .list {
     display: flex;
+    justify-content: center;
     gap: 1rem;
     overflow-x: auto;
     padding: 1rem;
@@ -124,6 +125,7 @@
     .list {
         padding-left: 0;
         padding-right: 0;
+        justify-content: normal;
     }
 
     .card {
