@@ -51,3 +51,36 @@ export const getVendorInfo = async () => {
   const res = await authFetch(`/vendors/vendor`, 'GET', {}, true);
   return res;
 };
+
+export interface CreateShopRequest {
+  name: string;
+  address: string;
+  city: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  vendorId: number;
+}
+
+export interface UpdateShopRequest {
+  name: string;
+  address: string;
+  city: string;
+  phoneNumber: string;
+  isActive: boolean;
+}
+
+export const getVendorShopsDetails = async () => {
+  const res = await authFetch(`/vendors/vendor/shops`, 'GET', {}, true);
+  return res;
+};
+
+export const addShop = async (addShopDto: CreateShopRequest) => {
+  const res = await authFetch(`/vendors/vendor/shops/add`, 'POST', addShopDto, true);
+  return res;
+};
+
+export const updateShop = async (updateShopDto: UpdateShopRequest) => {
+  const res = await authFetch(`/vendors/vendor/shops`, 'PUT', updateShopDto, true);
+  return res;
+};

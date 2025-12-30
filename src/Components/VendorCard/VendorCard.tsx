@@ -7,7 +7,7 @@ interface VendorCardProps {
   imageUrl: string | null;
 }
 
-export const VendorCard = ({ id, name, imageUrl }: VendorCardProps) => {
+export const VendorCard = ({ name, imageUrl }: VendorCardProps) => {
   return (
     <Link to={`/vendor/${name}`} className={styles.vendorCard}>
       <div className={styles.cardContent}>

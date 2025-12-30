@@ -49,7 +49,7 @@
 /* Mobile styles */
 @media (max-width: 640px) {
   .vendorsContainer {
-    padding: 3rem 1.5rem 6rem;
+    padding: 3rem 0 6rem;
   }
 
   .vendorsContainer h1 {

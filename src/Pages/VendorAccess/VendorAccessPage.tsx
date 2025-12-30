@@ -2,6 +2,7 @@ import { ViewToggler } from "../../Components/ViewToggler/ViewToggler";
 import { useState } from "react";
 import { ProductsCatalog } from "./ProductsCatalog/ProductsCatalog";
 import { OrderHistory } from "./OrderHistory/OrderHistory";
+import { ShopManagement } from "./ShopManagement/ShopManagement";
 import { getVendorInfo } from "../../services/vendorsService";
 import { useEffect } from "react";
 import type { VendorDetails } from "../../shared/types/Vendor/VendorDetails";
@@ -40,9 +41,13 @@ export const VendorAccessPage = () => {
                     </p>
                 </div>
             </div>
-            <ViewToggler onChange={(value) => setSelected(value)} options={["Products", "Orders"]} />
+            <ViewToggler
+                onChange={(value) => setSelected(value)}
+                options={["Products", "Orders", "Shops"]}
+            />
             {selected === "Products" && <ProductsCatalog />}
             {selected === "Orders" && <OrderHistory />}
+            {selected === "Shops" && <ShopManagement vendorId={vendorDetails.id} />}
         </div>
     );
 };

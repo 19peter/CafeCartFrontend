@@ -33,7 +33,6 @@
     overflow-x: auto;
     padding: 1rem;
     width: 100%;
-    justify-content: center;
     scrollbar-width: none;
     /* Firefox */
 }
@@ -123,8 +122,8 @@
 
 @media (max-width: 768px) {
     .list {
-        padding-left: 1rem;
-        padding-right: 1rem;
+        padding-left: 0;
+        padding-right: 0;
     }
 
     .card {

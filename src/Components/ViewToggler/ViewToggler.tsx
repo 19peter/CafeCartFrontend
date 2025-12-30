@@ -11,31 +11,22 @@ export const ViewToggler = ({ onChange, options }: { onChange: (view: string) =>
   return (
     <div style={styles.wrapper}>
       <div style={styles.container}>
-        <button
-          onClick={() => handleToggle(options[0])}
-          style={{
-            ...styles.btn,
-            ...(active === options[0] ? styles.active : {}),
-          }}
-        >
-          {options[0]}
-        </button>
-
-        <button
-          onClick={() => handleToggle(options[1])}
-          style={{
-            ...styles.btn,
-            ...(active === options[1] ? styles.active : {}),
-          }}
-        >
-          {options[1]}
-        </button>
-
-  
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={() => handleToggle(option)}
+            style={{
+              ...styles.btn,
+              ...(active === option ? styles.active : {}),
+            }}
+          >
+            {option}
+          </button>
+        ))}
       </div>
     </div>
   );
-}
+};
 
 const styles = {
   wrapper: {

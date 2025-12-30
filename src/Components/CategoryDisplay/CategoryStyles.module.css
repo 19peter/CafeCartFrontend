@@ -70,5 +70,6 @@
 @media (max-width: 768px) {
     .categoriesDisplay {
         flex-wrap: nowrap;
+        padding: 1rem 0;
     }
 }

@@ -151,6 +151,10 @@
     gap: 1.5rem;
   }
 
+  .vendorContainer {
+    padding: 0;
+  }
+
   .vendorContainer h1 {
     font-size: 2rem;
   }
