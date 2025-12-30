@@ -4,10 +4,12 @@ import { useCart } from '../../../contexts/CartContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import './Cart.css';
 import { addOneToCart, getCart, removeItemFromCart, removeOneFromCart } from '../../../services/cartService';
-import type { OrderSummary, CartSummary, OrderType, PaymentMethod, DeliveryArea, OrderTypeBase, OrderTypeBaseDelivery, OrderTypeBaseInHouse, OrderTypeBasePickup } from '../../../shared/types/cart/CartTypes';
+import type { OrderSummary, CartSummary, OrderType, PaymentMethod, OrderTypeBase, OrderTypeBaseDelivery, OrderTypeBaseInHouse, OrderTypeBasePickup } from '../../../shared/types/cart/CartTypes';
 import { useNotification } from '../../../contexts/NotificationContext';
 import { createOrder } from '../../../services/ordersService';
 import { generateIdempotencyKey } from '../../../utils/utils';
+import { CustomerInfoCard } from '../../../Components/CustomerInfoCard/CustomerInfoCard';
+import { savePreferredAddress } from '../../../services/customerService';
 
 
 interface CartItemProps {
@@ -41,7 +43,7 @@ const Cart = () => {
   } = useCart();
 
   const [locationError, setLocationError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, _] = useState(false);
 
   const [orderSummary, setOrderSummary] = useState<OrderSummary>();
   const [cartSummary, setCartSummary] = useState<CartSummary>();
@@ -55,6 +57,7 @@ const Cart = () => {
 
   const idempotencyKey = useRef(generateIdempotencyKey());
   const { showError, showSuccess } = useNotification();
+
 
   const fetchCart = async () => {
     const res = await getCart({ orderType, paymentMethod, latitude: deliveryLocation.lat, longitude: deliveryLocation.lng, deliveryAreaId: deliveryAreaId });
@@ -79,6 +82,8 @@ const Cart = () => {
     setShopName(res.data.orderSummary?.shopName || '');
 
   };
+
+
 
   const currencyFormatter = new Intl.NumberFormat('en-EG', {
     style: 'currency',
@@ -174,9 +179,26 @@ const Cart = () => {
     showSuccess('Order created successfully');
   };
 
+ const handleSavePreferredAddress = async (address: string) => {
+  if (!address.trim()) return;
+
+  let res = await savePreferredAddress(address);
+
+  if (res.status !== 200) {
+    showError(res.message);
+    return;
+  }
+
+  showSuccess('Address saved successfully');
+};
+
+
+
   if (!isAuthenticated) {
     return <div>Redirecting to login...</div>;
   }
+
+ 
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -188,235 +210,237 @@ const Cart = () => {
 
 
   return (
-    <div className="cart-container">
-      {cartSummary && !cartSummary.online && <h3 className="cart-shop-closed">Shop Is Closed</h3>}
-      <h1 className="cart-title">Your <span className="cart-shop-name">{orderSummary?.shopName}</span> Order</h1>
 
-      {/* Order Type Selection */}
-      {items.length > 0 && (
-        <div className="form-group">
-          <label htmlFor="order-type">Order Type</label>
-          <select
-            id="order-type"
-            value={orderType}
-            onChange={(e) => handleOrderTypeChange(e as any)}
-            className="form-control"
-          >
-            <option value="IN_HOUSE">In House</option>
-            <option value="PICKUP">Pickup</option>
-            {cartSummary?.deliveryAvailable && <option value="DELIVERY">Delivery</option>}
-          </select>
-          {locationError && (
-            <div className="error-message">
-              {locationError}
-            </div>
-          )}
-        </div>
-      )}
+    <div className="checkout-layout">
+      {/* LEFT */}
+      <CustomerInfoCard
+        orderType={orderType}
+        setDeliveryAddress={setDeliveryAddress}
+        onSaveAddress={handleSavePreferredAddress}
+      />
 
-      {/* DELIVERY ADDRESS */}
-      {items.length > 0 && orderType === 'DELIVERY' && (
-        <div className="delivery-section" >
+      {/* RIGHT */}
+      <div className="cart-wrapper">
+        <div className="cart-container">
+          {cartSummary && !cartSummary.online && <h3 className="cart-shop-closed">Shop Is Closed</h3>}
+          <h1 className="cart-title">Your <span className="cart-shop-name">{orderSummary?.shopName}</span> Order</h1>
 
-          {/* Delivery Area Selection */}
-          {(orderTypeInfo as OrderTypeBaseDelivery).availableDeliveryAreas?.length > 0 && (
+          {/* Order Type Selection */}
+          {items.length > 0 && (
             <div className="form-group">
-              <label htmlFor="delivery-area">Delivery Area</label>
+              <label htmlFor="order-type">Order Type</label>
               <select
-                id="delivery-area"
+                id="order-type"
+                value={orderType}
+                onChange={(e) => handleOrderTypeChange(e as any)}
                 className="form-control"
-                value={deliveryAreaId}
-                onChange={(e) => setDeliveryAreaId(Number(e.target.value))}
               >
-                <option value="">Select Delivery Area</option>
-                {(orderTypeInfo as OrderTypeBaseDelivery).availableDeliveryAreas?.map((area) => (
-                  <option key={area.id} value={area.id}>
-                    {area.area} - ${area.price.toFixed(2)}
-                  </option>
-                ))}
+                <option value="IN_HOUSE">In House</option>
+                <option value="PICKUP">Pickup</option>
+                {cartSummary?.deliveryAvailable && <option value="DELIVERY">Delivery</option>}
               </select>
+              {locationError && (
+                <div className="error-message">
+                  {locationError}
+                </div>
+              )}
             </div>
           )}
 
-          {/* Delivery Address Input */}
-          <div className="form-group">
-            <label htmlFor="delivery-address">Delivery Address</label>
-            <textarea
-              id="delivery-address"
-              className="form-control"
-              placeholder="Enter delivery address"
-              value={deliveryAddress}
-              onChange={(e) => setDeliveryAddress(e.target.value)}
-              rows={3}
-              style={{ resize: "none" }}
-            />
-          </div>
+          {/* DELIVERY ADDRESS */}
+          {items.length > 0 && orderType === 'DELIVERY' && (
+            <div className="delivery-section" >
 
-        </div>
-      )}
-
-
-      {items.length > 0 && orderType === 'PICKUP' && (
-        <div className="form-group" key={orderType} >
-          <label>Pickup Time</label>
-
-          <div className="pickup-time-row">
-            {/* HOUR */}
-            <select
-              className="form-control"
-              value={pickupHour}
-              onChange={(e) => setPickupHour(e.target.value)}
-            >
-              <option value="">HH</option>
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
-                <option key={h} value={h}>
-                  {h}
-                </option>
-              ))}
-            </select>
-
-            {/* MINUTE */}
-            <select
-              className="form-control"
-              value={pickupMinute}
-              onChange={(e) => setPickupMinute(e.target.value)}
-            >
-              {['00', '15', '30', '45'].map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
-              ))}
-            </select>
-
-            {/* AM / PM */}
-            <select
-              className="form-control"
-              value={pickupPeriod}
-              onChange={(e) => setPickupPeriod(e.target.value as 'AM' | 'PM')}
-            >
-              <option value="AM">AM</option>
-              <option value="PM">PM</option>
-            </select>
-          </div>
-        </div>
-      )}
-
-      {/* Cart Items */}
-      <div className="cart-items">
-        {items.length === 0 ? (
-          <p className="empty-cart">Your cart is empty</p>
-        ) : (
-          items.map((item) => (
-
-              <CartItem key={item.id}>
-                <div className="item-details">
-                  <h3 className="item-name">{item.productName}</h3>
-                  <p className="item-price">${item.unitPrice.toFixed(2)} each</p>
-                </div>
-                <div className="item-actions">
-                  <button
-                    onClick={() => handleRemoveOneFromCart(item.id)}
-                    className="quantity-btn"
-                    aria-label="Decrease quantity"
+              {/* Delivery Area Selection */}
+              {(orderTypeInfo as OrderTypeBaseDelivery).availableDeliveryAreas?.length > 0 && (
+                <div className="form-group">
+                  <label htmlFor="delivery-area">Delivery Area</label>
+                  <select
+                    id="delivery-area"
+                    className="form-control"
+                    value={deliveryAreaId}
+                    onChange={(e) => setDeliveryAreaId(Number(e.target.value))}
                   >
-                    -
-                  </button>
-                  <span className="quantity">{item.quantity}</span>
-                  <button
-                    onClick={() => handleAddOneToCart(item.productId, cartSummary!.shopId, item.id)}
-                    className="quantity-btn"
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
-                  <span className="item-total">
-                    ${(item.unitPrice * item.quantity).toFixed(2)}
-                  </span>
-
-                  <button
-                    onClick={() => handleRemoveItemFromCart(item.id)}
-                    className="remove-btn"
-                    aria-label="Remove item"
-                  >
-                    ×
-                  </button>
+                    <option value="">Select Delivery Area</option>
+                    {(orderTypeInfo as OrderTypeBaseDelivery).availableDeliveryAreas?.map((area) => (
+                      <option key={area.id} value={area.id}>
+                        {area.area} - ${area.price.toFixed(2)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-              </CartItem>
-          ))
-        )}
-      </div>
+              )}
 
-      {items.length > 0 && (
-        <>
-          {/* Payment Method */}
-          <div className="form-group">
-            <label htmlFor="payment-method">Payment Method</label>
-            <select
-              id="payment-method"
-              value={paymentMethod}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePaymentMethodChange(e)}
-              className="form-control"
-            >
-              <option value="CASH">Cash on Delivery</option>
-              {cartSummary?.onlinePaymentAvailable && <option value="CREDIT_CARD">Online Payment</option>}
-            </select>
-          </div>
 
-          {/* Order Summary */}
-          <div className="order-summary">
-            <h2 className="summary-title">Order Summary</h2>
 
-            {orderSummary ? (
-              <>
+            </div>
+          )}
 
-                <div className="summary-row">
-                  <span>Subtotal <span style={{ color: 'gray', fontSize: '10px' }}>Incl VAT</span> </span>
-                  <span>{formatCurrency(orderSummary.subTotal)}</span>
-                </div>
 
-                {orderTypeInfo?.orderType === 'DELIVERY' && (
-                  <div className="summary-row">
-                    <span>Delivery Fee</span>
-                    <span>{formatCurrency((orderTypeInfo as OrderTypeBaseDelivery).price)}</span>
-                  </div>
-                )}
+          {items.length > 0 && orderType === 'PICKUP' && (
+            <div className="form-group" key={orderType} >
+              <label>Pickup Time</label>
 
-                {orderSummary.transactionFee != null && orderSummary.transactionFee != 0 && (
-                  <div className="summary-row">
-                    <span>Transaction Fee</span>
-                    <span>{formatCurrency(orderSummary.transactionFee)}</span>
-                  </div>
-                )}
-
-                <div className="divider" />
-                <div className="summary-total">
-                  <span>Total</span>
-                  <span>{formatCurrency(orderSummary.total)}</span>
-                </div>
-
-                <button
-                  className={`submit-btn 
-                    ${isLoading || items.length === 0 ? 'disabled' : ''}
-                    ${!cartSummary?.online ? 'offline' : ''}`}
-                  onClick={() => handleCreateOrder()}
-                  disabled={!cartSummary?.online || isLoading || items.length === 0}
-                  title={!cartSummary?.online ? 'Shop Is Closed' : ''}
+              <div className="pickup-time-row">
+                {/* HOUR */}
+                <select
+                  className="form-control"
+                  value={pickupHour}
+                  onChange={(e) => setPickupHour(e.target.value)}
                 >
-                  {isLoading
-                    ? 'Processing...'
-                    : paymentMethod === 'CREDIT_CARD'
-                      ? 'Proceed to Payment'
-                      : 'Place Order'}
-                </button>
+                  <option value="">HH</option>
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => (
+                    <option key={h} value={h}>
+                      {h}
+                    </option>
+                  ))}
+                </select>
 
-              </>
+                {/* MINUTE */}
+                <select
+                  className="form-control"
+                  value={pickupMinute}
+                  onChange={(e) => setPickupMinute(e.target.value)}
+                >
+                  {['00', '15', '30', '45'].map((m) => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
+                </select>
+
+                {/* AM / PM */}
+                <select
+                  className="form-control"
+                  value={pickupPeriod}
+                  onChange={(e) => setPickupPeriod(e.target.value as 'AM' | 'PM')}
+                >
+                  <option value="AM">AM</option>
+                  <option value="PM">PM</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* Cart Items */}
+          <div className="cart-items">
+            {items.length === 0 ? (
+              <p className="empty-cart">Your cart is empty</p>
             ) : (
-              <p className="empty-summary">No items in cart</p>
+              items.map((item) => (
+
+                <CartItem key={item.id}>
+                  <div className="item-details">
+                    <h3 className="item-name">{item.productName}</h3>
+                    <p className="item-price">${item.unitPrice.toFixed(2)} each</p>
+                  </div>
+                  <div className="item-actions">
+                    <button
+                      onClick={() => handleRemoveOneFromCart(item.id)}
+                      className="quantity-btn"
+                      aria-label="Decrease quantity"
+                    >
+                      -
+                    </button>
+                    <span className="quantity">{item.quantity}</span>
+                    <button
+                      onClick={() => handleAddOneToCart(item.productId, cartSummary!.shopId, item.id)}
+                      className="quantity-btn"
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                    <span className="item-total">
+                      ${(item.unitPrice * item.quantity).toFixed(2)}
+                    </span>
+
+                    <button
+                      onClick={() => handleRemoveItemFromCart(item.id)}
+                      className="remove-btn"
+                      aria-label="Remove item"
+                    >
+                      ×
+                    </button>
+                  </div>
+                </CartItem>
+              ))
             )}
           </div>
-        </>
-      )}
+
+          {items.length > 0 && (
+            <>
+              {/* Payment Method */}
+              <div className="form-group">
+                <label htmlFor="payment-method">Payment Method</label>
+                <select
+                  id="payment-method"
+                  value={paymentMethod}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePaymentMethodChange(e)}
+                  className="form-control"
+                >
+                  <option value="CASH">Cash on Delivery</option>
+                  {cartSummary?.onlinePaymentAvailable && <option value="CREDIT_CARD">Online Payment</option>}
+                </select>
+              </div>
+
+              {/* Order Summary */}
+              <div className="order-summary">
+                <h2 className="summary-title">Order Summary</h2>
+
+                {orderSummary ? (
+                  <>
+
+                    <div className="summary-row">
+                      <span>Subtotal <span style={{ color: 'gray', fontSize: '10px' }}>Incl VAT</span> </span>
+                      <span>{formatCurrency(orderSummary.subTotal)}</span>
+                    </div>
+
+                    {orderTypeInfo?.orderType === 'DELIVERY' && (
+                      <div className="summary-row">
+                        <span>Delivery Fee</span>
+                        <span>{formatCurrency((orderTypeInfo as OrderTypeBaseDelivery).price)}</span>
+                      </div>
+                    )}
+
+                    {orderSummary.transactionFee != null && orderSummary.transactionFee != 0 && (
+                      <div className="summary-row">
+                        <span>Transaction Fee</span>
+                        <span>{formatCurrency(orderSummary.transactionFee)}</span>
+                      </div>
+                    )}
+
+                    <div className="divider" />
+                    <div className="summary-total">
+                      <span>Total</span>
+                      <span>{formatCurrency(orderSummary.total)}</span>
+                    </div>
+
+                    <button
+                      className={`submit-btn 
+                    ${isLoading || items.length === 0 ? 'disabled' : ''}
+                    ${!cartSummary?.online ? 'offline' : ''}`}
+                      onClick={() => handleCreateOrder()}
+                      disabled={!cartSummary?.online || isLoading || items.length === 0}
+                      title={!cartSummary?.online ? 'Shop Is Closed' : ''}
+                    >
+                      {isLoading
+                        ? 'Processing...'
+                        : paymentMethod === 'CREDIT_CARD'
+                          ? 'Proceed to Payment'
+                          : 'Place Order'}
+                    </button>
+
+                  </>
+                ) : (
+                  <p className="empty-summary">No items in cart</p>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </div>
     </div>
+
   );
 };
 

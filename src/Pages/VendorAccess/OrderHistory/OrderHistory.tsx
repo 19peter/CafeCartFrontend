@@ -11,7 +11,7 @@ export const OrderHistory = () => {
 
     const [orders, setOrders] = useState<ShopOrder[]>([]);
     const [page, setPage] = useState(0);
-    const [size, setSize] = useState(10);
+    const [size, _] = useState(10);
     const [totalPages, setTotalPages] = useState(0);
     const [year, setYear] = useState(new Date().getFullYear());
     const [month, setMonth] = useState(new Date().getMonth() + 1); // 1-12

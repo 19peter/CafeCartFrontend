@@ -1,38 +1,38 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+// import { useAuth } from '../../contexts/AuthContext';
+// import { useNavigate } from 'react-router-dom';
 
 export const ShopNavigation = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const [showUserMenu, setShowUserMenu] = useState(false);
 
-    const { isShopAuthenticated, logout } = useAuth();
-    const navigate = useNavigate();
+    // const {  logout } = useAuth();
+    // const navigate = useNavigate();
 
     const userMenuRef = useRef<HTMLDivElement>(null);
-    const mobileMenuRef = useRef<HTMLDivElement>(null);
+    // const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-    const toggleMenu = () => {
-        setIsMenuOpen(!isMenuOpen);
-    };
+    // const toggleMenu = () => {
+    //     setIsMenuOpen(!isMenuOpen);
+    // };
 
-    const handleLogout = async () => {
-        try {
-            logout();
-            setShowUserMenu(false);
-            setIsMenuOpen(false);
-            navigate('/');
-        } catch (error) {
-            console.error('Failed to log out', error);
-        }
-    };
+    // const handleLogout = async () => {
+    //     try {
+    //         logout();
+    //         setShowUserMenu(false);
+    //         setIsMenuOpen(false);
+    //         navigate('/');
+    //     } catch (error) {
+    //         console.error('Failed to log out', error);
+    //     }
+    // };
 
-    const handleNavigation = (path: string) => {
-        navigate(path);
-        setIsMenuOpen(false);
-        setShowUserMenu(false);
-    };
+    // const handleNavigation = (path: string) => {
+    //     navigate(path);
+    //     setIsMenuOpen(false);
+    //     setShowUserMenu(false);
+    // };
 
     // Handle window resize
     useEffect(() => {

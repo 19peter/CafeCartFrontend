@@ -21,7 +21,7 @@ export const ProductDetail = () => {
   const { showSuccess, showError } = useNotification();
   const { isAuthenticated } = useAuth();
   const { productId } = useParams<{ productId: string }>();
-
+  console.log(productDetails);
   // Fetch latest stock when component mounts
   useEffect(() => {
     const fetchLatestStock = async () => {
@@ -43,7 +43,7 @@ export const ProductDetail = () => {
       navigate('/login');
       return;
     }
-    if (!productDetails || productDetails.quantity === 0) return;
+    if (!productDetails || (productDetails.isStockTracked && productDetails.quantity === 0)) return;
     let res: { status: number, message: string } = await addToCart({ productId: Number(productId), shopId: Number(vendorShopId), quantity });
     if (res.status !== 200) {
       showError(res.message);

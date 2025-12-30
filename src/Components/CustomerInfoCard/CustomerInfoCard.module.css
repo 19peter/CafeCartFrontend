@@ -1,0 +1,155 @@
+/* CustomerInfoCard.module.css */
+
+.customerCard {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  max-width: 600px;
+}
+
+.customerCard h3 {
+  margin: 0 0 24px 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.infoRow {
+  margin-bottom: 20px;
+}
+
+.infoRow label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a4a4a;
+  margin-bottom: 8px;
+}
+
+.infoRow input,
+.infoRow textarea {
+  width: 90%;
+  padding: 10px 12px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1a1a1a;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.infoRow input:focus,
+.infoRow textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.infoRow input:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.infoRow textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.inlineRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inlineRow input {
+  flex: 1;
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.linkBtn:hover {
+  background: #f0f7ff;
+  color: #0056b3;
+}
+
+.linkBtn:active {
+  transform: scale(0.98);
+}
+
+.secondaryBtn {
+  background: #007bff;
+  color: #ffffff;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.secondaryBtn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.secondaryBtn:active {
+  transform: translateY(0);
+}
+
+.secondaryBtn:disabled {
+  background: #cbd5e1;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.infoNote {
+  background: #f0f7ff;
+  border-left: 4px solid #007bff;
+  padding: 12px 16px;
+  margin: 24px 0 10px 0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #1e3a8a;
+  line-height: 1.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .customerCard {
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .inlineRow {
+    flex-wrap: wrap;
+  }
+
+  .inlineRow input {
+    flex-basis: 100%;
+  }
+
+  .secondaryBtn,
+  .linkBtn {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}
+

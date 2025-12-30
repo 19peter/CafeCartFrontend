@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
 import type { RegisterCustomerPayload } from '../../services/authService';
@@ -18,8 +18,7 @@ export const Register = () => {
   const [lastNameError, setLastNameError] = useState('');
   const { registerCustomer, loading, error } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from || '/';
+
   const todayStr = new Date().toISOString().split('T')[0];
 
   const handleSubmit = async (e: React.FormEvent) => {

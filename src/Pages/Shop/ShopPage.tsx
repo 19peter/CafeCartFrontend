@@ -8,7 +8,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { setIsOnline, setIsDeliveryAvailable, getShopSettings } from "../../services/vendorShopsService";
 import { Client } from '@stomp/stompjs';
 import type { Area } from "../../shared/types/Shop/Shop";
-import { addDeliveryArea, deleteDeliveryArea, getDeliveryAreas, updateDeliveryArea } from "../../services/deliverySettingsService";
+import { addDeliveryArea, deleteDeliveryArea, updateDeliveryArea } from "../../services/deliverySettingsService";
 
 type ShopSettings = {
     shopId: string;
@@ -27,7 +27,7 @@ export const ShopPage = () => {
     
     const [selected, setSelected] = useState("Orders");
     const [settings, setSettings] = useState<ShopSettings>({} as ShopSettings);
-    const [stompClient, setStompClient] = useState<Client | null>(null);
+    const [_, setStompClient] = useState<Client | null>(null);
     const [connected, setConnected] = useState(false);
     const [shopId, setShopId] = useState("");
     const [newOrder, setNewOrder] = useState(false);
@@ -118,7 +118,7 @@ export const ShopPage = () => {
             console.log('Connected: ' + frame);
             setConnected(true);
 
-            client.subscribe(`/topic/shop/${shopId}/orders`, (message) => {
+            client.subscribe(`/topic/shop/${shopId}/orders`, (_) => {
                 setNewOrder(true);
             });
         };

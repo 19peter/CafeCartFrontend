@@ -17,7 +17,7 @@ import type { Shop } from '../../../shared/types/Shop/Shop';
 export const Vendor = () => {
   const { vendorId } = useParams<{ vendorId: string }>();
   const [selectedShop, setSelectedShop] = useState<number>(0);
-  const [vendorName, setVendorName] = useState('');
+  const [vendorName, _] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [shops, setShops] = useState<Shop[]>([]);
   const [inventory, setInventory] = useState<Product[]>([]);

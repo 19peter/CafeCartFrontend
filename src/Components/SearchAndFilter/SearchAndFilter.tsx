@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styles from './SearchAndFilter.module.css';
 
 interface SearchAndFilterProps {
-  onSearch: (searchTerm: string, category: { id: number; name: string }) => void;
+  onSearch: (searchTerm: string, category: string) => void;
   categories: { id: number; name: string }[];
 }
 
@@ -12,7 +12,7 @@ export const SearchAndFilter: React.FC<SearchAndFilterProps> = ({ onSearch, cate
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(searchTerm, selectedCategory);
+    onSearch(searchTerm,  selectedCategory);
   };
 
   return (

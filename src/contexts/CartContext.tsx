@@ -31,7 +31,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<OrderItem[]>([]);
   const [orderType, setOrderTypeState] = useState<OrderType>('PICKUP');
   const [paymentMethod, setPaymentMethodState] = useState<PaymentMethod>('CASH');
-  const [deliveryLocation, setDeliveryLocation] = useState<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
+  const [deliveryLocation, _] = useState<{ lat: number; lng: number }>({ lat: 0, lng: 0 });
   const [shopName, setShopName] = useState<string>('');
   // We don't need isAuthenticated here as we'll handle auth in the Cart component
 
@@ -119,23 +119,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     return orderType === 'DELIVERY' ? DELIVERY_FEE : 0;
   };
 
-  const getCurrentPositionContext = (): Promise<GeolocationPosition> => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation is not supported by your browser'));
-      } else {
-        navigator.geolocation.getCurrentPosition(
-          resolve,
-          reject,
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      }
-    });
-  };
+  // const getCurrentPositionContext = (): Promise<GeolocationPosition> => {
+  //   return new Promise((resolve, reject) => {
+  //     if (!navigator.geolocation) {
+  //       reject(new Error('Geolocation is not supported by your browser'));
+  //     } else {
+  //       navigator.geolocation.getCurrentPosition(
+  //         resolve,
+  //         reject,
+  //         {
+  //           enableHighAccuracy: true,
+  //           timeout: 10000,
+  //           maximumAge: 0
+  //         }
+  //       );
+  //     }
+  //   });
+  // };
 
 
   return (

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./ProductCatalog.module.css";
 import type { Product } from "../../../shared/types/product/ProductTypes";
-import { getVendorProducts, saveProductImage } from "../../../services/productService";
+import { getVendorProducts } from "../../../services/productService";
 import { createProduct, getAllCategories, updateProduct } from "../../../services/productService";
 import { uploadToS3 } from "../../../services/S3Service";
 
