@@ -212,7 +212,7 @@ export const isShopAuthenticated = async () => {
   } catch (_) {
     return { valid: false, accessToken: null };
   }
-}; 
+};
 
 export const isVendorAuthenticated = async () => {
   const token = getVendorToken();
@@ -231,7 +231,7 @@ export const isVendorAuthenticated = async () => {
   } catch (_) {
     return { valid: false, accessToken: null };
   }
-}; 
+};
 
 export const getAuthToken = () => localStorage.getItem('token');
 export const getShopToken = () => localStorage.getItem('shopToken');
@@ -283,5 +283,36 @@ export const loginCustomer = async (email: string, password: string) => {
   return null;
 }
 
+export const loginAdmin = async (email: string, password: string) => {
+  const res = await handleRequest('/auth/login/admin', { email, password });
+  if (res) {
+    setAuthToken(res.accessToken);
+    return res;
+  }
+  return null;
+}
+
 export const registerCustomer = (payload: RegisterCustomerPayload) =>
   handleRequest('/auth/register/customer', payload);
+
+export const forgotPassword = async (email: string) => {
+  const response = await fetch(`${API_BASE_URL}/auth/forgot-password?email=${encodeURIComponent(email)}`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Request failed');
+    throw new Error(errorText);
+  }
+  return response.text();
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const response = await fetch(`${API_BASE_URL}/auth/reset-password?token=${encodeURIComponent(token)}&newPassword=${encodeURIComponent(password)}`, {
+    method: 'POST',
+  });
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => 'Request failed');
+    throw new Error(errorText);
+  }
+  return response.text();
+};

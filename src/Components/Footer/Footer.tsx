@@ -7,7 +7,6 @@ export const Footer = () => {
 
     const handleNavigation = (path: string) => {
         navigate(path);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
     return (
@@ -53,8 +52,8 @@ export const Footer = () => {
             <div className={styles.footerBottom}>
                 <p>&copy; {new Date().getFullYear()} CafeCart. All rights reserved.</p>
                 <div className={styles.footerLegal}>
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
+                    <button onClick={() => handleNavigation('/privacy-policy')} className={styles.legalLink}>Privacy Policy</button>
+                    <button onClick={() => handleNavigation('/terms-of-service')} className={styles.legalLink}>Terms of Service</button>
                 </div>
             </div>
         </footer>

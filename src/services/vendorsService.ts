@@ -63,6 +63,7 @@ export interface CreateShopRequest {
 }
 
 export interface UpdateShopRequest {
+  id: number;
   name: string;
   address: string;
   city: string;

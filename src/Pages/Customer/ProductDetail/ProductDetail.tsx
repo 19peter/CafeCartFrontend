@@ -6,6 +6,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { addToCart } from '../../../services/cartService';
 import type { Product } from '../../../shared/types/product/ProductTypes';
 import { getVendorProduct } from '../../../services/shopProductService';
+import { StickyCartButton } from '../../../Components/StickyCartButton/StickyCartButton';
 
 interface LocationState {
   state: { vendorShopId: number };
@@ -19,7 +20,7 @@ export const ProductDetail = () => {
   const [productDetails, setProductDetails] = useState<Product>();
   const [isLoading, setIsLoading] = useState(false);
   const { showSuccess, showError } = useNotification();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, setOpenAuthModal } = useAuth();
   const { productId } = useParams<{ productId: string }>();
   console.log(productDetails);
   // Fetch latest stock when component mounts
@@ -40,7 +41,7 @@ export const ProductDetail = () => {
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      navigate('/login');
+      setOpenAuthModal(true);
       return;
     }
     if (!productDetails || (productDetails.isStockTracked && productDetails.quantity === 0)) return;
@@ -55,13 +56,13 @@ export const ProductDetail = () => {
   };
 
   const increaseQuantity = () => {
-    if (quantity < productDetails!.quantity) {
+    if ((productDetails!.isStockTracked && quantity < productDetails!.quantity) || !productDetails!.isStockTracked) {
       setQuantity(prev => prev + 1);
     }
   };
 
   const decreaseQuantity = () => {
-    if (quantity > 1) {
+    if ((productDetails!.isStockTracked && quantity > 1) || !productDetails!.isStockTracked) {
       setQuantity(prev => prev - 1);
     }
   };
@@ -83,11 +84,11 @@ export const ProductDetail = () => {
         <div className={styles.productContainer}>
           <div className={styles.imageContainer}>
             {productDetails?.imageUrl ? (
-            <img
-              src={ productDetails?.imageUrl} 
-              alt={productDetails?.name}
-              className={styles.productImage}
-            />
+              <img
+                src={productDetails?.imageUrl}
+                alt={productDetails?.name}
+                className={styles.productImage}
+              />
             ) : (
               <div className={styles.imagePlaceholder}>
                 <p>No Image</p>
@@ -129,7 +130,7 @@ export const ProductDetail = () => {
               <button
                 onClick={increaseQuantity}
                 className={styles.quantityButton}
-                disabled={quantity >= productDetails!.quantity}
+                disabled={(productDetails!.isStockTracked && quantity == 0)}
                 aria-label="Increase quantity"
               >
                 +
@@ -145,6 +146,7 @@ export const ProductDetail = () => {
             </button>
           </div>
         </div>
+        <StickyCartButton />
       </div>
     ) : null
 

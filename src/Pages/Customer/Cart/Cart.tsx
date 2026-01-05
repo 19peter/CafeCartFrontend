@@ -39,7 +39,8 @@ const Cart = () => {
     setPaymentMethodContext,
     clearCartContext,
     saveItemsToContext,
-    setShopName
+    setShopName,
+    getPaymentMethodsContext
   } = useCart();
 
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -57,6 +58,13 @@ const Cart = () => {
 
   const idempotencyKey = useRef(generateIdempotencyKey());
   const { showError, showSuccess } = useNotification();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
 
   const fetchCart = async () => {
@@ -79,12 +87,13 @@ const Cart = () => {
     setCartSummary(res.data.cartSummary);
     setOrderSummary(res.data.orderSummary);
     saveItemsToContext(res.data.orderSummary?.items || []);
+    setPaymentMethodContext(res.data.cartSummary?.allowedPaymentMethods[0]);
     setShopName(res.data.orderSummary?.shopName || '');
 
   };
 
 
-
+  // console.log(getPaymentMethodsContext());
   const currencyFormatter = new Intl.NumberFormat('en-EG', {
     style: 'currency',
     currency: 'EGP',
@@ -177,20 +186,21 @@ const Cart = () => {
     }
     clearCartContext();
     showSuccess('Order created successfully');
+    navigate('/order-success');
   };
 
- const handleSavePreferredAddress = async (address: string) => {
-  if (!address.trim()) return;
+  const handleSavePreferredAddress = async (address: string) => {
+    if (!address.trim()) return;
 
-  let res = await savePreferredAddress(address);
+    let res = await savePreferredAddress(address);
 
-  if (res.status !== 200) {
-    showError(res.message);
-    return;
-  }
+    if (res.status !== 200) {
+      showError(res.message);
+      return;
+    }
 
-  showSuccess('Address saved successfully');
-};
+    showSuccess('Address saved successfully');
+  };
 
 
 
@@ -198,7 +208,7 @@ const Cart = () => {
     return <div>Redirecting to login...</div>;
   }
 
- 
+
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -213,11 +223,13 @@ const Cart = () => {
 
     <div className="checkout-layout">
       {/* LEFT */}
-      <CustomerInfoCard
-        orderType={orderType}
-        setDeliveryAddress={setDeliveryAddress}
-        onSaveAddress={handleSavePreferredAddress}
-      />
+      {windowWidth > 900 && (
+        <CustomerInfoCard
+          orderType={orderType}
+          setDeliveryAddress={setDeliveryAddress}
+          onSaveAddress={handleSavePreferredAddress}
+        />
+      )}
 
       {/* RIGHT */}
       <div className="cart-wrapper">
@@ -378,10 +390,22 @@ const Cart = () => {
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handlePaymentMethodChange(e)}
                   className="form-control"
                 >
-                  <option value="CASH">Cash on Delivery</option>
-                  {cartSummary?.onlinePaymentAvailable && <option value="CREDIT_CARD">Online Payment</option>}
+                  {cartSummary?.allowedPaymentMethods.includes('CASH') && <option value="CASH">Cash on Delivery</option>}
+                  {cartSummary?.allowedPaymentMethods.includes('INSTAPAY') && <option value="INSTAPAY">Instapay</option>}
+                  {cartSummary?.allowedPaymentMethods.includes('CREDIT_CARD') && <option value="CREDIT_CARD">Online Payment</option>}
                 </select>
+
+                {getPaymentMethodsContext() === "INSTAPAY" && <p>The Shop will send you a payment link to complete the payment</p>}
+
               </div>
+
+              {windowWidth <= 900 && (
+                <CustomerInfoCard
+                  orderType={orderType}
+                  setDeliveryAddress={setDeliveryAddress}
+                  onSaveAddress={handleSavePreferredAddress}
+                />
+              )}
 
               {/* Order Summary */}
               <div className="order-summary">

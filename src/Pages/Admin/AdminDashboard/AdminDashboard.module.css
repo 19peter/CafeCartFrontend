@@ -1,0 +1,470 @@
+.container {
+    width: 95%;
+    padding: 2rem;
+    min-height: 100vh;
+    background-color: #f8fafc;
+}
+
+.header {
+    margin-bottom: 2.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 1.5rem;
+}
+
+.header h1 {
+    font-size: 2.25rem;
+    color: #1e293b;
+    margin-bottom: 0.5rem;
+}
+
+.header p {
+    color: #64748b;
+    font-size: 1.1rem;
+}
+
+.headerContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.adminIcon {
+    color: var(--color-primary);
+}
+
+.navigation {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Management Shared Styles */
+.managementSection {
+    animation: fadeIn 0.3s ease-out;
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.headerInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.headerIcon {
+    width: 40px;
+    height: 40px;
+    padding: 8px;
+    background: rgba(156, 102, 68, 0.1);
+    color: var(--color-primary);
+    border-radius: 10px;
+}
+
+.sectionHeader h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #1e293b;
+}
+
+.sectionHeader p {
+    margin: 0.25rem 0 0;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.addBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.addBtn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Form Styles */
+.addForm {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.formGrid input {
+    padding: 0.75rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+}
+
+.submitBtn {
+    align-self: flex-start;
+    padding: 0.75rem 1.5rem;
+    background: #1e293b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Table Styles */
+.dataTableWrapper {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dataTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.dataTable th {
+    background: #f8fafc;
+    padding: 1rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dataTable td {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.95rem;
+}
+
+.vendorNameColumn {
+    display: flex;
+    flex-direction: column;
+}
+
+.vendorNameColumn span {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.contactInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.contactInfo span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.dateCell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+}
+
+/* Shop Grid Styles */
+.shopGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+
+.shopItemCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.shopCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.shopIcon {
+    color: var(--color-primary);
+}
+
+.statusBadge {
+    background: #f0fdf4;
+    color: #166534;
+    padding: 0.25rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.shopItemCard h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.vendorTag {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0.5rem 0 1rem;
+}
+
+.locationDetails {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding-top: 1rem;
+    border-top: 1px solid #f1f5f9;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.addressText {
+    color: #94a3b8;
+}
+
+/* Category Grid Styles */
+.categoryGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+}
+
+.categoryCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    gap: 1.25rem;
+    align-items: center;
+}
+
+.categoryIcon {
+    width: 48px;
+    height: 48px;
+    background: var(--color-bg);
+    color: var(--color-primary);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.categoryInfo h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.categoryInfo p {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.statsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.statCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.statCard h3 {
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    margin-bottom: 0.75rem;
+}
+
+.statNumber {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.recentActivity {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+}
+
+.recentActivity h2 {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+}
+
+.emptyState {
+    color: #94a3b8;
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+}
+
+.imageUploadArea {
+    border: 2px dashed #e2e8f0;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #f8fafc;
+    position: relative;
+    grid-column: 1 / -1;
+}
+
+.imageUploadArea:hover {
+    border-color: var(--color-primary);
+    background: rgba(156, 102, 68, 0.02);
+}
+
+.imagePreviewWrapper {
+    width: 100%;
+    max-width: 200px;
+    height: 120px;
+    margin: 0 auto 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+}
+
+.imagePreview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.uploadPlaceholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+}
+
+.uploadPlaceholder span {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.fileInput {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.uploadingText {
+    color: var(--color-primary);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+
+.vendorTableImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    object-fit: cover;
+    margin-right: 0.75rem;
+}
+
+.vendorNameWithImage {
+    display: flex;
+    align-items: center;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

@@ -3,6 +3,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
 import type { RegisterCustomerPayload } from '../../services/authService';
+import { Info, Calendar } from 'lucide-react';
+import { RegistrationSuccessModal } from '../../Components/RegistrationSuccessModal/RegistrationSuccessModal';
 
 export const Register = () => {
   const [firstName, setFirstName] = useState('');
@@ -16,6 +18,7 @@ export const Register = () => {
   const [dobError, setDobError] = useState('');
   const [firstNameError, setFirstNameError] = useState('');
   const [lastNameError, setLastNameError] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { registerCustomer, loading, error } = useAuth();
   const navigate = useNavigate();
 
@@ -51,8 +54,8 @@ export const Register = () => {
     const dobDate = new Date(dob);
     const today = new Date();
     // Zero out times for a fair comparison
-    dobDate.setHours(0,0,0,0);
-    today.setHours(0,0,0,0);
+    dobDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
     if (!(dobDate instanceof Date) || isNaN(dobDate.getTime())) {
       setDobError('Please enter a valid date.');
       return;
@@ -77,8 +80,9 @@ export const Register = () => {
       };
       const success = await registerCustomer(payload);
       if (!success) throw new Error('Registration failed');
-      // Only navigate if registration was successful (no error was thrown)
-      navigate('/login', { replace: true });
+
+      // Show success modal instead of immediate navigation
+      setShowSuccessModal(true);
     } catch (error) {
       // Error is already handled in the AuthContext
     }
@@ -89,9 +93,9 @@ export const Register = () => {
       <div className={styles.authCard}>
         <h2>Create an Account</h2>
         <p className={styles.subtitle}>Join CafeCart today</p>
-        
+
         {error && <div className={styles.error}>{error}</div>}
-        
+
         <form onSubmit={handleSubmit} className={styles.authForm}>
           <div className={styles.formGroup}>
             <label htmlFor="firstName">First Name</label>
@@ -124,7 +128,7 @@ export const Register = () => {
             />
             {lastNameError && <div className={styles.error}>{lastNameError}</div>}
           </div>
-          
+
           <div className={styles.formGroup}>
             <label htmlFor="email">Email</label>
             <input
@@ -155,26 +159,38 @@ export const Register = () => {
               required
               disabled={loading}
             />
+            <p className={styles.inputNote}>
+              <Info size={14} className={styles.noteIcon} />
+              cafes need your number to verify the order
+            </p>
             {phoneError && <div className={styles.error}>{phoneError}</div>}
           </div>
 
           <div className={styles.formGroup}>
             <label htmlFor="dob">Date of Birth</label>
-            <input
-              id="dob"
-              type="date"
-              value={dob}
-              onChange={(e) => {
-                setDob(e.target.value);
-                if (dobError) setDobError('');
-              }}
-              max={todayStr}
-              required
-              disabled={loading}
-            />
+            <div className={styles.inputWrapper}>
+              <input
+                id="dob"
+                type="date"
+                className={styles.dateInput}
+                value={dob}
+                onChange={(e) => {
+                  setDob(e.target.value);
+                  if (dobError) setDobError('');
+                }}
+                max={todayStr}
+                required
+                disabled={loading}
+              />
+              <Calendar size={18} className={styles.inputIcon} />
+            </div>
+            <p className={styles.inputNote}>
+              <Info size={14} className={styles.noteIcon} />
+              help us celebrate your birthday
+            </p>
             {dobError && <div className={styles.error}>{dobError}</div>}
           </div>
-          
+
           <div className={styles.formGroup}>
             <label htmlFor="password">Password</label>
             <input
@@ -187,7 +203,7 @@ export const Register = () => {
               disabled={loading}
             />
           </div>
-          
+
           <div className={styles.formGroup}>
             <label htmlFor="confirmPassword">Confirm Password</label>
             <input
@@ -199,12 +215,12 @@ export const Register = () => {
               disabled={loading}
             />
           </div>
-          
+
           <button type="submit" className={styles.submitButton} disabled={loading}>
             {loading ? 'Creating Account...' : 'Register'}
           </button>
         </form>
-        
+
         <div className={styles.authFooter}>
           Already have an account?{' '}
           <Link to="/login" className={styles.authLink}>
@@ -212,6 +228,11 @@ export const Register = () => {
           </Link>
         </div>
       </div>
+
+      <RegistrationSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => navigate('/login', { replace: true })}
+      />
     </div>
   );
 };

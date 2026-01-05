@@ -124,13 +124,17 @@
     gap: 2rem;
 }
 
-.footerLegal a {
+.legalLink {
+    background: none;
+    border: none;
+    padding: 0;
     color: #8d6e63;
-    text-decoration: none;
+    cursor: pointer;
+    font-size: 0.85rem;
     transition: color 0.2s ease;
 }
 
-.footerLegal a:hover {
+.legalLink:hover {
     color: #d7ccc8;
 }
 

@@ -12,6 +12,9 @@ import {
   getShopToken,
   getVendorToken,
   loginVendorShop as authLoginVendorShop,
+  loginAdmin as authLoginAdmin,
+  forgotPassword as authForgotPassword,
+  resetPassword as authResetPassword,
 } from '../services/authService';
 import type { RegisterCustomerPayload } from '../services/authService';
 
@@ -23,12 +26,17 @@ interface AuthContextType {
   registerCustomer: (payload: RegisterCustomerPayload) => Promise<boolean>;
   loginShop: (email: string, password: string) => Promise<boolean>;
   loginVendor: (email: string, password: string) => Promise<boolean>;
+  loginAdmin: (email: string, password: string) => Promise<boolean>;
+  forgotPassword: (email: string) => Promise<boolean>;
+  resetPassword: (token: string, password: string) => Promise<boolean>;
   logout: () => void;
   loading: boolean;
   error: string | null;
   token: string | null;
   shopToken: string | null;
   vendorToken: string | null;
+  openAuthModal: boolean;
+  setOpenAuthModal: (open: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -40,6 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(getAuthToken());
   const [shopToken, setShopToken] = useState<string | null>(getShopToken());
   const [vendorToken, setVendorToken] = useState<string | null>(getVendorToken());
+  const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
   const navigate = useNavigate();
   const hostname = window.location.hostname;
 
@@ -172,6 +181,51 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const loginAdmin = async (email: string, _password: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await authLoginAdmin(email, _password);
+      const access = res?.token ?? res?.accessToken ?? res?.jwt ?? null;
+      if (!access) throw new Error('Missing token in response');
+      setToken(access);
+      return true;
+    } catch (err: any) {
+      setError(err?.message || 'Failed to login. Please check your credentials.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const forgotPassword = async (email: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await authForgotPassword(email);
+      return true;
+    } catch (err: any) {
+      setError(err?.message || 'Failed to send reset email. Please try again.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetPassword = async (token: string, password: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      await authResetPassword(token, password);
+      return true;
+    } catch (err: any) {
+      setError(err?.message || 'Failed to reset password. Link might be expired.');
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = () => {
     try {
       authLogout();
@@ -194,9 +248,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         registerCustomer,
         loginShop,
         loginVendor,
+        loginAdmin,
+        forgotPassword,
+        resetPassword,
         logout,
         loading,
-        error
+        error,
+        openAuthModal,
+        setOpenAuthModal
       }}
     >
       {children}

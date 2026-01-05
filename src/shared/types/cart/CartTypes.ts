@@ -10,8 +10,8 @@ export interface OrderItem {
 }
 
 export interface OrderSummary {
-  orderType: string;
-  paymentMethod: string;
+  orderType: OrderType;
+  paymentMethod: PaymentMethod;
   subTotal: number;
   deliveryFee: number;
   total: number;
@@ -28,6 +28,7 @@ export interface CartSummary {
   online: boolean;
   onlinePaymentAvailable: boolean;
   deliveryAvailable: boolean;
+  allowedPaymentMethods: PaymentMethod[];
 }
 
 export interface OrderTypeBase {
@@ -57,4 +58,4 @@ export interface DeliveryArea {
 }
 
 export type OrderType = 'PICKUP' | 'IN_HOUSE' | 'DELIVERY';
-export type PaymentMethod = 'CASH' | 'CREDIT_CARD';
+export type PaymentMethod = 'CASH' | 'CREDIT_CARD' | 'INSTAPAY';

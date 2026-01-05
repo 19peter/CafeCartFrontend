@@ -14,6 +14,7 @@ export type ShopOrder = {
     totalPrice: number;
     createdAt: string;
     verified: boolean;
+    paymentStatus: PaymentStatus;
 }
 
 export type OrderItem = {
@@ -26,4 +27,6 @@ export type OrderItem = {
 type paymentMethod = "CASH" | "CREDIT_CARD";
 type orderType = "PICKUP" | "DELIVERY" | "IN_HOUSE";
 type orderStatus = "PENDING" | "PREPARING" | "READY_FOR_PICKUP" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED";
+
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
 

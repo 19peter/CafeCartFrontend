@@ -12,6 +12,7 @@ import NotFound from '../../Shared/NotFound';
 import type { Shop } from '../../../shared/types/Shop/Shop';
 import { LocationSelector } from './LocationSelector';
 import { Search, Layers } from 'lucide-react';
+import { StickyCartButton } from '../../../Components/StickyCartButton/StickyCartButton';
 
 
 
@@ -158,6 +159,7 @@ export const Vendor = () => {
               </div>
             )}
           </div>
+          <StickyCartButton />
         </div>
       )}
     </>

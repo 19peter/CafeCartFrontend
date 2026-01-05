@@ -6,7 +6,7 @@ import styles from './Auth.module.css';
 export const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { loginCustomer, loginShop, loginVendor, loading, error } = useAuth();
+  const { loginCustomer, loginShop, loginVendor, loginAdmin, loading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const hostname = window.location.hostname;
@@ -19,6 +19,8 @@ export const SignIn = () => {
       res = await loginShop(email, password);
     } else if (hostname.includes("vendor")) {
       res = await loginVendor(email, password);
+    } else if (hostname.includes("admin")) {
+      res = await loginAdmin(email, password);
     } else {
       res = await loginCustomer(email, password);
     }
@@ -57,6 +59,11 @@ export const SignIn = () => {
               required
               disabled={loading}
             />
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '4px' }}>
+              <Link to="/forgot-password" className={styles.authLink} style={{ fontSize: '0.85rem' }}>
+                Forgot Password?
+              </Link>
+            </div>
           </div>
 
           <button type="submit" className={styles.submitButton} disabled={loading}>

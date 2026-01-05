@@ -1,9 +1,22 @@
 import { useEffect, useState } from "react";
 import styles from "./ProductCatalog.module.css";
+import {
+  Package,
+  Tag,
+  DollarSign,
+  Image as ImageIcon,
+  CheckCircle,
+  PlusCircle,
+  PencilLine,
+  Loader2,
+  AlertTriangle,
+  X
+} from "lucide-react";
 import type { Product } from "../../../shared/types/product/ProductTypes";
 import { getVendorProducts } from "../../../services/productService";
 import { createProduct, getAllCategories, updateProduct } from "../../../services/productService";
 import { uploadToS3 } from "../../../services/S3Service";
+import { useNotification } from "../../../contexts/NotificationContext";
 
 const EMPTY_FORM = {
   name: "",
@@ -32,6 +45,8 @@ export const ProductsCatalog = () => {
   const [search, setSearch] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const { showSuccess, showError } = useNotification();
 
   /* ----------------------------- helpers ----------------------------- */
 
@@ -108,6 +123,8 @@ export const ProductsCatalog = () => {
     if (!form.name || !form.price) return;
 
     try {
+      setUploading(true);
+      setUploadError(null);
       const payload = {
         name: form.name,
         price: +form.price,
@@ -124,13 +141,6 @@ export const ProductsCatalog = () => {
         : await createProduct(payload);
       if (res.status !== 200) throw new Error(res.message);
 
-      if (selectedImage) {
-        const uploadUrl = res.data.uploadUrl;
-        uploadToS3(uploadUrl, selectedImage);
-
-        setUploading(false);
-      }
-
       const mapped = mapApiProduct(res.data);
 
       setProducts((prev) =>
@@ -139,9 +149,28 @@ export const ProductsCatalog = () => {
           : [...prev, mapped]
       );
 
+      const uploadUrl = res.data.uploadUrl;
+      const productName = form.name;
+      const operation = editingId ? 'updated' : 'created';
+
+      showSuccess(`Product "${productName}" ${operation} successfully!`);
       resetForm();
-    } catch (err) {
+
+      if (selectedImage && uploadUrl) {
+        try {
+          await uploadToS3(uploadUrl, selectedImage);
+          showSuccess(`Image for "${productName}" uploaded successfully!`);
+        } catch (uploadErr) {
+          const errMsg = `Product saved, but failed to upload image for "${productName}".`;
+          showError(errMsg);
+          setUploadError(errMsg);
+        }
+      }
+    } catch (err: any) {
       console.error("Product save failed:", err);
+      showError(err.message || "Failed to save product");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -179,6 +208,17 @@ export const ProductsCatalog = () => {
     <div className={styles.inventoryContainer}>
 
       <div className={styles.inventoryPage}>
+        {uploadError && (
+          <div className={styles.persistentError}>
+            <div className={styles.errorContent}>
+              <AlertTriangle size={20} />
+              <span>{uploadError}</span>
+            </div>
+            <button onClick={() => setUploadError(null)} className={styles.closeError}>
+              <X size={16} />
+            </button>
+          </div>
+        )}
         <h1 className={styles.inventoryTitle}>Inventory</h1>
         <div className={styles.inventoryToolbar}>
           <input
@@ -231,74 +271,141 @@ export const ProductsCatalog = () => {
       </div>
 
       <div className={styles.productFormContainer}>
-        {/* ADD / EDIT FORM */}
         <div className={styles.productForm}>
-          <h2>{editingId ? "Edit Product" : "Add New Product"}</h2>
+          <h2>
+            {editingId ? <PencilLine size={24} /> : <PlusCircle size={24} />}
+            {editingId ? "Edit Product" : "New Item"}
+          </h2>
 
-          <div className={styles.formGrid}>
-            <input name="name" placeholder="Product Name" value={form.name} onChange={handleChange} />
+          <div className={styles.formSection}>
+            {/* Name Input */}
+            <div className={styles.inputGroup}>
+              <label>Product Name</label>
+              <div className={styles.inputWrapper}>
+                <Package className={styles.inputIcon} size={18} />
+                <input
+                  name="name"
+                  placeholder="e.g. Arabica Roast"
+                  value={form.name}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
-            <select
-              name="categoryId"
-              value={form.categoryId}
-              onChange={handleChange}
-            >
-              <option value="">Select Category</option>
-              {categories?.map(cat => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
+            {/* Category selection */}
+            <div className={styles.inputGroup}>
+              <label>Category</label>
+              <div className={styles.inputWrapper}>
+                <Tag className={styles.inputIcon} size={18} />
+                <select
+                  name="categoryId"
+                  value={form.categoryId}
+                  onChange={handleChange}
+                >
+                  <option value="">Select Category</option>
+                  {categories?.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-            <label htmlFor="price">Price</label>
-            <input name="price" type="number" step="0.01" placeholder="Price" value={form.price} onChange={handleChange} />
+            {/* Price Input */}
+            <div className={styles.inputGroup}>
+              <label>Price (EGP)</label>
+              <div className={styles.inputWrapper}>
+                <DollarSign className={styles.inputIcon} size={18} />
+                <input
+                  name="price"
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={form.price}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
 
-            <label htmlFor="image">Image</label>
+            {/* Image Upload Area */}
+            <div className={styles.inputGroup}>
+              <label>Product Image</label>
+              <div className={styles.imageUploadArea}>
+                {form.image || selectedImage ? (
+                  <div className={styles.imagePreviewWrapper}>
+                    <img
+                      src={selectedImage ? URL.createObjectURL(selectedImage) : form.image}
+                      alt="Preview"
+                      className={styles.imagePreview}
+                    />
+                  </div>
+                ) : (
+                  <div className={styles.uploadPlaceholder}>
+                    <ImageIcon size={32} />
+                    <span>Click to upload image</span>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className={styles.fileInput}
+                  onChange={handleImageSelect}
+                />
+              </div>
+              {uploading && (
+                <div className={styles.uploadingOverlay}>
+                  <Loader2 className={styles.spinner} size={24} />
+                  <span>Uploading item image...</span>
+                </div>
+              )}
+            </div>
 
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageSelect}
-            />
-
-            {uploading && <p>Uploading image...</p>}
-
-            {form.image && (
-              <img
-                src={form.image}
-                alt="Preview"
-                style={{ width: 120, marginTop: 10, borderRadius: 6 }}
-              />
-            )}
-
-
-            <label className={styles.checkboxLabel}>
+            {/* Stock Toggle */}
+            <div className={styles.switchContainer}>
+              <div className={styles.switchLabel}>
+                <CheckCircle size={18} color={form.isStockTracked ? "var(--color-primary)" : "#94a3b8"} />
+                <span>Track Stock</span>
+              </div>
               <input
                 type="checkbox"
                 name="isStockTracked"
                 checked={form.isStockTracked}
                 onChange={handleChange}
+                style={{ width: 'auto', padding: 0 }}
               />
-              Track Stock
-            </label>
+            </div>
+
+            {/* Description */}
+            <div className={styles.inputGroup}>
+              <label>Description</label>
+              <textarea
+                name="description"
+                placeholder="Give your product a tempting description..."
+                value={form.description}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className={styles.buttonGroup}>
+              <button className={styles.submitBtn} onClick={saveProduct} disabled={uploading}>
+                {uploading ? <Loader2 className={styles.spinner} size={18} /> : (editingId ? <PencilLine size={18} /> : <PlusCircle size={18} />)}
+                {uploading ? "Processing..." : (editingId ? "Save Changes" : "Create Product")}
+              </button>
+
+              {editingId && (
+                <button className={styles.cancelBtn} onClick={resetForm}>
+                  Cancel Edit
+                </button>
+              )}
+            </div>
           </div>
-
-          <textarea
-            name="description"
-            placeholder="Description"
-            value={form.description}
-            style={{ width: "80%", resize: "none" }}
-            onChange={handleChange}
-          />
-
-          <button className={styles.submitBtn} onClick={saveProduct}>
-            {editingId ? "Update Product" : "Add Product"}
-          </button>
         </div>
       </div>
     </div>
   );
-}
 
+};
+
+export default ProductsCatalog;
 

@@ -253,7 +253,7 @@ export const NavigationBar = () => {
                 <div className={styles.mobileAuthButtons}>
                   <button
                     className={styles.signin_btn}
-                    onClick={() => handleNavigation('/signin')}
+                    onClick={() => handleNavigation('/login')}
                   >
                     Sign In
                   </button>

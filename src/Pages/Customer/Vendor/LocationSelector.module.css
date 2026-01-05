@@ -126,6 +126,8 @@
         padding-left: 0;
         padding-right: 0;
         justify-content: normal;
+        width: 90%;
+
     }
 
     .card {

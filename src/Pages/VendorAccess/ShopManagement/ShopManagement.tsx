@@ -19,6 +19,7 @@ const EMPTY_CREATE_FORM: CreateShopRequest = {
 };
 
 const EMPTY_UPDATE_FORM: UpdateShopRequest = {
+    id: 0,
     name: "",
     address: "",
     city: "",
@@ -82,6 +83,7 @@ export const ShopManagement = ({ vendorId }: ShopManagementProps) => {
     const handleEditClick = (shop: Shop) => {
         setEditingId(shop.id);
         setUpdateForm({
+            id: shop.id,
             name: shop.name,
             address: shop.address,
             city: shop.city,

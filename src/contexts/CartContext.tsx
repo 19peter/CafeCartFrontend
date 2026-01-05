@@ -21,6 +21,7 @@ interface CartContextType {
   saveItemsToContext: (items: OrderItem[]) => void;
   shopName: string;
   setShopName: (name: string) => void;
+  getPaymentMethodsContext: () => PaymentMethod;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -99,12 +100,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const setOrderTypeContext = async (type: OrderType) => {
-  
+
     setOrderTypeState(type);
   };
 
   const setPaymentMethodContext = (method: PaymentMethod) => {
     setPaymentMethodState(method);
+  };
+
+  const getPaymentMethodsContext = () => {
+    return paymentMethod;
   };
 
   const clearCartContext = () => {
@@ -157,6 +162,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         saveItemsToContext,
         shopName,
         setShopName,
+        getPaymentMethodsContext
       }}
     >
       {children}

@@ -65,7 +65,7 @@ export const OrderDetails = ({ order }: OrderDetailsProps) => {
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>Payment Method:</span>
           <span className={styles.infoValue}>
-            {order.paymentMethod === 'CASH' ? 'Cash on Delivery' : 'Credit Card'}
+            {order.paymentMethod}
           </span>
         </div>
         {order.paymentStatus && (

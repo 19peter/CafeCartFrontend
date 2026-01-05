@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { OrdersTable } from "../../../Components/VendorOrderTable/OrderTable";
 import { getShopOrders } from "../../../services/ordersService";
 import type { ShopOrder } from "../../../shared/types/orders/ShopOrder";
@@ -7,17 +8,15 @@ import type { BasicCustomerInfo } from "../../../shared/types/customer/CustomerT
 import { blockUser, getBlockedCustomers, unblockUser } from "../../../services/vendorShopsService";
 import { useNotification } from "../../../hooks/useNotification";
 import BlockedCustomersModal from "../../../Components/BlockedUserModal/BlockedUserModal";
+import { Calendar, Filter, RefreshCw, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
 
 export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNewOrder: (value: boolean) => void }) => {
-
   const { showError, showSuccess } = useNotification();
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [orders, setOrders] = useState<ShopOrder[]>([]);
   const [blockedCustomers, setBlockedCustomers] = useState<BasicCustomerInfo[]>([]);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [pinnedOrders, setPinnedOrders] = useState<Set<string>>(new Set());
-
-
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const cairoDate = new Intl.DateTimeFormat("en-CA", {
@@ -26,7 +25,6 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
       month: "2-digit",
       day: "2-digit"
     }).format(new Date());
-    
     return new Date(cairoDate);
   });
 
@@ -40,9 +38,7 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
   };
 
   const shiftDay = (days: number) => {
-    setSelectedDate((prev) => {
-      return new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + days);
-    });
+    setSelectedDate((prev) => new Date(prev.getFullYear(), prev.getMonth(), prev.getDate() + days));
   };
 
   const fetchOrders = async () => {
@@ -81,8 +77,6 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
     }
   };
 
-
-
   useEffect(() => {
     fetchBlockedCustomers();
     fetchOrders();
@@ -94,82 +88,117 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
     fetchOrders();
   }, [selectedDate]);
 
-
   useEffect(() => {
-    localStorage.setItem(
-      "pinnedOrders",
-      JSON.stringify(Array.from(pinnedOrders))
-    );
+    localStorage.setItem("pinnedOrders", JSON.stringify(Array.from(pinnedOrders)));
   }, [pinnedOrders]);
 
-  const filtered =
-    statusFilter === "ALL"
-      ? orders
-      : orders.filter((o: ShopOrder) => o.status === statusFilter);
+  const filtered = statusFilter === "ALL"
+    ? orders
+    : orders.filter((o: ShopOrder) => o.status === statusFilter);
 
   const pinned = filtered.filter(o => pinnedOrders.has(o.orderNumber));
   const unpinned = filtered.filter(o => !pinnedOrders.has(o.orderNumber));
-
   const ordered = [...pinned, ...unpinned];
 
   return (
-    <div className={styles.container}>
-      {/* FILTER */}
-      <div className={styles.filterContainer}>
-        <div style={{ marginBottom: "20px" }}>
-          <label>Status Filter: </label>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
+    <motion.div
+      className={styles.container}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <header className={styles.headerSection}>
+        <div className={styles.titleGroup}>
+          <h1>Manage Orders</h1>
+          <p>Track and manage your incoming cafe orders in real-time.</p>
+        </div>
+
+        <div className={styles.controlsWrapper}>
+          <div className={styles.filterGroup}>
+            <div className={styles.filterField}>
+              <Filter size={18} className={styles.icon} />
+              <label>Status</label>
+              <select
+                className={styles.selectStyled}
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <option value="ALL">All Orders</option>
+                <option value="PENDING">Pending</option>
+                <option value="PREPARING">Preparing</option>
+                <option value="READY_FOR_PICKUP">Ready for Pickup</option>
+                <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
+                <option value="DELIVERED">Delivered</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+
+            <div className={styles.filterField}>
+              <Calendar size={18} className={styles.icon} />
+              <label>Date</label>
+              <div className={styles.dateNav}>
+                <button className={styles.navBtn} onClick={() => shiftDay(-1)}>
+                  <ChevronLeft size={20} />
+                </button>
+                <input
+                  className={styles.dateInput}
+                  type="date"
+                  value={selectedDate.toISOString().split("T")[0]}
+                  onChange={(e) => setSelectedDate(new Date(e.target.value))}
+                />
+                <button className={styles.navBtn} onClick={() => shiftDay(1)}>
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <AnimatePresence>
+        {newOrder && (
+          <motion.div
+            className={styles.newOrderIndicator}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
           >
-            <option value="ALL">All</option>
-            <option value="PENDING">PENDING</option>
-            <option value="PREPARING">PREPARING</option>
-            <option value="READY_FOR_PICKUP">READY FOR PICKUP</option>
-            <option value="OUT_FOR_DELIVERY">OUT FOR DELIVERY</option>
-            <option value="DELIVERED">DELIVERED</option>
-            <option value="CANCELLED">CANCELLED</option>
-          </select>
-        </div>
+            <button className={styles.newOrderBtn} onClick={() => fetchOrders()}>
+              <RefreshCw size={20} />
+              New Orders Available
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        <div className={styles.dateContainer}>
-          <button onClick={() => shiftDay(-1)}>◀</button>
-
-          <input
-            type="date"
-            value={selectedDate.toISOString().split("T")[0]}
-            onChange={(e) => setSelectedDate(new Date(e.target.value))}
-          />
-
-          <button onClick={() => shiftDay(1)}>▶</button>
-        </div>
+      <div className={styles.ordersList}>
+        {ordered.length > 0 ? (
+          ordered.map((order: ShopOrder, index) => (
+            <motion.div
+              key={order.orderNumber}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              <OrdersTable
+                order={order}
+                isCustomerBlocked={blockedCustomers.some((customer) => customer.id === order.customerId)}
+                handleBlockUser={handleBlockUser}
+                handleUnblockUser={handleUnblockUser}
+                openBlockedCustomersModal={() => setShowBlockedModal(true)}
+                isPinned={pinnedOrders.has(order.orderNumber)}
+                onTogglePin={(e) => togglePin(e, order.orderNumber)}
+              />
+            </motion.div>
+          ))
+        ) : (
+          <div className={styles.emptyState}>
+            <ShoppingBag size={64} className={styles.emptyIcon} />
+            <h3>No orders found</h3>
+            <p>Try changing the filters or checking another date.</p>
+          </div>
+        )}
       </div>
-
-      {newOrder && (
-        <button
-          className={styles.newOrderBtn}
-
-          onClick={() => fetchOrders()}>Get New Orders</button>
-      )}
-
-      {ordered.length > 0 ? (
-        ordered.map((order: ShopOrder) => (
-          <OrdersTable
-            key={order.orderNumber}
-            order={order}
-            isCustomerBlocked={blockedCustomers.some((customer) => customer.id === order.customerId)}
-            handleBlockUser={handleBlockUser}
-            handleUnblockUser={handleUnblockUser}
-            openBlockedCustomersModal={() => setShowBlockedModal(true)}
-            isPinned={pinnedOrders.has(order.orderNumber)}
-            onTogglePin={(e) => togglePin(e, order.orderNumber)}
-          />
-        ))
-      ) : (
-        <div style={{ textAlign: "center" }}>
-          No orders found
-        </div>
-      )}
 
       <BlockedCustomersModal
         open={showBlockedModal}
@@ -177,6 +206,6 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
         blockedCustomers={blockedCustomers}
         onUnblock={handleUnblockUser}
       />
-    </div>
+    </motion.div>
   );
 };

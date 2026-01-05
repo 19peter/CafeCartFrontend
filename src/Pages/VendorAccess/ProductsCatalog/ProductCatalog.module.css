@@ -6,17 +6,16 @@
 }
 
 .productFormContainer {
-  display: flex;
-  flex-direction: column;
-  width: 30%;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-  border-radius: 16px;
-  border: 1px solid #d1d5db;
+  width: 380px;
   position: sticky;
   top: 24px;
   height: fit-content;
-   background: #ffffff;
-     box-shadow: -6px 0 24px rgba(0,0,0,0.06);
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(156, 102, 68, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .inventoryPage {
@@ -150,69 +149,193 @@
 }
 
 .productForm {
-  background: #ffffff;
-  padding: 24px;
-  border-radius: 16px;
-  max-width: 700px;
+  padding: 2rem;
 }
 
 .productForm h2 {
-  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.formGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
-  margin-bottom: 12px;
+.formSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-left: 4px;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  color: #94a3b8;
+  pointer-events: none;
 }
 
 .productForm input,
+.productForm select,
 .productForm textarea {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
+  width: 100%;
+  padding: 0.85rem 1rem 0.85rem 2.8rem;
+  border-radius: 14px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 1rem;
+  color: #1e293b;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .productForm textarea {
-  min-height: 90px;
-  resize: vertical;
-  margin-bottom: 16px;
-}
-
-.productForm select {
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #d1d5db;
-  font-size: 14px;
-}
-
-.productForm select:focus {
-  outline: none;
-  border-color: #2563eb;
+  padding-left: 1rem;
+  min-height: 120px;
+  line-height: 1.5;
 }
 
 .productForm input:focus,
+.productForm select:focus,
 .productForm textarea:focus {
   outline: none;
-  border-color: #2563eb;
+  border-color: var(--color-primary);
+  background: white;
+  box-shadow: 0 0 0 4px rgba(156, 102, 68, 0.1);
+}
+
+.imageUploadArea {
+  border: 2px dashed #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #f8fafc;
+  position: relative;
+}
+
+.imageUploadArea:hover {
+  border-color: var(--color-primary);
+  background: rgba(156, 102, 68, 0.02);
+}
+
+.imagePreviewWrapper {
+  width: 100%;
+  height: 140px;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  border: 1px solid #e2e8f0;
+}
+
+.imagePreview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.uploadPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #64748b;
+}
+
+.uploadPlaceholder span {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.fileInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.switchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.switchLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: #1e293b;
 }
 
 .submitBtn {
   width: 100%;
-  padding: 14px;
-  border-radius: 12px;
+  padding: 1rem;
+  border-radius: 16px;
   border: none;
-  background: var(--color-primary-light);
-  color: #ffffff;
-  font-size: 16px;
-  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .submitBtn:hover {
   background: var(--color-primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(156, 102, 68, 0.2);
+}
+
+.cancelBtn {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 16px;
+  border: 1.5px solid #e2e8f0;
+  background: white;
+  color: #64748b;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 0.75rem;
+}
+
+.cancelBtn:hover {
+  background: #f8fafc;
+  color: #1e293b;
+  border-color: #cbd5e1;
 }
 
 
@@ -235,5 +358,79 @@
   .productFormContainer,
   .inventoryPage {
     width: 100%;
+  }
+}
+
+.uploadingOverlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.persistentError {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  animation: slideDown 0.3s ease-out;
+}
+
+.errorContent {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+}
+
+.closeError {
+  background: transparent;
+  border: none;
+  color: #ef4444;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.closeError:hover {
+  background-color: #fee2e2;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

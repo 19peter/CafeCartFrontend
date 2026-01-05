@@ -35,13 +35,13 @@ export const getOrderItems = async () => {
 // POST /orders/customer
 export const createOrder = async (
   { orderType, paymentMethod, latitude, longitude, address, pickupTime, deliveryAreaId, idempotencyKey }:
-   { orderType: OrderType; paymentMethod: PaymentMethod; latitude: number; longitude: number; address: string; pickupTime: string; deliveryAreaId: number; idempotencyKey: string },
+    { orderType: OrderType; paymentMethod: PaymentMethod; latitude: number; longitude: number; address: string; pickupTime: string; deliveryAreaId: number; idempotencyKey: string },
 ) => {
   const res = await authFetch(`/orders/customer`,
     'POST',
     { orderType, paymentMethod, latitude, longitude, address, pickupTime, deliveryAreaId },
-     true,
-     { 'Idempotency-Key': idempotencyKey });
+    true,
+    { 'Idempotency-Key': idempotencyKey });
   return res;
 };
 
@@ -53,6 +53,11 @@ export const updateOrderStatus = async ({ orderId }: { orderId: number }) => {
 
 export const cancelOrder = async ({ orderId }: { orderId: number }) => {
   const res = await authFetch(`/orders/shop/cancel-order`, 'POST', { orderId }, true);
+  return res;
+};
+
+export const updatePaymentStatus = async ({ orderId, paymentStatus }: { orderId: number, paymentStatus: string }) => {
+  const res = await authFetch(`/orders/shop/update-payment-status`, 'POST', { orderId, paymentStatus }, true);
   return res;
 };
 

@@ -1,13 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import styles from './LandingStyles.module.css';
-// import heroImg from '../../../assets/cafe-2.png';
-// import heroImg from '../../../assets/cafe-1.jpg';
 import heroImg from '../../../assets/cafe-4.jpg';
-// import heroImg from '../../../assets/cafe-5.jpg';
-
-
-
 import { Button } from '../../../Components/Button/Button';
 import { Coffee, MapPin, ShoppingBag, ArrowRight } from 'lucide-react';
 

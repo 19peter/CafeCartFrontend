@@ -1,116 +1,208 @@
+@import '../../../styles/global.css';
+
 .container {
-    padding: 20px;
-    min-width: 800px;
+  padding: 2.5rem 1rem;
+  width: 70%;
+  max-width: 1000px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background-color: #f1f5f9;
 }
 
-.filterContainer {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-bottom: 20px;
+.headerSection {
+  margin-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.filterContainer button {
-    color: var(--color-text);
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
-    font-size: 1.2rem;
+.titleGroup h1 {
+  font-size: 2.5rem;
+  font-family: "Story Script", sans-serif;
+  color: var(--color-primary-dark);
+  margin: 0;
 }
 
-.dateContainer {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    margin-bottom: 20px;
+.titleGroup p {
+  color: var(--color-text-light);
+  font-size: 1.1rem;
+  margin-top: 0.5rem;
+}
+
+.controlsWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 1.25rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(156, 102, 68, 0.1);
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.filterField {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.filterField label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.selectStyled,
+.dateInput {
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.selectStyled:focus,
+.dateInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(156, 102, 68, 0.1);
+  background-color: white;
+}
+
+.dateNav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f8fafc;
+  padding: 0.25rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.navBtn {
+  background: transparent;
+  border: none;
+  color: var(--color-primary);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.navBtn:hover {
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transform: translateY(-1px);
+}
+
+.newOrderIndicator {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
 }
 
 .newOrderBtn {
-    background: var(--color-primary);
-    color: var(--color-bg-dark);
-    padding: 10px 18px;
-    border-radius: 12px;
-    border: none;
-    width: 20%;
-    font-size: 14px;
-    font-weight: 700;
-    transition: all 0.2s ease;
-    margin-bottom: 10px;
-}
-
-
-/* Wrapper for label + control */
-.filterContainer label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--color-text);
-  margin-right: 8px;
-}
-
-/* Shared style for select & date input */
-.filterContainer select,
-.filterContainer input[type="date"] {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  padding: 10px 14px;
-  font-size: 14px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  background-color: #fff;
-  color: #333;
+  background: var(--color-primary);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 15px;
+  border: none;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Focus state */
-.filterContainer select:focus,
-.filterContainer input[type="date"]:focus {
-  outline: none;
-  border-color: #c49a6c; /* warm café accent */
-  box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.2);
-}
-
-/* Hover */
-.filterContainer select:hover,
-.filterContainer input[type="date"]:hover {
-  border-color: #bbb;
-}
-
-/* Custom dropdown arrow */
-.filterContainer select {
-  background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23666' stroke-width='2'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  padding-right: 36px;
-}
-
-/* Date input icon spacing */
-.filterContainer input[type="date"] {
-  padding-right: 14px;
-}
-
-/* Date arrows container */
-.dateContainer {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.75rem;
+  box-shadow: 0 10px 20px rgba(156, 102, 68, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: pulse 2s infinite;
 }
 
-/* Arrow buttons */
-.dateContainer button {
-  background: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 8px 10px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s ease, border-color 0.2s ease;
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 10px 20px rgba(156, 102, 68, 0.2);
+  }
+
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(156, 102, 68, 0.3);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 10px 20px rgba(156, 102, 68, 0.2);
+  }
 }
 
-.dateContainer button:hover {
-  background: #f7f7f7;
-  border-color: #ccc;
+.newOrderBtn:hover {
+  background-color: var(--color-primary-dark);
+  transform: translateY(-2px);
+}
+
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 5rem 2rem;
+  background: white;
+  border-radius: 30px;
+  border: 2px dashed #e2e8f0;
+  color: var(--color-text-light);
+}
+
+.emptyIcon {
+  margin-bottom: 1.5rem;
+  color: #cbd5e1;
+}
+
+.emptyState h3 {
+  font-size: 1.5rem;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    width: 85%;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    width: 95%;
+    padding: 1rem 0.5rem;
+  }
+
+  .controlsWrapper {
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+
+  .filterGroup {
+    flex-direction: column;
+    width: 100%;
+    align-items: stretch;
+  }
 }
