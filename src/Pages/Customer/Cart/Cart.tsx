@@ -395,7 +395,11 @@ const Cart = () => {
                   {cartSummary?.allowedPaymentMethods.includes('CREDIT_CARD') && <option value="CREDIT_CARD">Online Payment</option>}
                 </select>
 
-                {getPaymentMethodsContext() === "INSTAPAY" && <p>The Shop will send you a payment link to complete the payment</p>}
+                {getPaymentMethodsContext() === "INSTAPAY" &&
+                  <p>The Shop will send you a payment link to complete the payment</p>
+                }
+
+                <p> Want to call ? shop phone number: {cartSummary?.phoneNumber}</p>
 
               </div>
 

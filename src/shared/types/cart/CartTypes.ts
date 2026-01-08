@@ -29,6 +29,7 @@ export interface CartSummary {
   onlinePaymentAvailable: boolean;
   deliveryAvailable: boolean;
   allowedPaymentMethods: PaymentMethod[];
+  phoneNumber: string;
 }
 
 export interface OrderTypeBase {
