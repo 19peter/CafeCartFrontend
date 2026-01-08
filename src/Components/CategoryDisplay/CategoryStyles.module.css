@@ -69,7 +69,9 @@
 
 @media (max-width: 768px) {
     .categoriesDisplay {
+        display: flex;
         flex-wrap: nowrap;
-        padding: 1rem 0;
+        padding: 1rem 10px;
+        justify-content: flex-start;
     }
 }
