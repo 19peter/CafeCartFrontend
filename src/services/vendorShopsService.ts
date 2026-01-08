@@ -1,6 +1,6 @@
 import { authFetch } from './authService';
 
-const BASE_URL = import.meta.env.VITE_VENDOR_SHOPS_BASE_URL || 'http://localhost:8080/api/v1';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const handleJson = async (response: any) => {
   let result;
@@ -42,35 +42,34 @@ export const getShopSettings = async () => {
 };
 
 export const setIsOnline = async (isOnline: boolean) => {
-  const res = await authFetch(`/vendor-shops/shop/set-online`, 'PUT', { value: isOnline }, true);  
+  const res = await authFetch(`/vendor-shops/shop/set-online`, 'PUT', { value: isOnline }, true);
   return res;
 }
 
 export const setIsDeliveryAvailable = async (isDeliveryAvailable: boolean) => {
-  const res = await authFetch(`/vendor-shops/shop/set-delivery`, 'PUT', { value: isDeliveryAvailable }, true);  
+  const res = await authFetch(`/vendor-shops/shop/set-delivery`, 'PUT', { value: isDeliveryAvailable }, true);
   return res;
 }
 
 export const setIsOnlinePaymentAvailable = async (isOnlinePaymentAvailable: boolean) => {
-  const res = await authFetch(`/vendor-shops/shop/set-online-payment`, 'PUT', { value: isOnlinePaymentAvailable }, true);  
+  const res = await authFetch(`/vendor-shops/shop/set-online-payment`, 'PUT', { value: isOnlinePaymentAvailable }, true);
   return res;
 }
 
 export const blockUser = async (userId: number) => {
-  const res = await authFetch(`/vendor-shops/shop/block/${userId}`, 'POST', { }, true);  
+  const res = await authFetch(`/vendor-shops/shop/block/${userId}`, 'POST', {}, true);
   return res;
 }
 
 export const unblockUser = async (userId: number) => {
-  const res = await authFetch(`/vendor-shops/shop/unblock/${userId}`, 'POST', { }, true);  
+  const res = await authFetch(`/vendor-shops/shop/unblock/${userId}`, 'POST', {}, true);
   return res;
 }
-  
+
 export const getBlockedCustomers = async () => {
-  const res = await authFetch(`/vendor-shops/shop/blocked-users`, 'GET', {}, true);  
+  const res = await authFetch(`/vendor-shops/shop/blocked-users`, 'GET', {}, true);
   return res;
 }
 
-  
 
-  
+

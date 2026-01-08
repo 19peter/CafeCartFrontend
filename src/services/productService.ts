@@ -1,7 +1,7 @@
 import type { CreateProductDTO, UpdateProductDTO } from "../shared/types/product/ProductTypes";
 import { authFetch } from "./authService";
 
-const BASE_URL = import.meta.env.VITE_INVENTORY_BASE_URL || 'http://localhost:8080/api/v1/products';
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/products`;
 
 const handleJson = async (response: any) => {
   let result;

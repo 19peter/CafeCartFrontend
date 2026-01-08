@@ -1,6 +1,6 @@
 import { authFetch } from "./authService";
 
-const BASE_URL = import.meta.env.VITE_VENDORS_BASE_URL || 'http://localhost:8080/api/v1/vendors';
+const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/vendors`;
 
 const handleJson = async (response: any) => {
   let result;
