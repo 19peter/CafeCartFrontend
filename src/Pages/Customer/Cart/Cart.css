@@ -89,6 +89,53 @@
   margin-top: 0.5rem;
 }
 
+.payment-help-text {
+  font-size: 0.9rem;
+  color: #666;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.shop-contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--color-background-soft, #fcfcfc);
+  border-radius: 8px;
+  border: 1px dashed var(--color-primary-light, rgba(156, 102, 68, 0.2));
+}
+
+.contact-label {
+  font-size: 0.85rem;
+  color: #888;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.phone-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.phone-link:hover {
+  transform: translateX(5px);
+  color: var(--color-primary-dark);
+}
+
+.phone-link svg {
+  color: var(--color-primary);
+}
+
 /* Cart Items */
 .cart-items {
   margin: 2rem 0;

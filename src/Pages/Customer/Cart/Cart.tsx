@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../../contexts/CartContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -396,10 +397,18 @@ const Cart = () => {
                 </select>
 
                 {getPaymentMethodsContext() === "INSTAPAY" &&
-                  <p>The Shop will send you a payment link to complete the payment</p>
+                  <p className="payment-help-text">The Shop will send you a payment link to complete the payment</p>
                 }
 
-                <p> Want to call ? shop phone number: {cartSummary?.phoneNumber}</p>
+                {cartSummary?.phoneNumber && (
+                  <div className="shop-contact-info">
+                    <span className="contact-label">Need help? Call the shop:</span>
+                    <a href={`tel:${cartSummary.phoneNumber}`} className="phone-link">
+                      <Phone size={16} />
+                      {cartSummary.phoneNumber}
+                    </a>
+                  </div>
+                )}
 
               </div>
 
