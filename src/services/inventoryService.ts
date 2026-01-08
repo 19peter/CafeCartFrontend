@@ -1,6 +1,6 @@
 import { authFetch } from "./authService";
 
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/inventory`;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const handleJson = async (response: any) => {
   let result;
@@ -31,7 +31,7 @@ const toQuery = (params = {}) => {
 // GET /inventory/vendor/{vendorId}
 export const getVendorShopInventoryByCategory = async ({ shopId, quantity, page, size, category }: { shopId: number; quantity?: number; page?: number; size?: number; category: string }) => {
   const qs = toQuery({ quantity, page, size, category });
-  const res = await fetch(`${BASE_URL}/vendor/${shopId}${qs}`, {
+  const res = await fetch(`${BASE_URL}/inventory/vendor/${shopId}${qs}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -41,7 +41,7 @@ export const getVendorShopInventoryByCategory = async ({ shopId, quantity, page,
 
 // GET /inventory/vendor/{vendorId}/product/{productId}
 export const getVendorProduct = async ({ vendorShopId, productId }: { vendorShopId: number; productId: number }) => {
-  const res = await fetch(`${BASE_URL}/vendor/${vendorShopId}/product/${productId}`, {
+  const res = await fetch(`${BASE_URL}/inventory/vendor/${vendorShopId}/product/${productId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });

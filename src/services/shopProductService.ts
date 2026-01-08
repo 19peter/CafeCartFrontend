@@ -1,6 +1,6 @@
 import { authFetch } from "./authService";
 
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/shop-products`;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const handleJson = async (response: any) => {
   let result;
@@ -41,7 +41,7 @@ export const unpublishProduct = async ({ productId }: { productId: number }) => 
 
 // GET /shop-product/vendor/{vendorId}
 export const getVendorShopProducts = async ({ shopId }: { shopId: number }) => {
-  const res = await fetch(`${BASE_URL}/${shopId}`, {
+  const res = await fetch(`${BASE_URL}/shop-products/${shopId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -50,7 +50,7 @@ export const getVendorShopProducts = async ({ shopId }: { shopId: number }) => {
 
 // GET /shop-product/vendor/{vendorId}/product/{productId}
 export const getVendorProduct = async ({ vendorShopId, productId }: { vendorShopId: number; productId: number }) => {
-  const res = await fetch(`${BASE_URL}/${vendorShopId}/product/${productId}`, {
+  const res = await fetch(`${BASE_URL}/shop-products/${vendorShopId}/product/${productId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });

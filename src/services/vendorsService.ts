@@ -1,6 +1,6 @@
 import { authFetch } from "./authService";
 
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/vendors`;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const handleJson = async (response: any) => {
   let result;
@@ -31,7 +31,7 @@ const toQuery = (params = {}) => {
 // GET /vendors?page=&size=
 export const getVendors = async ({ page = 0, size = 10 } = {}) => {
   const qs = toQuery({ page, size });
-  const res = await fetch(`${BASE_URL}${qs}`, {
+  const res = await fetch(`${API_BASE_URL}/vendors${qs}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -40,7 +40,7 @@ export const getVendors = async ({ page = 0, size = 10 } = {}) => {
 
 // GET /vendors/{vendorId}
 export const getVendorById = async (vendorId: number) => {
-  const res = await fetch(`${BASE_URL}/${vendorId}`, {
+  const res = await fetch(`${API_BASE_URL}/vendors/${vendorId}`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });

@@ -1,7 +1,7 @@
 import type { CreateProductDTO, UpdateProductDTO } from "../shared/types/product/ProductTypes";
 import { authFetch } from "./authService";
 
-const BASE_URL = `${import.meta.env.VITE_API_BASE_URL || '/api/v1'}/products`;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 const handleJson = async (response: any) => {
   let result;
@@ -22,7 +22,7 @@ const handleJson = async (response: any) => {
 
 
 export const getShopCategories = async ({ shopId }: { shopId: number }) => {
-  const res = await fetch(`${BASE_URL}/vendor/${shopId}/categories`, {
+  const res = await fetch(`${BASE_URL}/products/vendor/${shopId}/categories`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
@@ -30,7 +30,7 @@ export const getShopCategories = async ({ shopId }: { shopId: number }) => {
 };
 
 export const getAllCategories = async () => {
-  const res = await fetch(`${BASE_URL}/categories`, {
+  const res = await fetch(`${BASE_URL}/products/categories`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
