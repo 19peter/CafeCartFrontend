@@ -72,7 +72,6 @@ export const ProductsCatalog = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setSelectedImage(file);
-    console.log(file);
   };
 
 
@@ -84,7 +83,6 @@ export const ProductsCatalog = () => {
         getVendorProducts(),
         getAllCategories(),
       ]);
-      console.log(productsRes);
       setProducts(productsRes.data);
       setCategories(categoriesRes);
     };

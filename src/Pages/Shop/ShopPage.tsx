@@ -104,7 +104,6 @@ export const ShopPage = () => {
             brokerURL: 'ws://localhost:8080/ws', // Note: ws:// not http://
             connectHeaders: {},
             debug: (str) => {
-                console.log('STOMP: ' + str);
             },
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
@@ -112,7 +111,6 @@ export const ShopPage = () => {
         });
 
         client.onConnect = (frame) => {
-            console.log('Connected: ' + frame);
             setConnected(true);
 
             client.subscribe(`/topic/shop/${shopId}/orders`, (_) => {
@@ -127,7 +125,6 @@ export const ShopPage = () => {
         };
 
         client.onWebSocketClose = () => {
-            console.log('WebSocket closed');
             setConnected(false);
         };
 

@@ -35,7 +35,6 @@ export const getVendorShopInventoryByCategory = async ({ shopId, quantity, page,
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
   });
-  console.log('Inventory:', res);
   return handleJson(res);
 };
 
