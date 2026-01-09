@@ -103,14 +103,14 @@ export const ShopPage = () => {
         const client = new Client({
             brokerURL: 'ws://localhost:8080/ws', // Note: ws:// not http://
             connectHeaders: {},
-            debug: (str) => {
+            debug: () => {
             },
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
         });
 
-        client.onConnect = (frame) => {
+        client.onConnect = () => {
             setConnected(true);
 
             client.subscribe(`/topic/shop/${shopId}/orders`, (_) => {
