@@ -101,7 +101,7 @@ export const ShopPage = () => {
     useEffect(() => {
         // Create STOMP client with native WebSocket
         const client = new Client({
-            brokerURL: 'ws://localhost:8080/ws', // Note: ws:// not http://
+            brokerURL: `wss://${window.location.host}/ws`,
             connectHeaders: {},
             debug: () => {
             },
