@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { LogIn, UserPlus, X } from 'lucide-react';
 import styles from './AuthModal.module.css';
 
@@ -11,12 +11,12 @@ interface AuthModalProps {
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     if (!isOpen) return null;
-
     const handleAction = (path: string) => {
         onClose();
-        navigate(path);
+        navigate(path, { state: { from: location.pathname, ...location.state } });
     };
 
     return ReactDOM.createPortal(

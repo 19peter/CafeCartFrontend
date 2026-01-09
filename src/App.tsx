@@ -26,7 +26,6 @@ import { ScrollToTop } from './Components/ScrollToTop/ScrollToTop';
 import { OrderSuccess } from './Pages/Customer/OrderSuccess/OrderSuccess';
 import { AuthModal } from './Components/AuthModal/AuthModal';
 
-
 // Protected route component
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -86,7 +85,9 @@ function App() {
       <CartProvider>
         <div className='layout'>
           <NavigationBar />
-          <AuthModal isOpen={openAuthModal} onClose={() => setOpenAuthModal(false)} />
+          <AuthModal
+            isOpen={openAuthModal}
+            onClose={() => setOpenAuthModal(false)} />
           <Routes>
             <Route path="*" element={<NotFound />} />
             <Route path="/" element={<Landing />} />

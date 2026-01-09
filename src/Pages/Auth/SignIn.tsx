@@ -11,9 +11,9 @@ export const SignIn = () => {
   const location = useLocation();
   const hostname = window.location.hostname;
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const from = location.state?.from || '/';
     let res;
     if (hostname.includes("shop")) {
       res = await loginShop(email, password);
@@ -24,7 +24,11 @@ export const SignIn = () => {
     } else {
       res = await loginCustomer(email, password);
     }
-    if (res) navigate(from, { replace: true });
+
+    if (res) {
+      const from = location.state?.from ?? "/";
+      navigate(from, { state: location?.state });
+    }
 
   };
 

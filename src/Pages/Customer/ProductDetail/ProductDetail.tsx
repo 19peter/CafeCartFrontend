@@ -22,8 +22,7 @@ export const ProductDetail = () => {
   const { showSuccess, showError } = useNotification();
   const { isAuthenticated, setOpenAuthModal } = useAuth();
   const { productId } = useParams<{ productId: string }>();
-  console.log(productDetails);
-  // Fetch latest stock when component mounts
+
   useEffect(() => {
     const fetchLatestStock = async () => {
       if (!productId) {

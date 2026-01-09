@@ -94,7 +94,6 @@ const Cart = () => {
   };
 
 
-  // console.log(getPaymentMethodsContext());
   const currencyFormatter = new Intl.NumberFormat('en-EG', {
     style: 'currency',
     currency: 'EGP',
@@ -357,7 +356,11 @@ const Cart = () => {
                     </button>
                     <span className="quantity">{item.quantity}</span>
                     <button
-                      onClick={() => handleAddOneToCart(item.productId, cartSummary!.shopId, item.id)}
+                      onClick={() => handleAddOneToCart(
+                        item.productId,
+                        cartSummary!.shopId,
+                        item.id)}
+
                       className="quantity-btn"
                       aria-label="Increase quantity"
                     >

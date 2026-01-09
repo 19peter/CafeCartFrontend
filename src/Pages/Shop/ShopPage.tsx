@@ -18,13 +18,10 @@ type ShopSettings = {
     deliveryAreas: Area[];
 }
 
-
-
-
 export const ShopPage = () => {
     const [areasModalOpen, setAreasModalOpen] = useState(false);
     const [editingArea, setEditingArea] = useState<Area | null>(null);
-    
+
     const [selected, setSelected] = useState("Orders");
     const [settings, setSettings] = useState<ShopSettings>({} as ShopSettings);
     const [_, setStompClient] = useState<Client | null>(null);

@@ -70,7 +70,6 @@ export const Vendor = () => {
         // Load inventory
         const res = await getVendorShopProducts({ shopId: Number(selectedShop) });
         const inventoryData = res.content ?? res;
-        console.log(inventoryData);
         setInventory(inventoryData);
 
         // Filter inventory by selectedCategory

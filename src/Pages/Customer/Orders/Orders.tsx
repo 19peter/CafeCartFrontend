@@ -15,7 +15,6 @@ export const Orders = () => {
                 setIsLoading(true);
                 const res = await getCustomerOrders();
                 if (res.status === 200) {
-                    console.log(res.data);
                     setOrders(Array.isArray(res.data) ? res.data : []);
                 } else {
                     setError(res.message || 'Failed to load orders');
@@ -44,7 +43,7 @@ export const Orders = () => {
         return (
             <div className={styles.errorContainer}>
                 <p className={styles.errorText}>{error}</p>
-                <button 
+                <button
                     className={styles.retryButton}
                     onClick={() => window.location.reload()}
                 >
@@ -57,12 +56,12 @@ export const Orders = () => {
     return (
         <div className={styles.ordersContainer}>
             <h1 className={styles.pageTitle}>My Orders</h1>
-            
+
             {orders.length === 0 ? (
                 <div className={styles.emptyState}>
                     <p>You haven't placed any orders yet.</p>
                 </div>
-            ) :  (
+            ) : (
                 <div className={styles.ordersList}>
                     {orders.map((order) => (
                         <OrderDetails key={order.id} order={order} />

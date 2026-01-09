@@ -26,7 +26,7 @@ export const removeFromCart = async ({ productId, quantity }: { productId: numbe
 
 
 // POST /cart/add-one-to-cart
-export const addOneToCart = async ({ productId, shopId }: { productId: number; shopId: number }): Promise<{ status: number, message: string, data: any }> => {
+export const addOneToCart = async ({ productId, shopId }: { productId: number; shopId: number; }): Promise<{ status: number, message: string, data: any }> => {
   const res = await authFetch(`/cart/add-one-to-cart`, 'POST', { productId, shopId, quantity: 1 }, true);
   return res;
 };
