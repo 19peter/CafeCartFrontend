@@ -30,12 +30,12 @@ graph TD
 
 ---
 
-## 2. Role Detection (`App.tsx`)
+## 2. Role Detection & Protected Routes (`App.tsx`)
 
 Detection is performed at the entry point of the application. The `ActiveApp` component switches the entire application layout and its corresponding provider based on `window.location.hostname`.
 
-*   **Dynamic Sub-apps**: The application renders different component trees (`ShopApp`, `VendorApp`, etc.) based on the subdomain.
-*   **Provider Isolation**: Only the relevant `AuthProvider` is mounted, ensuring that a "Shop" user doesn't accidentally trigger "Customer" state logic.
+### Protected Route Loading
+To support session recovery from cookies, the `ProtectedRoute` components are **loading-aware**. On page refresh, when memory is empty, the routes will render `null` while the background auth check is in progress, preventing premature redirects to `/login`.
 
 ---
 
@@ -45,22 +45,28 @@ To avoid duplicating session management logic, all authentication behaviors are 
 
 **Key Responsibilities:**
 *   **State Management**: Tracks `token`, `loading`, `error`, and `isAuthenticated`.
-*   **Initialization**: Validates the existing token on mount using the `checkAuthApi`.
-*   **Login Flow**: Executes the login API and persists the token using role-specific setters.
+*   **Session Recovery**: On mount, it triggers an async check. If no token is in memory (e.g., after a refresh), it relies on the Backend to validate via HTTP-only cookies.
+*   **Login Flow**: Executes the login API and persists the token in memory.
 *   **Logout Flow**: Clears roles-specific storage and redirects to the login route.
 
 ---
 
-## 4. Role-Aware Service Layer (`authService.ts`)
+## 4. In-Memory Service Layer (`authService.ts`)
 
 The service layer handles the core API communication and token persistence.
 
-### Token Management
-Tokens are stored in `localStorage` using unique keys to allow concurrent logins:
+### In-Memory Storage (Security)
+Tokens are stored in a private `memoryStore` object. This provides high-grade security against XSS attacks, as the tokens are not accessible via `localStorage` or `sessionStorage`.
 *   `token`: Customer
 *   `shopToken`: Shop
 *   `vendorToken`: Vendor
 *   `adminToken`: Admin
+
+### Session Recovery Logic
+The `checkAuthenticated` helper manages the recovery flow:
+1.  **Check Memory**: If a token exists, validate it.
+2.  **Silent Refresh**: If memory is empty, attempt to call the refresh endpoint. The browser automatically sends the HTTP-only refresh cookie.
+3.  **Update Memory**: If the refresh is successful, the new access token is saved back into the `memoryStore`.
 
 ### `authFetch` & Role Awareness
 The `authFetch` helper is the primary tool for authenticated requests. It is **hostname-aware**, meaning it automatically detects which token to attach to the `Authorization` header and which refresh logic to use if the request returns a 401.

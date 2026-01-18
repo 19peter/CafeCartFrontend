@@ -41,7 +41,9 @@ function App() {
   const hostname = window.location.hostname;
 
   const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isAuthenticated } = useCustomerAuth();
+    const { isAuthenticated, loading } = useCustomerAuth();
+
+    if (loading) return null; // Wait for initial check
 
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
@@ -51,7 +53,9 @@ function App() {
   };
 
   const ShopProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isShopAuthenticated } = useShopAuth();
+    const { isShopAuthenticated, loading } = useShopAuth();
+
+    if (loading) return null;
 
     if (!isShopAuthenticated) {
       return <Navigate to="/login" />;
@@ -61,7 +65,9 @@ function App() {
   };
 
   const VendorProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isVendorAuthenticated } = useVendorAuth();
+    const { isVendorAuthenticated, loading } = useVendorAuth();
+
+    if (loading) return null;
 
     if (!isVendorAuthenticated) {
       return <Navigate to="/login" />;
@@ -72,7 +78,9 @@ function App() {
 
   /* Placeholder for Admin Protected Route - can be refined when Admin roles are ready */
   const AdminProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isAdminAuthenticated } = useAdminAuth();
+    const { isAdminAuthenticated, loading } = useAdminAuth();
+
+    if (loading) return null;
 
     if (!isAdminAuthenticated) {
       return <Navigate to="/login" />;

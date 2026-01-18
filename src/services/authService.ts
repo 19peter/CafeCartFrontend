@@ -35,9 +35,19 @@ const handleRequest = async (endpoint: string, data: any) => {
   return result;
 };
 
+// In-Memory Store
+const memoryStore: Record<string, string | null> = {
+  [TOKEN_KEYS.CUSTOMER]: null,
+  [TOKEN_KEYS.SHOP]: null,
+  [TOKEN_KEYS.VENDOR]: null,
+  [TOKEN_KEYS.ADMIN]: null,
+};
+
 // Generic Helpers
-const getToken = (key: string) => localStorage.getItem(key);
-const setToken = (key: string, token: string) => token ? localStorage.setItem(key, token) : localStorage.removeItem(key);
+const getToken = (key: string) => memoryStore[key];
+const setToken = (key: string, token: string) => {
+  memoryStore[key] = token || null;
+};
 
 export const getAuthToken = () => getToken(TOKEN_KEYS.CUSTOMER);
 export const getShopToken = () => getToken(TOKEN_KEYS.SHOP);
@@ -64,8 +74,11 @@ const performRefreshToken = async (tokenKey: string) => {
     throw new Error(result.message || 'Request failed');
   }
 
-  setToken(tokenKey, result.accessToken);
-  return result.accessToken;
+  const token = result.accessToken || result.token || result.jwt;
+  if (token) {
+    setToken(tokenKey, token);
+  }
+  return token;
 };
 
 export const refreshToken = () => performRefreshToken(TOKEN_KEYS.CUSTOMER);
@@ -177,22 +190,31 @@ const handleJson = async (response: { json: () => Promise<any>, ok: boolean, sta
 };
 
 const checkAuthenticated = async (tokenGetter: () => string | null, tokenRefresher: () => Promise<string>) => {
-  const token = tokenGetter();
-  if (!token) return { valid: false, accessToken: null };
-  try {
-    const res = await isTokenValid(token);
-    if (!res) {
-      try {
-        await tokenRefresher();
-        return { valid: true, accessToken: tokenGetter() };
-      } catch (_) {
-        return { valid: false, accessToken: null };
+  let token = tokenGetter();
+
+  // 1. If we have a token, check if it's still valid
+  if (token) {
+    try {
+      const res = await isTokenValid(token);
+      if (res && res.valid) {
+        return { valid: true, accessToken: token };
       }
+    } catch (_) {
+      // Token likely expired, proceed to refresh
     }
-    return { valid: true, accessToken: tokenGetter() };
-  } catch (_) {
-    return { valid: false, accessToken: null };
   }
+
+  // 2. No token or invalid token: Try to refresh using HTTP-only cookie
+  try {
+    const newToken = await tokenRefresher();
+    if (newToken) {
+      return { valid: true, accessToken: newToken };
+    }
+  } catch (_) {
+    // Refresh failed or no cookie present
+  }
+
+  return { valid: false, accessToken: null };
 };
 
 export const isAuthenticated = () => checkAuthenticated(getAuthToken, refreshToken);
@@ -210,11 +232,14 @@ const getCurrentRoleName = (): keyof typeof TOKEN_KEYS => {
 };
 
 export const logout = (role?: keyof typeof TOKEN_KEYS) => {
-  const roleToLogout = role || getCurrentRoleName();
-  localStorage.removeItem(TOKEN_KEYS[roleToLogout]);
+  const roleName = role || getCurrentRoleName();
+  const key = TOKEN_KEYS[roleName];
+  memoryStore[key] = null;
+  localStorage.removeItem(key); // Cleanup legacy if exists
 };
 
 export const logoutAll = () => {
+  Object.keys(memoryStore).forEach(key => memoryStore[key] = null);
   Object.values(TOKEN_KEYS).forEach(key => localStorage.removeItem(key));
 };
 

@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useNotification } from './useNotification';
 
 interface UseRoleAuthOptions {
     loginApi: (email: string, password: string) => Promise<any>;
@@ -22,7 +21,6 @@ export const useRoleAuth = (options: UseRoleAuthOptions) => {
         setStoredToken,
         removeStoredToken,
         loginRoute = '/login',
-        defaultRoute = '/'
     } = options;
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -38,22 +36,20 @@ export const useRoleAuth = (options: UseRoleAuthOptions) => {
 
     const checkAuth = async () => {
         const currentToken = getStoredToken();
-        if (!currentToken) {
-            setLoading(false);
-            return;
-        }
 
+        // Even if no token in memory, try to call checkAuthApi 
+        // because the backend might have a valid refresh cookie.
         try {
             const { valid, accessToken } = await checkAuthApi();
             if (!valid) {
-                logout(false);
+                // Only logout if we had a token or were trying to recover and failed hard
+                if (currentToken) logout(false);
             } else if (accessToken) {
                 setTokenState(accessToken);
-                // Ensure strictly only this token is set if needed, but we typically just set ours
                 setStoredToken(accessToken);
             }
         } catch (err) {
-            logout(false);
+            if (currentToken) logout(false);
         } finally {
             setLoading(false);
         }
