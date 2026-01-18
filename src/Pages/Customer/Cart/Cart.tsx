@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Phone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../../contexts/CartContext';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useCustomerAuth } from '../../../contexts/CustomerAuthContext';
 import './Cart.css';
 import { addOneToCart, getCart, removeItemFromCart, removeOneFromCart } from '../../../services/cartService';
 import type { OrderSummary, CartSummary, OrderType, PaymentMethod, OrderTypeBase, OrderTypeBaseDelivery, OrderTypeBaseInHouse, OrderTypeBasePickup } from '../../../shared/types/cart/CartTypes';
@@ -27,7 +27,7 @@ const CartItem: React.FC<CartItemProps> = ({ children }) => (
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useCustomerAuth();
   const {
     items,
     deliveryLocation,

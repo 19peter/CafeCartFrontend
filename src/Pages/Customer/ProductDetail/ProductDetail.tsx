@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styles from './ProductDetail.module.css';
 import { useNotification } from '../../../hooks/useNotification';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useCustomerAuth } from '../../../contexts/CustomerAuthContext';
 import { addToCart } from '../../../services/cartService';
 import type { Product } from '../../../shared/types/product/ProductTypes';
 import { getVendorProduct } from '../../../services/shopProductService';
@@ -21,7 +21,7 @@ export const ProductDetail = () => {
   const [selectedSize, setSelectedSize] = useState<{ id: number, size: string }>();
   const [isLoading, setIsLoading] = useState(false);
   const { showSuccess, showError } = useNotification();
-  const { isAuthenticated, setOpenAuthModal } = useAuth();
+  const { isAuthenticated, setOpenAuthModal } = useCustomerAuth();
   const { productId } = useParams<{ productId: string }>();
 
   useEffect(() => {

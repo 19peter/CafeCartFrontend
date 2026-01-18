@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
 import { KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 
-export const ResetPassword = () => {
+interface ResetPasswordProps {
+    resetPassword: (token: string, password: string) => Promise<boolean>;
+    loading: boolean;
+    error: string | null;
+}
+
+export const ResetPassword = ({ resetPassword, loading, error }: ResetPasswordProps) => {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [localError, setLocalError] = useState('');
     const [searchParams] = useSearchParams();
     const token = searchParams.get('token');
-    const { resetPassword, loading, error } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {

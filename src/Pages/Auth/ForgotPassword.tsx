@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
 import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
-export const ForgotPassword = () => {
+interface ForgotPasswordProps {
+    forgotPassword: (email: string) => Promise<boolean>;
+    loading: boolean;
+    error: string | null;
+}
+
+export const ForgotPassword = ({ forgotPassword, loading, error }: ForgotPasswordProps) => {
     const [email, setEmail] = useState('');
     const [submitted, setSubmitted] = useState(false);
-    const { forgotPassword, loading, error } = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

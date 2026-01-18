@@ -11,7 +11,11 @@ import PrivacyPolicy from './Pages/Legal/PrivacyPolicy';
 import TermsOfService from './Pages/Legal/TermsOfService';
 import { NavigationBar } from './Components/NavigationBar/NavigationBar';
 import { NotificationProvider } from './contexts/NotificationContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CustomerAuthProvider, useCustomerAuth } from './contexts/CustomerAuthContext';
+import { ShopAuthProvider, useShopAuth } from './contexts/ShopAuthContext';
+import { VendorAuthProvider, useVendorAuth } from './contexts/VendorAuthContext';
+import { AdminAuthProvider, useAdminAuth } from './contexts/AdminAuthContext';
+
 import { CartProvider } from './contexts/CartContext';
 import Cart from './Pages/Customer/Cart/Cart';
 import './App.css';
@@ -26,7 +30,6 @@ import { ScrollToTop } from './Components/ScrollToTop/ScrollToTop';
 import { OrderSuccess } from './Pages/Customer/OrderSuccess/OrderSuccess';
 import { AuthModal } from './Components/AuthModal/AuthModal';
 
-// Protected route component
 interface ProtectedRouteProps {
   children: ReactNode;
 }
@@ -38,7 +41,7 @@ function App() {
   const hostname = window.location.hostname;
 
   const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated } = useCustomerAuth();
 
     if (!isAuthenticated) {
       return <Navigate to="/login" />;
@@ -48,7 +51,7 @@ function App() {
   };
 
   const ShopProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isShopAuthenticated } = useAuth();
+    const { isShopAuthenticated } = useShopAuth();
 
     if (!isShopAuthenticated) {
       return <Navigate to="/login" />;
@@ -58,7 +61,7 @@ function App() {
   };
 
   const VendorProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isVendorAuthenticated } = useAuth();
+    const { isVendorAuthenticated } = useVendorAuth();
 
     if (!isVendorAuthenticated) {
       return <Navigate to="/login" />;
@@ -69,9 +72,9 @@ function App() {
 
   /* Placeholder for Admin Protected Route - can be refined when Admin roles are ready */
   const AdminProtectedRoute = ({ children }: ProtectedRouteProps) => {
-    const { isAuthenticated } = useAuth(); // Using customer auth as base for now
+    const { isAdminAuthenticated } = useAdminAuth();
 
-    if (!isAuthenticated) {
+    if (!isAdminAuthenticated) {
       return <Navigate to="/login" />;
     }
 
@@ -79,7 +82,7 @@ function App() {
   };
 
   const CustomerApp = () => {
-    const { openAuthModal, setOpenAuthModal } = useAuth();
+    const { openAuthModal, setOpenAuthModal, login, loading, error, forgotPassword, resetPassword } = useCustomerAuth();
     return (
 
       <CartProvider>
@@ -91,10 +94,10 @@ function App() {
           <Routes>
             <Route path="*" element={<NotFound />} />
             <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<SignIn />} />
+            <Route path="/login" element={<SignIn login={login} loading={loading} error={error} />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword forgotPassword={forgotPassword} loading={loading} error={error} />} />
+            <Route path="/reset-password" element={<ResetPassword resetPassword={resetPassword} loading={loading} error={error} />} />
             <Route path="/vendors" element={<Vendors />} />
             <Route path="/vendor/:vendorId" element={<Vendor />} />
             <Route path="/product/:productId" element={<ProductDetail />} />
@@ -117,12 +120,13 @@ function App() {
   }
 
   const ShopApp = () => {
+    const { login, loading, error, forgotPassword, resetPassword } = useShopAuth();
     return (
       <div className='layout'>
         <Routes>
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/login" element={<SignIn login={login} loading={loading} error={error} />} />
+          <Route path="/forgot-password" element={<ForgotPassword forgotPassword={forgotPassword} loading={loading} error={error} />} />
+          <Route path="/reset-password" element={<ResetPassword resetPassword={resetPassword} loading={loading} error={error} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/" element={
@@ -136,12 +140,13 @@ function App() {
   }
 
   const VendorApp = () => {
+    const { login, loading, error, forgotPassword, resetPassword } = useVendorAuth();
     return (
       <div className='layout'>
         <Routes>
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/login" element={<SignIn login={login} loading={loading} error={error} />} />
+          <Route path="/forgot-password" element={<ForgotPassword forgotPassword={forgotPassword} loading={loading} error={error} />} />
+          <Route path="/reset-password" element={<ResetPassword resetPassword={resetPassword} loading={loading} error={error} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/" element={
@@ -155,12 +160,13 @@ function App() {
   }
 
   const AdminApp = () => {
+    const { login, loading, error, forgotPassword, resetPassword } = useAdminAuth();
     return (
       <div className='layout'>
         <Routes>
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/login" element={<SignIn login={login} loading={loading} error={error} />} />
+          <Route path="/forgot-password" element={<ForgotPassword forgotPassword={forgotPassword} loading={loading} error={error} />} />
+          <Route path="/reset-password" element={<ResetPassword resetPassword={resetPassword} loading={loading} error={error} />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-of-service" element={<TermsOfService />} />
           <Route path="/" element={
@@ -175,24 +181,38 @@ function App() {
 
   const ActiveApp = () => {
     if (hostname.includes("shop")) {
-      return <ShopApp />
+      return (
+        <ShopAuthProvider>
+          <ShopApp />
+        </ShopAuthProvider>
+      )
     } else if (hostname.includes("vendor")) {
-      return <VendorApp />
+      return (
+        <VendorAuthProvider>
+          <VendorApp />
+        </VendorAuthProvider>
+      )
     } else if (hostname.includes("admin")) {
-      return <AdminApp />
+      return (
+        <AdminAuthProvider>
+          <AdminApp />
+        </AdminAuthProvider>
+      )
     } else {
-      return <CustomerApp />
+      return (
+        <CustomerAuthProvider>
+          <CustomerApp />
+        </CustomerAuthProvider>
+      )
     }
   }
 
   return (
     <Router>
       <ScrollToTop />
-      <AuthProvider>
-        <NotificationProvider>
-          <ActiveApp />
-        </NotificationProvider>
-      </AuthProvider>
+      <NotificationProvider>
+        <ActiveApp />
+      </NotificationProvider>
     </Router>
   );
 }

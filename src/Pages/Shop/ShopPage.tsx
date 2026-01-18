@@ -4,7 +4,7 @@ import styles from "./ShopPage.module.css";
 import { ViewToggler } from "../../Components/ViewToggler/ViewToggler";
 import { OrdersPage } from "./Orders/OrdersPage";
 import { InventoryPage } from "./Inventory/InventoryPage";
-import { useAuth } from "../../contexts/AuthContext";
+import { useShopAuth } from "../../contexts/ShopAuthContext";
 import { setIsOnline, setIsDeliveryAvailable, getShopSettings } from "../../services/vendorShopsService";
 import { Client } from '@stomp/stompjs';
 import type { Area } from "../../shared/types/Shop/Shop";
@@ -28,7 +28,7 @@ export const ShopPage = () => {
     const [connected, setConnected] = useState(false);
     const [shopId, setShopId] = useState("");
     const [newOrder, setNewOrder] = useState(false);
-    const { logout } = useAuth();
+    const { logout } = useShopAuth();
 
     const handleModeChange = async (value: boolean) => {
         setSettings({ ...settings, online: value });

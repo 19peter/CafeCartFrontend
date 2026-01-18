@@ -9,6 +9,13 @@ export type RegisterCustomerPayload = {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
+const TOKEN_KEYS = {
+  CUSTOMER: 'token',
+  SHOP: 'shopToken',
+  VENDOR: 'vendorToken',
+  ADMIN: 'adminToken'
+};
+
 const handleRequest = async (endpoint: string, data: any) => {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: 'POST',
@@ -28,8 +35,21 @@ const handleRequest = async (endpoint: string, data: any) => {
   return result;
 };
 
+// Generic Helpers
+const getToken = (key: string) => localStorage.getItem(key);
+const setToken = (key: string, token: string) => token ? localStorage.setItem(key, token) : localStorage.removeItem(key);
 
-export const refreshToken = async () => {
+export const getAuthToken = () => getToken(TOKEN_KEYS.CUSTOMER);
+export const getShopToken = () => getToken(TOKEN_KEYS.SHOP);
+export const getVendorToken = () => getToken(TOKEN_KEYS.VENDOR);
+export const getAdminToken = () => getToken(TOKEN_KEYS.ADMIN);
+
+export const setAuthToken = (token: string) => setToken(TOKEN_KEYS.CUSTOMER, token);
+export const setShopToken = (token: string) => setToken(TOKEN_KEYS.SHOP, token);
+export const setVendorToken = (token: string) => setToken(TOKEN_KEYS.VENDOR, token);
+export const setAdminToken = (token: string) => setToken(TOKEN_KEYS.ADMIN, token);
+
+const performRefreshToken = async (tokenKey: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
     method: 'POST',
     headers: {
@@ -44,56 +64,34 @@ export const refreshToken = async () => {
     throw new Error(result.message || 'Request failed');
   }
 
-  setAuthToken(result.accessToken);
+  setToken(tokenKey, result.accessToken);
   return result.accessToken;
 };
 
-export const refreshTokenShop = async () => {
-  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
+export const refreshToken = () => performRefreshToken(TOKEN_KEYS.CUSTOMER);
+export const refreshTokenShop = () => performRefreshToken(TOKEN_KEYS.SHOP);
+export const refreshTokenVendor = () => performRefreshToken(TOKEN_KEYS.VENDOR);
+export const refreshTokenAdmin = () => performRefreshToken(TOKEN_KEYS.ADMIN);
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || 'Request failed');
-  }
-
-  setShopToken(result.accessToken);
-  return result.accessToken;
+const getCurrentRoleHelpers = () => {
+  if (typeof window === 'undefined') return { get: getAuthToken, refresh: refreshToken };
+  const hostname = window.location.hostname;
+  if (hostname.includes("shop")) return { get: getShopToken, refresh: refreshTokenShop };
+  if (hostname.includes("vendor")) return { get: getVendorToken, refresh: refreshTokenVendor };
+  if (hostname.includes("admin")) return { get: getAdminToken, refresh: () => Promise.resolve("") };
+  return { get: getAuthToken, refresh: refreshToken };
 };
 
-export const refreshTokenVendor = async () => {
-  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-  });
+export const isTokenValid = async (token?: string | null) => {
+  const tokenToCheck = token || getCurrentRoleHelpers().get();
+  if (!tokenToCheck) return { valid: false };
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || 'Request failed');
-  }
-
-  setVendorToken(result.accessToken);
-  return result.accessToken;
-};
-
-
-export const isTokenValid = async () => {
   const response = await fetch(`${API_BASE_URL}/auth/is-token-valid`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ token: getAuthToken() }),
+    body: JSON.stringify({ token: tokenToCheck }),
     credentials: 'include',
   });
 
@@ -107,10 +105,11 @@ export const isTokenValid = async () => {
 };
 
 export const authFetch = async (endpoint: string, method: string, data: any, retry = true, additionalHeaders: any = {}) => {
+  const helpers = getCurrentRoleHelpers();
   try {
     const headers = {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${getAuthToken()}`,
+      Authorization: `Bearer ${helpers.get()}`,
       ...additionalHeaders
     };
 
@@ -122,10 +121,10 @@ export const authFetch = async (endpoint: string, method: string, data: any, ret
 
     // Check status before parsing to avoid logging error
     if (response.status === 401 && retry) {
-      const newToken = await refreshToken();
+      const newToken = await helpers.refresh();
 
       if (!newToken) {
-        logout();
+        logout(getCurrentRoleName());
         return {
           data: null,
           message: 'Unauthorized',
@@ -177,130 +176,65 @@ const handleJson = async (response: { json: () => Promise<any>, ok: boolean, sta
   return { data: result, message: "success", status: response.status };
 };
 
-export const isAuthenticated = async () => {
-  const token = getAuthToken();
+const checkAuthenticated = async (tokenGetter: () => string | null, tokenRefresher: () => Promise<string>) => {
+  const token = tokenGetter();
   if (!token) return { valid: false, accessToken: null };
   try {
-    const res = await isTokenValid();
+    const res = await isTokenValid(token);
     if (!res) {
       try {
-        await refreshToken();
-        return { valid: true, accessToken: getAuthToken() };
+        await tokenRefresher();
+        return { valid: true, accessToken: tokenGetter() };
       } catch (_) {
         return { valid: false, accessToken: null };
       }
     }
-    return { valid: true, accessToken: getAuthToken() };
+    return { valid: true, accessToken: tokenGetter() };
   } catch (_) {
     return { valid: false, accessToken: null };
   }
 };
 
-export const isShopAuthenticated = async () => {
-  const token = getShopToken();
-  if (!token) return { valid: false, accessToken: null };
-  try {
-    const res = await isTokenValid();
-    if (!res) {
-      try {
-        await refreshTokenShop();
-        return { valid: true, accessToken: getShopToken() };
-      } catch (_) {
-        return { valid: false, accessToken: null };
-      }
-    }
-    return { valid: true, accessToken: getShopToken() };
-  } catch (_) {
-    return { valid: false, accessToken: null };
-  }
+export const isAuthenticated = () => checkAuthenticated(getAuthToken, refreshToken);
+export const isShopAuthenticated = () => checkAuthenticated(getShopToken, refreshTokenShop);
+export const isVendorAuthenticated = () => checkAuthenticated(getVendorToken, refreshTokenVendor);
+export const isAdminAuthenticated = () => checkAuthenticated(getAdminToken, refreshTokenAdmin);
+
+const getCurrentRoleName = (): keyof typeof TOKEN_KEYS => {
+  if (typeof window === 'undefined') return 'CUSTOMER';
+  const hostname = window.location.hostname;
+  if (hostname.includes("shop")) return 'SHOP';
+  if (hostname.includes("vendor")) return 'VENDOR';
+  if (hostname.includes("admin")) return 'ADMIN';
+  return 'CUSTOMER';
 };
 
-export const isVendorAuthenticated = async () => {
-  const token = getVendorToken();
-  if (!token) return { valid: false, accessToken: null };
-  try {
-    const res = await isTokenValid();
-    if (!res) {
-      try {
-        await refreshTokenVendor();
-        return { valid: true, accessToken: getVendorToken() };
-      } catch (_) {
-        return { valid: false, accessToken: null };
-      }
-    }
-    return { valid: true, accessToken: getVendorToken() };
-  } catch (_) {
-    return { valid: false, accessToken: null };
-  }
+export const logout = (role?: keyof typeof TOKEN_KEYS) => {
+  const roleToLogout = role || getCurrentRoleName();
+  localStorage.removeItem(TOKEN_KEYS[roleToLogout]);
 };
 
-export const getAuthToken = () => localStorage.getItem('token');
-export const getShopToken = () => localStorage.getItem('shopToken');
-export const getVendorToken = () => localStorage.getItem('vendorToken');
-export const getAdminToken = () => localStorage.getItem('adminToken');
-
-export const setAuthToken = (token: string) => {
-  token ? localStorage.setItem('token', token) : localStorage.removeItem('token');
+export const logoutAll = () => {
+  Object.values(TOKEN_KEYS).forEach(key => localStorage.removeItem(key));
 };
-
-export const setShopToken = (token: string) => {
-  token ? localStorage.setItem('shopToken', token) : localStorage.removeItem('shopToken');
-};
-
-export const setVendorToken = (token: string) => {
-  token ? localStorage.setItem('vendorToken', token) : localStorage.removeItem('vendorToken');
-};
-
-export const setAdminToken = (token: string) => {
-  token ? localStorage.setItem('adminToken', token) : localStorage.removeItem('adminToken');
-};
-
-export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('shopToken');
-  localStorage.removeItem('vendorToken');
-  localStorage.removeItem('adminToken');
-};
-
 
 export const loginVendor = async (email: string, password: string) => {
-  const res = await handleRequest('/auth/login/vendor', { email, password });
-  if (res) {
-    setVendorToken(res.accessToken);
-    return res;
-  }
-  return null;
+  return handleRequest('/auth/login/vendor', { email, password });
 }
 
 export const loginVendorShop = async (email: string, password: string) => {
-  const res = await handleRequest('/auth/login/vendor-shop', { email, password });
-  if (res) {
-    setShopToken(res.accessToken);
-    return res;
-  }
-  return null;
+  return handleRequest('/auth/login/vendor-shop', { email, password });
 }
 
 export const loginCustomer = async (email: string, password: string) => {
-  const res = await handleRequest('/auth/login/customer', { email, password });
-  if (res) {
-    setAuthToken(res.accessToken);
-    return res;
-  }
-  return null;
+  return handleRequest('/auth/login/customer', { email, password });
 }
 
 export const loginAdmin = async (email: string, password: string) => {
-  const res = await handleRequest('/auth/login/admin', { email, password });
-  if (res) {
-    setAuthToken(res.accessToken);
-    return res;
-  }
-  return null;
+  return handleRequest('/auth/login/admin', { email, password });
 }
 
-export const registerCustomer = (payload: RegisterCustomerPayload) =>
-  handleRequest('/auth/register/customer', payload);
+export const registerCustomer = (payload: RegisterCustomerPayload) => handleRequest('/auth/register/customer', payload);
 
 export const forgotPassword = async (email: string) => {
   const response = await fetch(`${API_BASE_URL}/auth/forgot-password?email=${encodeURIComponent(email)}`, {

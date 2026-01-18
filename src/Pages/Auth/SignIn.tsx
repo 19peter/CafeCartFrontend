@@ -1,29 +1,22 @@
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
 import styles from './Auth.module.css';
 
-export const SignIn = () => {
+interface SignInProps {
+  login: (email: string, password: string) => Promise<boolean>;
+  loading: boolean;
+  error: string | null;
+}
+
+export const SignIn = ({ login, loading, error }: SignInProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { loginCustomer, loginShop, loginVendor, loginAdmin, loading, error } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const hostname = window.location.hostname;
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let res;
-    if (hostname.includes("shop")) {
-      res = await loginShop(email, password);
-    } else if (hostname.includes("vendor")) {
-      res = await loginVendor(email, password);
-    } else if (hostname.includes("admin")) {
-      res = await loginAdmin(email, password);
-    } else {
-      res = await loginCustomer(email, password);
-    }
+    const res = await login(email, password);
 
     if (res) {
       const from = location.state?.from ?? "/";

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useCustomerAuth } from '../../contexts/CustomerAuthContext';
 import styles from './Auth.module.css';
 import type { RegisterCustomerPayload } from '../../services/authService';
 import { Info, Calendar } from 'lucide-react';
@@ -19,7 +19,7 @@ export const Register = () => {
   const [firstNameError, setFirstNameError] = useState('');
   const [lastNameError, setLastNameError] = useState('');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const { registerCustomer, loading, error } = useAuth();
+  const { register: registerCustomer, loading, error } = useCustomerAuth();
   const navigate = useNavigate();
 
   const todayStr = new Date().toISOString().split('T')[0];

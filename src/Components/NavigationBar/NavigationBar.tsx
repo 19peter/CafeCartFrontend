@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Coffee, User, ChevronDown, LogOut, ShoppingCart, Layout } from 'lucide-react';
 import styles from './NavigationBar.module.css';
-import { useAuth } from '../../contexts/AuthContext';
+import { useCustomerAuth } from '../../contexts/CustomerAuthContext';
 import { useCart } from '../../contexts/CartContext';
 
 export const NavigationBar = () => {
@@ -10,7 +10,7 @@ export const NavigationBar = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useCustomerAuth();
   const { items, shopName } = useCart();
   const navigate = useNavigate();
 
