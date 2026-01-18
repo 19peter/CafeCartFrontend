@@ -71,9 +71,17 @@
 }
 
 @keyframes pulse {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
 .detailsContainer {
@@ -122,6 +130,60 @@
   font-weight: 700;
   color: var(--color-primary);
   margin: 0.5rem 0;
+}
+
+.optionsSection {
+  margin: 1.5rem 0;
+}
+
+.optionLabel {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.sizeGrid {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.sizeButton {
+  padding: 0.5rem 1rem;
+  border: 1px solid #cbd5e1;
+  background: white;
+  border-radius: 50px;
+  /* Pill shape */
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #64748b;
+  min-width: 60px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sizeButton:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: #f8fafc;
+}
+
+.selectedSize {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.selectedSize:hover {
+  background: var(--color-primary-dark);
+  color: white;
 }
 
 .description {
@@ -355,6 +417,17 @@
     gap: 0.75rem;
   }
 
+  .sizeGrid {
+    gap: 0.5rem;
+  }
+
+  .sizeButton {
+    min-width: unset;
+    flex: 1;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.9rem;
+  }
+
   .quantityButton {
     width: 36px;
     height: 36px;
@@ -413,7 +486,7 @@
 
 /* Very Small Mobile (up to 320px) */
 @media (max-width: 320px) {
- 
+
 
   .price {
     font-size: 1.15rem;

@@ -13,8 +13,8 @@ export const getShopName = async (): Promise<{ status: number, message: string, 
 };
 
 // POST /cart/add-to-cart
-export const addToCart = async ({ productId, shopId, quantity }: { productId: number; shopId: number; quantity: number }): Promise<{ status: number, message: string, data: any }> => {
-  const res = await authFetch(`/cart/add-to-cart`, 'POST', { productId, shopId, quantity }, true);
+export const addToCart = async ({ shopId, quantity, productOptionId }: { shopId: number; quantity: number; productOptionId?: number }): Promise<{ status: number, message: string, data: any }> => {
+  const res = await authFetch(`/cart/add-to-cart`, 'POST', { shopId, quantity, productOptionId }, true);
   return res;
 };
 

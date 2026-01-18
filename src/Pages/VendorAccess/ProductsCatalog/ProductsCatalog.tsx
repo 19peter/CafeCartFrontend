@@ -1,32 +1,29 @@
 import { useEffect, useState } from "react";
 import styles from "./ProductCatalog.module.css";
-import {
-  Package,
-  Tag,
-  DollarSign,
-  Image as ImageIcon,
-  CheckCircle,
-  PlusCircle,
-  PencilLine,
-  Loader2,
-  AlertTriangle,
-  X
-} from "lucide-react";
-import type { Product } from "../../../shared/types/product/ProductTypes";
+import { Package, Tag, DollarSign, Image as ImageIcon, CheckCircle, PlusCircle, PencilLine, Loader2, AlertTriangle, X, Trash2 } from "lucide-react";
+import { type Product, ProductSizes, type ProductOption } from "../../../shared/types/product/ProductTypes";
 import { getVendorProducts } from "../../../services/productService";
 import { createProduct, getAllCategories, updateProduct } from "../../../services/productService";
+import { getAdditionGroups, type AdditionGroup } from "../../../services/vendorsService";
 import { uploadToS3 } from "../../../services/S3Service";
 import { useNotification } from "../../../contexts/NotificationContext";
 
 const EMPTY_FORM = {
   name: "",
-  price: 0,
   image: "",
   description: "",
   categoryId: 0,
   isAvailable: false,
   isStockTracked: false,
   contentType: "",
+  additionGroupIds: [] as number[],
+  hasDefaultSize: true,
+  options: [
+    { size: ProductSizes.DEFAULT, price: 0, isDeleted: false },
+    { size: ProductSizes.SMALL, price: 0, isDeleted: true },
+    { size: ProductSizes.MEDIUM, price: 0, isDeleted: true },
+    { size: ProductSizes.LARGE, price: 0, isDeleted: true },
+  ] as ProductOption[],
 };
 
 const EMPTY_AUX_DATA = {
@@ -42,6 +39,7 @@ export const ProductsCatalog = () => {
   const [auxData, setAuxData] = useState<typeof EMPTY_AUX_DATA>(EMPTY_AUX_DATA);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [additionGroups, setAdditionGroups] = useState<AdditionGroup[]>([]);
   const [search, setSearch] = useState<string>("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -56,7 +54,6 @@ export const ProductsCatalog = () => {
   const mapApiProduct = (data: any): Product => ({
     id: data.id,
     name: data.name,
-    price: +data.price,
     quantity: +data.quantity,
     imageUrl: data.imageUrl,
     description: data.description,
@@ -66,6 +63,10 @@ export const ProductsCatalog = () => {
     vendorShopId: data.vendorShopId,
     productId: data.id,
     categoryName: getCategoryName(data.categoryId),
+    additionGroupIds: data.additionGroupIds || [],
+    options: Array.isArray(data.options)
+      ? data.options
+      : (data.options?.optionList || []),
   });
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,12 +80,14 @@ export const ProductsCatalog = () => {
 
   useEffect(() => {
     const init = async () => {
-      const [productsRes, categoriesRes] = await Promise.all([
+      const [productsRes, categoriesRes, groupsRes] = await Promise.all([
         getVendorProducts(),
         getAllCategories(),
+        getAdditionGroups(),
       ]);
-      setProducts(productsRes.data);
+      setProducts((productsRes.data || []).map(mapApiProduct));
       setCategories(categoriesRes);
+      setAdditionGroups(groupsRes.data || []);
     };
 
     init();
@@ -118,20 +121,37 @@ export const ProductsCatalog = () => {
   };
 
   const saveProduct = async () => {
-    if (!form.name || !form.price) return;
+    // Filter options based on hasDefaultSize
+    // Only send deleted options if they already have an ID (to trigger backend deletion)
+    const finalOptions = form.options.filter(o => {
+      const isCorrectMode = form.hasDefaultSize
+        ? o.size === ProductSizes.DEFAULT
+        : o.size !== ProductSizes.DEFAULT;
+
+      return isCorrectMode && (!o.isDeleted || (o.isDeleted && !!o.id));
+    });
+
+    if (!form.name || finalOptions.filter(o => !o.isDeleted).length === 0) {
+      showError("Product name and at least one size option are required");
+      return;
+    }
 
     try {
       setUploading(true);
       setUploadError(null);
       const payload = {
         name: form.name,
-        price: +form.price,
         imageUrl: selectedImage?.name || " ",
         description: form.description,
         categoryId: +form.categoryId,
         isAvailable: form.isAvailable,
         isStockTracked: form.isStockTracked,
         contentType: selectedImage?.type || null,
+        additionGroupIds: form.additionGroupIds,
+        options: {
+          optionList: finalOptions,
+          hasDefaultSize: form.hasDefaultSize,
+        },
       };
 
       const res = editingId
@@ -175,15 +195,34 @@ export const ProductsCatalog = () => {
   const handleEdit = (product: Product) => {
     setEditingId(product.id);
 
+    // Check if it has a default size (convention: if there is an option with size 'DEFAULT')
+    const hasDefaultSize = product.options.some(o => o.size === ProductSizes.DEFAULT);
+
+    // Merge existing options with the fixed 4 sizes for the form
+    const currentOptions = product.options || [];
+    const fullOptions = [
+      ProductSizes.DEFAULT,
+      ProductSizes.SMALL,
+      ProductSizes.MEDIUM,
+      ProductSizes.LARGE
+    ].map(size => {
+      const match = currentOptions.find(o => o.size === size);
+      return match
+        ? { ...match, isDeleted: false }
+        : { size, price: 0, isDeleted: true };
+    });
+
     setForm({
       name: product.name,
-      price: product.price,
       image: product.imageUrl,
       description: product.description,
       categoryId: product.categoryId,
       isAvailable: product.isAvailable,
       isStockTracked: product.isStockTracked,
-      contentType: ""
+      contentType: "",
+      additionGroupIds: product.additionGroupIds || [],
+      hasDefaultSize: hasDefaultSize,
+      options: fullOptions,
     });
 
     setAuxData({
@@ -254,8 +293,16 @@ export const ProductsCatalog = () => {
 
                 <p className={styles.productDesc}>{p.description}</p>
 
+                <div className={styles.productSizesDisplay}>
+                  {p.options?.filter((o) => !o.isDeleted).map((opt) => (
+                    <div key={opt.size} className={styles.productSizeRow}>
+                      <span className={styles.productSizeName}>{opt.size}</span>
+                      <span className={styles.productSizePrice}>{opt.price.toFixed(2)} EGP</span>
+                    </div>
+                  ))}
+                </div>
+
                 <div className={styles.productFooter}>
-                  <span className={styles.productPrice}>${p.price}</span>
 
 
                   <button className={styles.editBtn} onClick={() => handleEdit(p)}>
@@ -310,19 +357,79 @@ export const ProductsCatalog = () => {
               </div>
             </div>
 
-            {/* Price Input */}
+            {/* Has Default Size Toggle */}
+            <div className={styles.switchContainer}>
+              <div className={styles.switchLabel}>
+                <CheckCircle size={18} color={form.hasDefaultSize ? "var(--color-primary)" : "#94a3b8"} />
+                <span>Has Default Size</span>
+              </div>
+              <input
+                type="checkbox"
+                name="hasDefaultSize"
+                checked={form.hasDefaultSize}
+                onChange={handleChange}
+                disabled={!!editingId}
+                style={{ width: 'auto', padding: 0, opacity: editingId ? 0.5 : 1 }}
+              />
+            </div>
+
+            {/* Product Options (Sizes) */}
             <div className={styles.inputGroup}>
-              <label>Price (EGP)</label>
-              <div className={styles.inputWrapper}>
-                <DollarSign className={styles.inputIcon} size={18} />
-                <input
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={form.price}
-                  onChange={handleChange}
-                />
+              <label>{form.hasDefaultSize ? "Product Price" : "Product Sizes & Prices"}</label>
+              <div className={styles.optionsList}>
+                {form.options
+                  .filter(opt => form.hasDefaultSize ? opt.size === ProductSizes.DEFAULT : opt.size !== ProductSizes.DEFAULT)
+                  .map((opt) => {
+                    const idx = form.options.findIndex(o => o.size === opt.size);
+                    return (
+                      <div key={opt.size} className={styles.optionItem} style={{ opacity: opt.isDeleted ? 0.5 : 1 }}>
+                        <div className={styles.optionSizeLabel}>{opt.size}</div>
+
+                        {!opt.isDeleted ? (
+                          <>
+                            <div className={styles.optionPriceInputWrapper}>
+                              <DollarSign className={styles.inputIcon} size={14} />
+                              <input
+                                type="number"
+                                step="0.01"
+                                placeholder="0.00"
+                                value={opt.price}
+                                onChange={(e) => {
+                                  const newOptions = [...form.options];
+                                  newOptions[idx].price = +e.target.value;
+                                  setForm({ ...form, options: newOptions });
+                                }}
+                              />
+                            </div>
+                            {opt.size !== ProductSizes.DEFAULT && (
+                              <button
+                                className={styles.closeError}
+                                onClick={() => {
+                                  const newOptions = [...form.options];
+                                  newOptions[idx].isDeleted = true;
+                                  setForm({ ...form, options: newOptions });
+                                }}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <button
+                            className={styles.cancelBtn}
+                            style={{ padding: '4px 12px', marginTop: 0, fontSize: '0.8rem' }}
+                            onClick={() => {
+                              const newOptions = [...form.options];
+                              newOptions[idx].isDeleted = false;
+                              setForm({ ...form, options: newOptions });
+                            }}
+                          >
+                            Enable
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
               </div>
             </div>
 
@@ -383,6 +490,32 @@ export const ProductsCatalog = () => {
                 value={form.description}
                 onChange={handleChange}
               />
+            </div>
+
+            {/* Addition Groups Multi-Select */}
+            <div className={styles.inputGroup}>
+              <label>Addition Groups</label>
+              <div className={styles.checkboxList}>
+                {additionGroups?.map(group => (
+                  <label key={group.id} className={styles.checkboxItem}>
+                    <input
+                      type="checkbox"
+                      checked={form.additionGroupIds.includes(group.id)}
+                      onChange={() => {
+                        const isSelected = form.additionGroupIds.includes(group.id);
+                        setForm(prev => ({
+                          ...prev,
+                          additionGroupIds: isSelected
+                            ? prev.additionGroupIds.filter(id => id !== group.id)
+                            : [...prev.additionGroupIds, group.id]
+                        }));
+                      }}
+                    />
+                    {group.name}
+                  </label>
+                ))}
+                {additionGroups.length === 0 && <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>No groups available</span>}
+              </div>
             </div>
 
             <div className={styles.buttonGroup}>

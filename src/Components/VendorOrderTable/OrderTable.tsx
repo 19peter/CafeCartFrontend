@@ -208,7 +208,7 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
 
                             <div className={styles.actionButtons}>
                                 {!tableOrder.verified && (
-                                    <button onClick={() => handleVerifyCustomer(tableOrder.id)} className={styles.actionBtn}>
+                                    <button onClick={() => handleVerifyCustomer(tableOrder.customerId)} className={styles.actionBtn}>
                                         <Shield size={14} /> Verify
                                     </button>
                                 )}

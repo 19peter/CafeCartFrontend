@@ -11,6 +11,7 @@ import {
   getAuthToken,
   getShopToken,
   getVendorToken,
+  getAdminToken,
   loginVendorShop as authLoginVendorShop,
   loginAdmin as authLoginAdmin,
   forgotPassword as authForgotPassword,
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState<string | null>(getAuthToken());
   const [shopToken, setShopToken] = useState<string | null>(getShopToken());
   const [vendorToken, setVendorToken] = useState<string | null>(getVendorToken());
+  const [adminToken, setAdminToken] = useState<string | null>(getAdminToken());
   const [openAuthModal, setOpenAuthModal] = useState<boolean>(false);
   const navigate = useNavigate();
   const hostname = window.location.hostname;
@@ -154,7 +156,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await authLoginVendorShop(email, _password);
       const access = res?.token ?? res?.accessToken ?? res?.jwt ?? null;
       if (!access) throw new Error('Missing token in response');
-      setToken(access);
+      setShopToken(access);
       return true;
     } catch (err: any) {
       setError(err?.message || 'Failed to login. Please check your credentials.');
@@ -171,7 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await authLoginVendor(email, _password);
       const access = res?.token ?? res?.accessToken ?? res?.jwt ?? null;
       if (!access) throw new Error('Missing token in response');
-      setToken(access);
+      setVendorToken(access);
       return true;
     } catch (err: any) {
       setError(err?.message || 'Failed to login. Please check your credentials.');
@@ -188,7 +190,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const res = await authLoginAdmin(email, _password);
       const access = res?.token ?? res?.accessToken ?? res?.jwt ?? null;
       if (!access) throw new Error('Missing token in response');
-      setToken(access);
+      setAdminToken(access);
       return true;
     } catch (err: any) {
       setError(err?.message || 'Failed to login. Please check your credentials.');

@@ -338,7 +338,6 @@
   border-color: #cbd5e1;
 }
 
-
 .imagePlaceholder {
   height: 160px;
   background: #f3f4f6;
@@ -348,7 +347,6 @@
   font-size: 32px;
   color: #9ca3af;
 }
-
 
 @media (max-width: 1024px) {
   .inventoryContainer {
@@ -433,4 +431,80 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.optionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.optionItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.optionItem:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.optionSizeLabel {
+  width: 80px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+}
+
+.optionPriceInputWrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.optionPriceInputWrapper input {
+  padding: 0.5rem 0.75rem 0.5rem 2rem !important;
+  border-radius: 8px !important;
+  font-size: 0.9rem !important;
+}
+
+.optionPriceInputWrapper .inputIcon {
+  left: 0.75rem;
+}
+
+.optionToggle {
+  cursor: pointer;
+}
+
+.productSizesDisplay {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.productSizeRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.productSizeName {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.productSizePrice {
+  font-weight: 700;
+  color: var(--color-primary);
 }

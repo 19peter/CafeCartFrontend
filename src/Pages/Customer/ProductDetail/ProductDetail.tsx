@@ -18,6 +18,7 @@ export const ProductDetail = () => {
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [productDetails, setProductDetails] = useState<Product>();
+  const [selectedSize, setSelectedSize] = useState<{ id: number, size: string }>();
   const [isLoading, setIsLoading] = useState(false);
   const { showSuccess, showError } = useNotification();
   const { isAuthenticated, setOpenAuthModal } = useAuth();
@@ -31,6 +32,9 @@ export const ProductDetail = () => {
       };
       const data = await getVendorProduct({ vendorShopId: Number(vendorShopId), productId: Number(productId) });
       setProductDetails(data);
+      if (data && data.options && data.options.length > 0) {
+        setSelectedSize(data.options[0].size);
+      }
       setIsLoading(false);
 
     }
@@ -44,7 +48,14 @@ export const ProductDetail = () => {
       return;
     }
     if (!productDetails || (productDetails.isStockTracked && productDetails.quantity === 0)) return;
-    let res: { status: number, message: string } = await addToCart({ productId: Number(productId), shopId: Number(vendorShopId), quantity });
+    let res: { status: number, message: string } =
+      await addToCart(
+        {
+          shopId: Number(vendorShopId),
+          quantity,
+          productOptionId: selectedSize?.id
+        });
+
     if (res.status !== 200) {
       showError(res.message);
     } else {
@@ -100,7 +111,30 @@ export const ProductDetail = () => {
             {productDetails?.description && (
               <p className={styles.description}>{productDetails?.description}</p>
             )}
-            <p className={styles.price}>${productDetails?.price.toFixed(2)}</p>
+
+            {/* Show size selector if there are multiple options OR if the single option is not 'DEFAULT' */}
+            {productDetails?.options &&
+              productDetails.options.filter(o => !o.isDeleted).length > 0 &&
+              !(productDetails.options.filter(o => !o.isDeleted).length === 1 && productDetails.options.find(o => !o.isDeleted)?.size === 'DEFAULT') && (
+                <div className={styles.optionsSection}>
+                  <label className={styles.optionLabel}>Select Size:</label>
+                  <div className={styles.sizeGrid}>
+                    {productDetails.options.filter((o) => !o.isDeleted).map((opt) => (
+                      <button
+                        key={opt.size}
+                        className={`${styles.sizeButton} ${selectedSize?.size === opt.size ? styles.selectedSize : ''}`}
+                        onClick={() => setSelectedSize({ id: opt.id!, size: opt.size })}
+                      >
+                        {opt.size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            <p className={styles.price}>
+              {productDetails?.options?.find((o) => o.size === (selectedSize?.size || productDetails.options?.[0]?.size))?.price.toFixed(2) || '0.00'} EGP
+            </p>
 
             <div className={styles.stockStatus}>
               {productDetails.isStockTracked ? (

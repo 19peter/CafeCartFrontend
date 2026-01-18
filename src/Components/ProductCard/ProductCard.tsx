@@ -51,8 +51,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         <div className={styles.header}>
           <h3 className={styles.title}>{product.name}</h3>
           <div className={styles.priceContainer}>
-            <span className={styles.priceValue}>{product.price.toFixed(2)}</span>
-            <span className={styles.priceSymbol}> EGP</span>
+            {product.options?.filter(o => !o.isDeleted).map((opt) => (
+              <div key={opt.size} className={styles.priceRow}>
+                <span className={styles.sizeLabel}>{opt.size}:</span>
+                <span className={styles.priceValue}>{opt.price.toFixed(2)}</span>
+                <span className={styles.priceSymbol}> EGP</span>
+              </div>
+            ))}
           </div>
         </div>
 

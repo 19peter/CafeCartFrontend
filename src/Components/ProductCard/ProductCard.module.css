@@ -106,9 +106,23 @@
 
 .priceContainer {
   display: flex;
-  align-items: baseline;
+  flex-direction: column;
+  align-items: flex-end;
   color: var(--color-primary-dark);
   white-space: nowrap;
+}
+
+.priceRow {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.sizeLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
 }
 
 .priceValue {

@@ -237,6 +237,7 @@ export const isVendorAuthenticated = async () => {
 export const getAuthToken = () => localStorage.getItem('token');
 export const getShopToken = () => localStorage.getItem('shopToken');
 export const getVendorToken = () => localStorage.getItem('vendorToken');
+export const getAdminToken = () => localStorage.getItem('adminToken');
 
 export const setAuthToken = (token: string) => {
   token ? localStorage.setItem('token', token) : localStorage.removeItem('token');
@@ -250,10 +251,15 @@ export const setVendorToken = (token: string) => {
   token ? localStorage.setItem('vendorToken', token) : localStorage.removeItem('vendorToken');
 };
 
+export const setAdminToken = (token: string) => {
+  token ? localStorage.setItem('adminToken', token) : localStorage.removeItem('adminToken');
+};
+
 export const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('shopToken');
   localStorage.removeItem('vendorToken');
+  localStorage.removeItem('adminToken');
 };
 
 

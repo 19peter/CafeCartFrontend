@@ -38,6 +38,7 @@ export const OrderHistory = () => {
             console.error("Error fetching month sale summary:", error);
         }
     };
+
     const fetchOrders = async () => {
         try {
             const res = await getVendorOrders(year, month, page, size, shopId);
