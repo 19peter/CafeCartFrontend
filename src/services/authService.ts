@@ -59,8 +59,8 @@ export const setShopToken = (token: string) => setToken(TOKEN_KEYS.SHOP, token);
 export const setVendorToken = (token: string) => setToken(TOKEN_KEYS.VENDOR, token);
 export const setAdminToken = (token: string) => setToken(TOKEN_KEYS.ADMIN, token);
 
-const performRefreshToken = async (tokenKey: string) => {
-  const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+const performRefreshToken = async (tokenKey: string, endpoint: string = '/auth/refresh-token') => {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -81,10 +81,10 @@ const performRefreshToken = async (tokenKey: string) => {
   return token;
 };
 
-export const refreshToken = () => performRefreshToken(TOKEN_KEYS.CUSTOMER);
-export const refreshTokenShop = () => performRefreshToken(TOKEN_KEYS.SHOP);
-export const refreshTokenVendor = () => performRefreshToken(TOKEN_KEYS.VENDOR);
-export const refreshTokenAdmin = () => performRefreshToken(TOKEN_KEYS.ADMIN);
+export const refreshToken = () => performRefreshToken(TOKEN_KEYS.CUSTOMER, '/auth/refresh-token');
+export const refreshTokenShop = () => performRefreshToken(TOKEN_KEYS.SHOP, '/auth/refresh-token-shop');
+export const refreshTokenVendor = () => performRefreshToken(TOKEN_KEYS.VENDOR, '/auth/refresh-token-vendor');
+export const refreshTokenAdmin = () => performRefreshToken(TOKEN_KEYS.ADMIN, '/auth/refresh-token-admin');
 
 const getCurrentRoleHelpers = () => {
   if (typeof window === 'undefined') return { get: getAuthToken, refresh: refreshToken };

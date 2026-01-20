@@ -4,7 +4,7 @@ import { Package, Tag, DollarSign, Image as ImageIcon, CheckCircle, PlusCircle, 
 import { type Product, ProductSizes, type ProductOption } from "../../../shared/types/product/ProductTypes";
 import { getVendorProducts } from "../../../services/productService";
 import { createProduct, getAllCategories, updateProduct } from "../../../services/productService";
-import { getAdditionGroups, type AdditionGroup } from "../../../services/vendorsService";
+import { getAdditionGroups, type AdditionGroup } from "../../../services/additionsService";
 import { uploadToS3 } from "../../../services/S3Service";
 import { useNotification } from "../../../contexts/NotificationContext";
 
@@ -64,6 +64,7 @@ export const ProductsCatalog = () => {
     productId: data.id,
     categoryName: getCategoryName(data.categoryId),
     additionGroupIds: data.additionGroupIds || [],
+    additionGroups: data.additionGroups || [],
     options: Array.isArray(data.options)
       ? data.options
       : (data.options?.optionList || []),
@@ -292,6 +293,14 @@ export const ProductsCatalog = () => {
                 </div>
 
                 <p className={styles.productDesc}>{p.description}</p>
+
+                {p.additionGroups && p.additionGroups.length > 0 && (
+                  <div className={styles.productAdditionGroups}>
+                    {p.additionGroups.map(group => (
+                      <span key={group.id} className={styles.additionTag}>{group.name}</span>
+                    ))}
+                  </div>
+                )}
 
                 <div className={styles.productSizesDisplay}>
                   {p.options?.filter((o) => !o.isDeleted).map((opt) => (

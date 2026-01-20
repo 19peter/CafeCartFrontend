@@ -27,6 +27,7 @@ export interface Product {
   isStockTracked: boolean;
   isAvailable: boolean;
   additionGroupIds: number[];
+  additionGroups?: { id: number; name: string }[];
   options: ProductOption[];
   hasDefaultSize?: boolean; // Optional in case backend doesn't send it at top level
 }

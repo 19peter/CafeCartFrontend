@@ -65,7 +65,7 @@ Tokens are stored in a private `memoryStore` object. This provides high-grade se
 ### Session Recovery Logic
 The `checkAuthenticated` helper manages the recovery flow:
 1.  **Check Memory**: If a token exists, validate it.
-2.  **Silent Refresh**: If memory is empty, attempt to call the refresh endpoint. The browser automatically sends the HTTP-only refresh cookie.
+2.  **Silent Refresh**: If memory is empty, attempt to call the **role-specific refresh endpoint** (e.g., `/auth/refresh-token/shop`). The browser automatically sends the corresponding unique cookie (e.g., `shop_refreshToken`).
 3.  **Update Memory**: If the refresh is successful, the new access token is saved back into the `memoryStore`.
 
 ### `authFetch` & Role Awareness

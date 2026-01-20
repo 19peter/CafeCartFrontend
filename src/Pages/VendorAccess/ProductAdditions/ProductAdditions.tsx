@@ -6,50 +6,69 @@ import {
     Hash,
     DollarSign,
     Save,
-    X
+    X,
+    Trash2,
+    ChevronDown,
+    ChevronUp
 } from "lucide-react";
 import styles from "./ProductAdditions.module.css";
 import {
     getAdditionGroups,
-    getAdditions,
-    addAdditionGroup,
-    addAddition,
+    createAdditionGroup,
     updateAdditionGroup,
+    deleteAdditionGroup,
+    getAdditionsByGroup,
+    createAddition,
     updateAddition,
+    deleteAddition,
     type Addition,
     type AdditionGroup
-} from "../../../services/vendorsService";
+} from "../../../services/additionsService";
 import { useNotification } from "../../../contexts/NotificationContext";
+
+interface GroupWithAdditions extends AdditionGroup {
+    additions: Addition[];
+    isExpanded?: boolean;
+}
 
 export const ProductAdditions = () => {
     const { showSuccess, showError } = useNotification();
 
     // State for data
-    const [groups, setGroups] = useState<AdditionGroup[]>([]);
-    const [additions, setAdditions] = useState<Addition[]>([]);
+    const [groups, setGroups] = useState<GroupWithAdditions[]>([]);
+    const [loading, setLoading] = useState(true);
 
     // State for Group Form
-    const [groupForm, setGroupForm] = useState({ name: "" });
+    const [groupForm, setGroupForm] = useState({ name: "", maxSelectable: 1 });
     const [editingGroupId, setEditingGroupId] = useState<number | null>(null);
 
     // State for Addition Form
-    const [additionForm, setAdditionForm] = useState({ name: "", price: 0, groupIds: [] as number[] });
+    const [additionForm, setAdditionForm] = useState({ name: "", price: 0 });
     const [editingAdditionId, setEditingAdditionId] = useState<number | null>(null);
+    const [activeGroupId, setActiveGroupId] = useState<number | null>(null);
 
     useEffect(() => {
-        fetchData();
+        fetchGroups();
     }, []);
 
-    const fetchData = async () => {
+    const fetchGroups = async () => {
         try {
-            const [groupsRes, additionsRes] = await Promise.all([
-                getAdditionGroups(),
-                getAdditions()
-            ]);
-            setGroups(groupsRes.data || []);
-            setAdditions(additionsRes.data || []);
+            setLoading(true);
+            const res = await getAdditionGroups();
+            const groupsData: AdditionGroup[] = res.data || [];
+
+            // Fetch additions for each group
+            const groupsWithAdditions = await Promise.all(groupsData.map(async (group) => {
+                const addRes = await getAdditionsByGroup(group.id);
+                return { ...group, additions: addRes.data || [], isExpanded: true };
+            }));
+
+            setGroups(groupsWithAdditions);
         } catch (error) {
             console.error("Error fetching additions data:", error);
+            showError("Failed to fetch customizations");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -61,15 +80,15 @@ export const ProductAdditions = () => {
 
         try {
             if (editingGroupId) {
-                await updateAdditionGroup({ id: editingGroupId, name: groupForm.name, vendorId: 0 });
+                await updateAdditionGroup(editingGroupId, groupForm.name, groupForm.maxSelectable);
                 showSuccess("Group updated successfully");
             } else {
-                await addAdditionGroup(groupForm);
+                await createAdditionGroup(groupForm.name, groupForm.maxSelectable);
                 showSuccess("Group added successfully");
             }
-            setGroupForm({ name: "" });
+            setGroupForm({ name: "", maxSelectable: 1 });
             setEditingGroupId(null);
-            fetchData();
+            fetchGroups();
         } catch (error) {
             showError("Failed to save group");
         }
@@ -77,74 +96,108 @@ export const ProductAdditions = () => {
 
     const handleEditGroup = (group: AdditionGroup) => {
         setEditingGroupId(group.id);
-        setGroupForm({ name: group.name });
+        setGroupForm({ name: group.name, maxSelectable: group.maxSelectable || 1 });
+    };
+
+    const handleDeleteGroup = async (id: number) => {
+        if (!confirm("Are you sure? This will delete the group and ALL its additions across all shops.")) return;
+        try {
+            await deleteAdditionGroup(id);
+            showSuccess("Group deleted successfully");
+            fetchGroups();
+        } catch (error) {
+            showError("Failed to delete group");
+        }
+    };
+
+    const toggleGroupExpand = (groupId: number) => {
+        setGroups(prev => prev.map(g => g.id === groupId ? { ...g, isExpanded: !g.isExpanded } : g));
     };
 
     /* ---------------- Addition Handlers ---------------- */
 
     const handleAdditionSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!additionForm.name) return;
+        if (!additionForm.name || activeGroupId === null) return;
 
         try {
             if (editingAdditionId) {
-                await updateAddition({ id: editingAdditionId, ...additionForm });
+                await updateAddition(editingAdditionId, additionForm);
                 showSuccess("Addition updated successfully");
             } else {
-                await addAddition(additionForm);
+                await createAddition(activeGroupId, additionForm);
                 showSuccess("Addition added successfully");
             }
-            setAdditionForm({ name: "", price: 0, groupIds: [] });
-            setEditingAdditionId(null);
-            fetchData();
+            resetAdditionForm();
+            fetchGroups();
         } catch (error) {
             showError("Failed to save addition");
         }
     };
 
-    const handleEditAddition = (addition: Addition) => {
+    const handleEditAddition = (groupId: number, addition: Addition) => {
+        setActiveGroupId(groupId);
         setEditingAdditionId(addition.id);
         setAdditionForm({
             name: addition.name,
-            price: addition.price,
-            groupIds: addition.groupIds || []
+            price: addition.price
         });
     };
 
-    const toggleGroupInAddition = (groupId: number) => {
-        setAdditionForm(prev => {
-            const isSelected = prev.groupIds.includes(groupId);
-            if (isSelected) {
-                return { ...prev, groupIds: prev.groupIds.filter(id => id !== groupId) };
-            } else {
-                return { ...prev, groupIds: [...prev.groupIds, groupId] };
-            }
-        });
+    const handleDeleteAddition = async (id: number) => {
+        if (!confirm("Delete this addition? It will be removed from all shops.")) return;
+        try {
+            await deleteAddition(id);
+            showSuccess("Addition deleted");
+            fetchGroups();
+        } catch (error) {
+            showError("Failed to delete addition");
+        }
+    };
+
+    const resetAdditionForm = () => {
+        setAdditionForm({ name: "", price: 0 });
+        setEditingAdditionId(null);
+        setActiveGroupId(null);
     };
 
     return (
         <div className={styles.additionsContainer}>
-            {/* Addition Groups Section */}
+            {/* Addition Groups Management */}
             <div className={styles.section}>
                 <h2 className={styles.sectionTitle}>
                     <Layers size={24} />
-                    Addition Groups
+                    Customization Groups
                 </h2>
 
                 <form className={styles.form} onSubmit={handleGroupSubmit}>
                     <h3>{editingGroupId ? "Edit Group" : "Create New Group"}</h3>
-                    <div className={styles.inputGroup}>
-                        <label>Group Name</label>
-                        <div className={styles.inputWrapper}>
-                            <Hash className={styles.inputIcon} size={18} />
-                            <input
-                                value={groupForm.name}
-                                onChange={e => setGroupForm({ name: e.target.value })}
-                                placeholder="e.g. Extra Toppings"
-                            />
+                    <div className={styles.inputRow}>
+                        <div className={styles.inputGroup} style={{ flex: 3 }}>
+                            <label>Group Name</label>
+                            <div className={styles.inputWrapper}>
+                                <Hash className={styles.inputIcon} size={18} />
+                                <input
+                                    value={groupForm.name}
+                                    onChange={e => setGroupForm({ ...groupForm, name: e.target.value })}
+                                    placeholder="e.g. Extra Toppings"
+                                />
+                            </div>
+                        </div>
+                        <div className={styles.inputGroup} style={{ flex: 1 }}>
+                            <label>Max Selectable</label>
+                            <div className={styles.inputWrapper}>
+                                <PlusCircle className={styles.inputIcon} size={18} />
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={groupForm.maxSelectable}
+                                    onChange={e => setGroupForm({ ...groupForm, maxSelectable: parseInt(e.target.value) || 1 })}
+                                />
+                            </div>
                         </div>
                     </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                    <div className={styles.formActions}>
                         <button type="submit" className={styles.submitBtn}>
                             {editingGroupId ? <Save size={18} /> : <PlusCircle size={18} />}
                             {editingGroupId ? "Update Group" : "Add Group"}
@@ -153,7 +206,7 @@ export const ProductAdditions = () => {
                             <button
                                 type="button"
                                 className={styles.cancelBtn}
-                                onClick={() => { setEditingGroupId(null); setGroupForm({ name: "" }); }}
+                                onClick={() => { setEditingGroupId(null); setGroupForm({ name: "", maxSelectable: 1 }); }}
                             >
                                 <X size={18} />
                             </button>
@@ -161,113 +214,106 @@ export const ProductAdditions = () => {
                     </div>
                 </form>
 
-                <div className={styles.list}>
-                    {groups.map(group => (
-                        <div key={group.id} className={styles.listItem}>
-                            <div className={styles.itemInfo}>
-                                <h4>{group.name}</h4>
-                            </div>
-                            <div className={styles.actions}>
-                                <button className={styles.editBtn} onClick={() => handleEditGroup(group)}>
-                                    <PencilLine size={16} />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                    {groups.length === 0 && <p style={{ color: '#64748b', textAlign: 'center' }}>No groups created yet</p>}
-                </div>
-            </div>
-
-            {/* Additions Section */}
-            <div className={styles.section}>
-                <h2 className={styles.sectionTitle}>
-                    <PlusCircle size={24} />
-                    Individual Additions
-                </h2>
-
-                <form className={styles.form} onSubmit={handleAdditionSubmit}>
-                    <h3>{editingAdditionId ? "Edit Addition" : "Create New Addition"}</h3>
-                    <div className={styles.inputGroup}>
-                        <label>Addition Name</label>
-                        <div className={styles.inputWrapper}>
-                            <Hash className={styles.inputIcon} size={18} />
-                            <input
-                                value={additionForm.name}
-                                onChange={e => setAdditionForm({ ...additionForm, name: e.target.value })}
-                                placeholder="e.g. Extra Cheese"
-                            />
-                        </div>
-                    </div>
-                    <div className={styles.inputGroup}>
-                        <label>Price (EGP)</label>
-                        <div className={styles.inputWrapper}>
-                            <DollarSign className={styles.inputIcon} size={18} />
-                            <input
-                                type="number"
-                                step="0.5"
-                                value={additionForm.price}
-                                onChange={e => setAdditionForm({ ...additionForm, price: parseFloat(e.target.value) || 0 })}
-                                placeholder="0.00"
-                            />
-                        </div>
-                    </div>
-                    <div className={styles.inputGroup}>
-                        <label>Assign to Groups</label>
-                        <div className={styles.checkboxList}>
-                            {groups.map(group => (
-                                <label key={group.id} className={styles.checkboxItem}>
-                                    <input
-                                        type="checkbox"
-                                        checked={additionForm.groupIds.includes(group.id)}
-                                        onChange={() => toggleGroupInAddition(group.id)}
-                                    />
-                                    {group.name}
-                                </label>
-                            ))}
-                            {groups.length === 0 && <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Create a group first</span>}
-                        </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem' }}>
-                        <button type="submit" className={styles.submitBtn}>
-                            {editingAdditionId ? <Save size={18} /> : <PlusCircle size={18} />}
-                            {editingAdditionId ? "Update Addition" : "Add Addition"}
-                        </button>
-                        {editingAdditionId && (
-                            <button
-                                type="button"
-                                className={styles.cancelBtn}
-                                onClick={() => {
-                                    setEditingAdditionId(null);
-                                    setAdditionForm({ name: "", price: 0, groupIds: [] });
-                                }}
-                            >
-                                <X size={18} />
-                            </button>
-                        )}
-                    </div>
-                </form>
-
-                <div className={styles.list}>
-                    {additions.map(addition => (
-                        <div key={addition.id} className={styles.listItem}>
-                            <div className={styles.itemInfo}>
-                                <h4>{addition.name}</h4>
-                                <p>${addition.price.toFixed(2)}</p>
-                                <div className={styles.itemBadges}>
-                                    {addition.groupIds.map(gid => {
-                                        const group = groups.find(g => g.id === gid);
-                                        return group ? <span key={gid} className={styles.badge}>{group.name}</span> : null;
-                                    })}
+                <div className={styles.groupsAccordion}>
+                    {loading ? (
+                        <p className={styles.loadingText}>Loading customizations...</p>
+                    ) : (
+                        groups.map(group => (
+                            <div key={group.id} className={`${styles.accordionItem} ${group.isExpanded ? styles.expanded : ""}`}>
+                                <div className={styles.groupHeader}>
+                                    <div className={styles.groupMainInfo} onClick={() => toggleGroupExpand(group.id)}>
+                                        {group.isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                                        <h4>{group.name}</h4>
+                                        <span className={styles.countBadge}>{group.additions.length} additions</span>
+                                        <span className={styles.maxBadge}>Max: {group.maxSelectable}</span>
+                                    </div>
+                                    <div className={styles.groupActions}>
+                                        <button className={styles.editBtn} onClick={(e) => { e.stopPropagation(); handleEditGroup(group); }}>
+                                            <PencilLine size={16} />
+                                        </button>
+                                        <button className={styles.deleteBtn} onClick={(e) => { e.stopPropagation(); handleDeleteGroup(group.id); }}>
+                                            <Trash2 size={16} />
+                                        </button>
+                                        <button
+                                            className={styles.addBtn}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setActiveGroupId(group.id);
+                                                setEditingAdditionId(null);
+                                                setAdditionForm({ name: "", price: 0 });
+                                            }}
+                                        >
+                                            <PlusCircle size={16} />
+                                            Add
+                                        </button>
+                                    </div>
                                 </div>
+
+                                {group.isExpanded && (
+                                    <div className={styles.groupContent}>
+                                        {/* Nested Addition Form */}
+                                        {(activeGroupId === group.id) && (
+                                            <form className={styles.nestedForm} onSubmit={handleAdditionSubmit}>
+                                                <div className={styles.nestedInputRow}>
+                                                    <div className={styles.inputWrapper}>
+                                                        <Hash size={14} className={styles.inputIcon} />
+                                                        <input
+                                                            placeholder="Addition name"
+                                                            value={additionForm.name}
+                                                            onChange={e => setAdditionForm({ ...additionForm, name: e.target.value })}
+                                                        />
+                                                    </div>
+                                                    <div className={styles.inputWrapper}>
+                                                        <DollarSign size={14} className={styles.inputIcon} />
+                                                        <input
+                                                            type="number"
+                                                            placeholder="Price"
+                                                            step="0.5"
+                                                            value={additionForm.price}
+                                                            onChange={e => setAdditionForm({ ...additionForm, price: parseFloat(e.target.value) || 0 })}
+                                                        />
+                                                    </div>
+                                                    <button type="submit" className={styles.saveBtn}>
+                                                        <Save size={14} />
+                                                    </button>
+                                                    <button type="button" className={styles.cancelBtn} onClick={resetAdditionForm}>
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        )}
+
+                                        <div className={styles.additionsList}>
+                                            {group.additions.map(addition => (
+                                                <div key={addition.id} className={styles.additionItem}>
+                                                    <div className={styles.additionInfo}>
+                                                        <span className={styles.additionName}>{addition.name}</span>
+                                                        <span className={styles.additionPrice}>+{addition.price.toFixed(2)} EGP</span>
+                                                    </div>
+                                                    <div className={styles.additionActions}>
+                                                        <button className={styles.miniBtn} onClick={() => handleEditAddition(group.id, addition)}>
+                                                            <PencilLine size={14} />
+                                                        </button>
+                                                        <button className={styles.miniBtnDanger} onClick={() => handleDeleteAddition(addition.id)}>
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {group.additions.length === 0 && !activeGroupId && (
+                                                <p className={styles.emptyAdditions}>No additions in this group.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <div className={styles.actions}>
-                                <button className={styles.editBtn} onClick={() => handleEditAddition(addition)}>
-                                    <PencilLine size={16} />
-                                </button>
-                            </div>
+                        ))
+                    )}
+                    {!loading && groups.length === 0 && (
+                        <div className={styles.emptyState}>
+                            <p>No customization groups created yet.</p>
                         </div>
-                    ))}
-                    {additions.length === 0 && <p style={{ color: '#64748b', textAlign: 'center' }}>No additions created yet</p>}
+                    )}
                 </div>
             </div>
         </div>
