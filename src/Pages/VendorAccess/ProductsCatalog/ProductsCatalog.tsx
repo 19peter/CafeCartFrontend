@@ -154,7 +154,6 @@ export const ProductsCatalog = () => {
           hasDefaultSize: form.hasDefaultSize,
         },
       };
-
       const res = editingId
         ? await updateProduct({ ...payload, id: auxData.productId })
         : await createProduct(payload);

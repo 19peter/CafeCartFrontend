@@ -33,7 +33,10 @@ export const ProductDetail = () => {
       const data = await getVendorProduct({ vendorShopId: Number(vendorShopId), productId: Number(productId) });
       setProductDetails(data);
       if (data && data.options && data.options.length > 0) {
-        setSelectedSize(data.options[0].size);
+        const firstAvailable = data.options.find((o: any) => !o.isDeleted);
+        if (firstAvailable) {
+          setSelectedSize({ id: firstAvailable.id!, size: firstAvailable.size });
+        }
       }
       setIsLoading(false);
 

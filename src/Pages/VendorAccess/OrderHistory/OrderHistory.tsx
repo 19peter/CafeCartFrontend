@@ -7,7 +7,7 @@ import styles from "./OrderHistory.module.css";
 import type { SalesSummary } from "../../../shared/types/orders/SalesSummary";
 import { getSaleSummaryByMonth } from "../../../services/ordersService";
 
-export const OrderHistory = () => {
+export const OrderHistory = ({ vendorName }: { vendorName: string }) => {
 
     const [orders, setOrders] = useState<ShopOrder[]>([]);
     const [page, setPage] = useState(0);
@@ -51,7 +51,7 @@ export const OrderHistory = () => {
 
     const fetchVendorShops = async () => {
         try {
-            const res = await getVendorShopsByVendorId("trove");
+            const res = await getVendorShopsByVendorId(vendorName);
             setShops(res);
             setShopId(res[0].id);
         } catch (error) {

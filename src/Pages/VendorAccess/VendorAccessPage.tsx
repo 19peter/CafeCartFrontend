@@ -47,7 +47,7 @@ export const VendorAccessPage = () => {
                 options={["Products", "Orders", "Shops", "Additions"]}
             />
             {selected === "Products" && <ProductsCatalog />}
-            {selected === "Orders" && <OrderHistory />}
+            {selected === "Orders" && <OrderHistory vendorName={vendorDetails.name} />}
             {selected === "Shops" && <ShopManagement vendorId={vendorDetails.id} />}
             {selected === "Additions" && <ProductAdditions />}
         </div>
