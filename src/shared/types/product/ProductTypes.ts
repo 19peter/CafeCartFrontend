@@ -14,6 +14,19 @@ export interface ProductOption {
   isDeleted?: boolean | null;
 }
 
+export interface Addition {
+  id: number;
+  name: string;
+  price: number;
+}
+
+export interface AdditionGroup {
+  id: number;
+  name: string;
+  maxSelectable: number;
+  additions: Addition[];
+}
+
 export interface Product {
   id: number;
   vendorShopId: number;
@@ -27,7 +40,7 @@ export interface Product {
   isStockTracked: boolean;
   isAvailable: boolean;
   additionGroupIds: number[];
-  additionGroups?: { id: number; name: string }[];
+  additionGroups?: AdditionGroup[];
   options: ProductOption[];
   hasDefaultSize?: boolean; // Optional in case backend doesn't send it at top level
 }
