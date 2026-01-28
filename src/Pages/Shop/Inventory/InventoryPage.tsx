@@ -176,9 +176,9 @@ export const InventoryPage = () => {
 
 
                   <div className={styles.productFooter}>
-                    <span className={styles.productPrice}>
+                    {/* <span className={styles.productPrice}>
                       ${p.price}
-                    </span>
+                    </span> */}
 
                     <div>
                       {p.isAvailable && (
