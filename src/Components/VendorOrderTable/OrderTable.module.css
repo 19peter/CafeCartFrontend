@@ -213,10 +213,41 @@
   gap: 0.75rem;
 }
 
+.orderItemWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 .orderItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.additionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-left: 1.5rem;
+}
+
+.additionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+.additionName {
+  font-weight: 500;
+}
+
+.additionPrice {
+  font-size: 0.75rem;
+  opacity: 0.8;
 }
 
 .itemName {

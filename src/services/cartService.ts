@@ -13,21 +13,21 @@ export const getShopName = async (): Promise<{ status: number, message: string, 
 };
 
 // POST /cart/add-to-cart
-export const addToCart = async ({ shopId, quantity, productOptionId }: { shopId: number; quantity: number; productOptionId?: number }): Promise<{ status: number, message: string, data: any }> => {
-  const res = await authFetch(`/cart/add-to-cart`, 'POST', { shopId, quantity, productOptionId }, true);
+export const addToCart = async ({ shopId, quantity, productOptionId, additionsIds }: { shopId: number; quantity: number; productOptionId?: number; additionsIds?: number[] }): Promise<{ status: number, message: string, data: any }> => {
+  const res = await authFetch(`/cart/add-to-cart`, 'POST', { shopId, quantity, productOptionId, additionsIds }, true);
   return res;
 };
 
 // POST /cart/remove-from-cart
-export const removeFromCart = async ({ productId, quantity }: { productId: number; quantity: number }): Promise<{ status: number, message: string, data: any }> => {
-  const res = await authFetch(`/cart/remove-from-cart`, 'POST', { productId, quantity }, true);
+export const removeFromCart = async ({ productOptionId, quantity }: { productOptionId: number; quantity: number }): Promise<{ status: number, message: string, data: any }> => {
+  const res = await authFetch(`/cart/remove-from-cart`, 'POST', { productOptionId, quantity }, true);
   return res;
 };
 
 
 // POST /cart/add-one-to-cart
-export const addOneToCart = async ({ productId, shopId }: { productId: number; shopId: number; }): Promise<{ status: number, message: string, data: any }> => {
-  const res = await authFetch(`/cart/add-one-to-cart`, 'POST', { productId, shopId, quantity: 1 }, true);
+export const addOneToCart = async ({ cartItemId }: { cartItemId: number; }): Promise<{ status: number, message: string, data: any }> => {
+  const res = await authFetch(`/cart/add-one-to-cart`, 'POST', { cartItemId }, true);
   return res;
 };
 

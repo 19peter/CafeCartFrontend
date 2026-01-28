@@ -8,7 +8,7 @@ import type { BasicCustomerInfo } from "../../../shared/types/customer/CustomerT
 import { blockUser, getBlockedCustomers, unblockUser } from "../../../services/vendorShopsService";
 import { useNotification } from "../../../hooks/useNotification";
 import BlockedCustomersModal from "../../../Components/BlockedUserModal/BlockedUserModal";
-import { Calendar, Filter, RefreshCw, ShoppingBag, ChevronLeft, ChevronRight } from "lucide-react";
+import { Calendar, Filter, RefreshCw, ShoppingBag, ChevronLeft, ChevronRight, ArrowUpDown } from "lucide-react";
 
 export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNewOrder: (value: boolean) => void }) => {
   const { showError, showSuccess } = useNotification();
@@ -17,6 +17,7 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
   const [blockedCustomers, setBlockedCustomers] = useState<BasicCustomerInfo[]>([]);
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [pinnedOrders, setPinnedOrders] = useState<Set<string>>(new Set());
+  const [sortOrder, setSortOrder] = useState<'DESC' | 'ASC'>('DESC');
 
   const [selectedDate, setSelectedDate] = useState(() => {
     const cairoDate = new Intl.DateTimeFormat("en-CA", {
@@ -98,7 +99,17 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
 
   const pinned = filtered.filter(o => pinnedOrders.has(o.orderNumber));
   const unpinned = filtered.filter(o => !pinnedOrders.has(o.orderNumber));
-  const ordered = [...pinned, ...unpinned];
+
+  const sortByDate = (a: ShopOrder, b: ShopOrder) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return sortOrder === 'DESC' ? dateB - dateA : dateA - dateB;
+  };
+
+  const ordered = [
+    ...pinned.sort(sortByDate),
+    ...unpinned.sort(sortByDate)
+  ];
 
   return (
     <motion.div
@@ -130,6 +141,19 @@ export const OrdersPage = ({ newOrder, setNewOrder }: { newOrder: boolean, setNe
                 <option value="OUT_FOR_DELIVERY">Out for Delivery</option>
                 <option value="DELIVERED">Delivered</option>
                 <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+
+            <div className={styles.filterField}>
+              <ArrowUpDown size={18} className={styles.icon} />
+              <label>Sort</label>
+              <select
+                className={styles.selectStyled}
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value as 'DESC' | 'ASC')}
+              >
+                <option value="DESC">Latest First</option>
+                <option value="ASC">Oldest First</option>
               </select>
             </div>
 

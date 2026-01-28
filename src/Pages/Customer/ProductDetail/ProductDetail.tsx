@@ -112,11 +112,13 @@ export const ProductDetail = () => {
     }
     if (!productDetails || (productDetails.isStockTracked && productDetails.quantity === 0)) return;
 
-    // Note: additionIds are not yet handled by cartService as per instructions
+    const additionsIds = Object.values(selectedAdditions).flat();
+
     const res: { status: number; message: string } = await addToCart({
       shopId: Number(vendorShopId),
       quantity,
       productOptionId: selectedSize?.id,
+      additionsIds,
     });
 
     if (res.status !== 200) {

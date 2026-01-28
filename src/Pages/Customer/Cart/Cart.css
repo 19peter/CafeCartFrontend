@@ -164,20 +164,44 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.item-details {
-  flex: 1;
-}
-
 .item-name {
   font-size: 1.1rem;
   margin: 0 0 0.5rem 0;
   color: #333;
 }
 
+.item-base-price {
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: normal;
+  margin-left: 4px;
+}
+
+.item-details {
+  flex: 1;
+}
+
 .item-price {
   margin: 0;
   color: #666;
   font-size: 0.95rem;
+}
+
+.item-additions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0.4rem 0 0.6rem 0;
+}
+
+.addition-badge {
+  background-color: var(--color-background-soft, #f8f9fa);
+  color: #666;
+  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  display: inline-block;
 }
 
 .item-actions {

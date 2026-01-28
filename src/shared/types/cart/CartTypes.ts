@@ -1,3 +1,8 @@
+export interface OrderItemAddition {
+  id: number;
+  name: string;
+  price: number;
+}
 
 export interface OrderItem {
   id: number;
@@ -7,6 +12,8 @@ export interface OrderItem {
   unitPrice: number;
   productName: string;
   productImage: string;
+  additions: OrderItemAddition[];
+  productOptionId: number;
 }
 
 export interface OrderSummary {

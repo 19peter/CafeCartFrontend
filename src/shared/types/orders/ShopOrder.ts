@@ -22,6 +22,14 @@ export type OrderItem = {
     name: string;
     quantity: number;
     price: number;
+    additions?: OrderItemAddition[];
+}
+
+export type OrderItemAddition = {
+    id: number;
+    additionId: number;
+    name: string;
+    price: number;
 }
 
 type paymentMethod = "CASH" | "CREDIT_CARD";

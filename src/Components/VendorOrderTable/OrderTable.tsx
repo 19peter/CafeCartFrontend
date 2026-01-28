@@ -139,13 +139,25 @@ export const OrdersTable = ({ order, isCustomerBlocked, handleBlockUser, handleU
                             <h4>Order Summary</h4>
                             <ul className={styles.itemsList}>
                                 {tableOrder.items.map((item: OrderItem, i: number) => (
-                                    <li key={i} className={styles.orderItem}>
-                                        <div className={styles.itemName}>
-                                            {item.quantity}x {item.name}
+                                    <li key={i} className={styles.orderItemWrapper}>
+                                        <div className={styles.orderItem}>
+                                            <div className={styles.itemName}>
+                                                {item.quantity}x {item.name}
+                                            </div>
+                                            <div className={styles.itemPrice}>
+                                                {(item.price * item.quantity).toFixed(2)} EGP
+                                            </div>
                                         </div>
-                                        <div className={styles.itemPrice}>
-                                            {(item.price * item.quantity).toFixed(2)} EGP
-                                        </div>
+                                        {item.additions && item.additions.length > 0 && (
+                                            <div className={styles.additionsList}>
+                                                {item.additions.map((addition) => (
+                                                    <div key={addition.id} className={styles.additionItem}>
+                                                        <span className={styles.additionName}>+ {addition.name}</span>
+                                                        <span className={styles.additionPrice}>{addition.price.toFixed(2)} EGP</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </li>
                                 ))}
                             </ul>

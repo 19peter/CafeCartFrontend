@@ -117,8 +117,8 @@ const Cart = () => {
     setLocationError(null);
   };
 
-  const handleAddOneToCart = async (id: number, shopId: number, cartItemId: number) => {
-    const res = await addOneToCart({ productId: id, shopId });
+  const handleAddOneToCart = async (cartItemId: number) => {
+    const res = await addOneToCart({ cartItemId });
     if (res.status !== 200) {
       showError(res.message);
       return;
@@ -343,8 +343,19 @@ const Cart = () => {
 
                 <CartItem key={item.id}>
                   <div className="item-details">
-                    <h3 className="item-name">{item.productName}</h3>
-                    <p className="item-price">${item.unitPrice.toFixed(2)} each</p>
+                    <h3 className="item-name">
+                      {item.productName}
+                      <span className="item-base-price"> ({formatCurrency(item.unitPrice)})</span>
+                    </h3>
+                    {item.additions && item.additions.length > 0 && (
+                      <div className="item-additions">
+                        {item.additions.map((addition) => (
+                          <span key={addition.id} className="addition-badge">
+                            + {addition.name} ({formatCurrency(addition.price)})
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="item-actions">
                     <button
@@ -357,8 +368,6 @@ const Cart = () => {
                     <span className="quantity">{item.quantity}</span>
                     <button
                       onClick={() => handleAddOneToCart(
-                        item.productId,
-                        cartSummary!.shopId,
                         item.id)}
 
                       className="quantity-btn"
@@ -367,7 +376,7 @@ const Cart = () => {
                       +
                     </button>
                     <span className="item-total">
-                      ${(item.unitPrice * item.quantity).toFixed(2)}
+                      {formatCurrency((item.unitPrice + (item.additions?.reduce((acc, a) => acc + a.price, 0) || 0)) * item.quantity)}
                     </span>
 
                     <button
