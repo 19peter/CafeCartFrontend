@@ -110,7 +110,9 @@ export const ProductDetail = () => {
       setOpenAuthModal(true);
       return;
     }
-    if (!productDetails || (productDetails.isStockTracked && productDetails.quantity === 0)) return;
+
+    const isOutOfStock = !productDetails?.isAvailable || (productDetails?.isStockTracked && productDetails?.quantity === 0);
+    if (!productDetails || isOutOfStock) return;
 
     const additionsIds = Object.values(selectedAdditions).flat();
 
@@ -178,7 +180,7 @@ export const ProductDetail = () => {
             <span className={styles.category}>{productDetails.categoryName}</span>
             <h1 className={styles.productName}>{productDetails.name}</h1>
             <div className={styles.stockStatus}>
-              {productDetails.isAvailable ? (
+              {productDetails.isAvailable && (!productDetails.isStockTracked || productDetails.quantity > 0) ? (
                 <span className={`${styles.stockBadge} ${styles.inStock}`}>
                   ● In Stock {productDetails.isStockTracked && `(${productDetails.quantity})`}
                 </span>
@@ -235,35 +237,40 @@ export const ProductDetail = () => {
             </div>
 
             <div className={styles.actionSection}>
-              <div className={styles.quantityAndAdd}>
-                <div className={styles.quantitySelector}>
+              {productDetails.isAvailable && (!productDetails.isStockTracked || productDetails.quantity > 0) ? (
+                <div className={styles.quantityAndAdd}>
+                  <div className={styles.quantitySelector}>
+                    <button
+                      onClick={decreaseQuantity}
+                      className={styles.quantityButton}
+                      disabled={quantity <= 1}
+                      aria-label="Decrease quantity"
+                    >
+                      −
+                    </button>
+                    <span className={styles.quantity}>{quantity}</span>
+                    <button
+                      onClick={increaseQuantity}
+                      className={styles.quantityButton}
+                      disabled={productDetails.isStockTracked && quantity >= productDetails.quantity}
+                      aria-label="Increase quantity"
+                    >
+                      +
+                    </button>
+                  </div>
+
                   <button
-                    onClick={decreaseQuantity}
-                    className={styles.quantityButton}
-                    disabled={quantity <= 1}
-                    aria-label="Decrease quantity"
+                    onClick={handleAddToCart}
+                    className={styles.addToCartButton}
                   >
-                    −
-                  </button>
-                  <span className={styles.quantity}>{quantity}</span>
-                  <button
-                    onClick={increaseQuantity}
-                    className={styles.quantityButton}
-                    disabled={productDetails.isStockTracked && quantity >= productDetails.quantity}
-                    aria-label="Increase quantity"
-                  >
-                    +
+                    Add to Cart
                   </button>
                 </div>
-
-                <button
-                  onClick={handleAddToCart}
-                  className={styles.addToCartButton}
-                  disabled={!productDetails.isAvailable}
-                >
-                  {productDetails.isAvailable ? 'Add to Cart' : 'Out of Stock'}
-                </button>
-              </div>
+              ) : (
+                <div className={styles.outOfStockMessage}>
+                  This product is currently unavailable
+                </div>
+              )}
             </div>
           </div>
         </div>
