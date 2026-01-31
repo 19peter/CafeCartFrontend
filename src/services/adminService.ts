@@ -86,5 +86,19 @@ export const adminService = {
             return response.data;
         }
         throw new Error(response.message || 'Failed to add category');
+    },
+
+    activateVendor: async (vendorId: number): Promise<void> => {
+        const response = await authFetch(`/vendors/admin/activate/${vendorId}`, 'POST', null);
+        if (response.status !== 200 && response.status !== 201) {
+            throw new Error(response.message || 'Failed to activate vendor');
+        }
+    },
+
+    deactivateVendor: async (vendorId: number): Promise<void> => {
+        const response = await authFetch(`/vendors/admin/deactivate/${vendorId}`, 'POST', null);
+        if (response.status !== 200 && response.status !== 201) {
+            throw new Error(response.message || 'Failed to deactivate vendor');
+        }
     }
 };

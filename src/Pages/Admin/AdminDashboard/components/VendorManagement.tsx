@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { adminService, type Vendor } from '../../../../services/adminService';
 import styles from '../AdminDashboard.module.css';
-import { UserPlus, Mail, Phone, Calendar as CalendarIcon, Users, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { UserPlus, Mail, Phone, Calendar as CalendarIcon, Users, Image as ImageIcon, Loader2, Power, PowerOff } from 'lucide-react';
 import { uploadToS3 } from '../../../../services/S3Service';
 
 export const VendorManagement = () => {
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState<number | null>(null);
     const [showAddForm, setShowAddForm] = useState(false);
     const [newVendor, setNewVendor] = useState({ name: '', email: '', phoneNumber: '', vaaPassword: '', vaaEmail: '' });
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -58,6 +59,23 @@ export const VendorManagement = () => {
             alert('Failed to add vendor. Please try again.');
         } finally {
             setUploading(false);
+        }
+    };
+
+    const handleToggleStatus = async (vendorId: number, currentStatus: boolean) => {
+        try {
+            setActionLoading(vendorId);
+            if (currentStatus) {
+                await adminService.deactivateVendor(vendorId);
+            } else {
+                await adminService.activateVendor(vendorId);
+            }
+            await loadVendors();
+        } catch (error) {
+            console.error('Error toggling vendor status:', error);
+            alert('Failed to update vendor status.');
+        } finally {
+            setActionLoading(null);
         }
     };
 
@@ -163,6 +181,7 @@ export const VendorManagement = () => {
                                 <th>Status</th>
                                 <th>Total Shops</th>
                                 <th>Created At</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -199,6 +218,22 @@ export const VendorManagement = () => {
                                         <div className={styles.dateCell}>
                                             <CalendarIcon size={14} /> {new Date(vendor.createdAt).toLocaleDateString()}
                                         </div>
+                                    </td>
+                                    <td>
+                                        <button
+                                            className={`${styles.actionBtn} ${vendor.isActive ? styles.deactivateBtn : styles.activateBtn}`}
+                                            onClick={() => handleToggleStatus(vendor.id, vendor.isActive)}
+                                            disabled={actionLoading === vendor.id}
+                                        >
+                                            {actionLoading === vendor.id ? (
+                                                <Loader2 className={styles.spinner} size={14} />
+                                            ) : vendor.isActive ? (
+                                                <PowerOff size={14} style={{ marginRight: '4px' }} />
+                                            ) : (
+                                                <Power size={14} style={{ marginRight: '4px' }} />
+                                            )}
+                                            {vendor.isActive ? 'Deactivate' : 'Activate'}
+                                        </button>
                                     </td>
                                 </tr>
                             ))}

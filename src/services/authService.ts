@@ -91,7 +91,7 @@ const getCurrentRoleHelpers = () => {
   const hostname = window.location.hostname;
   if (hostname.includes("shop")) return { get: getShopToken, refresh: refreshTokenShop };
   if (hostname.includes("vendor")) return { get: getVendorToken, refresh: refreshTokenVendor };
-  if (hostname.includes("admin")) return { get: getAdminToken, refresh: () => Promise.resolve("") };
+  if (hostname.includes("admin")) return { get: getAdminToken, refresh: refreshTokenAdmin };
   return { get: getAuthToken, refresh: refreshToken };
 };
 
